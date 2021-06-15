@@ -1,0 +1,79 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^false\(unreach-call\)$
+; state vars
+(declare-fun b@e.c-p-7 () (_ BitVec 64)) 
+(declare-fun b@e.c-p-7+ () (_ BitVec 64)) 
+(define-fun d () (_ BitVec 4) (! b@e.c-p-7 :next b@e.c-p-7+     ) ) 
+(declare-fun at-b@k.f () Bool) 
+(declare-fun at-b@k.f+ () Bool) 
+(define-fun h () Bool (! at-b@k.f :next at-b@k.f+))  
+(declare-fun at-b@e.c () Bool)  
+(define-fun g () Bool (! at-b@e.c :next c))         
+(declare-fun b@e.c-p-12 () (Array (_ BitVec 64) (_ BitVec 64))) 
+(declare-fun b@e.c-p-12+ () (Array (_ BitVec 64) (_ BitVec 64))) 
+(define-fun i () (Array (_ BitVec 4) (_ BitVec 4)) (! b@e.c-p-12 :next b@e.c-p-12+                               )  ) 
+; inputs
+(declare-fun q-11 () Bool) 
+(declare-fun bool-input-31 () Bool)      
+(declare-fun m-input-19 () (_ BitVec 64))    
+(declare-fun m-input-20 () (_ BitVec 64  )  ) 
+(declare-fun m-input-18 () (_ BitVec 64))       
+(declare-fun arr-m-m-input-9 () (Array (_ BitVec 64) (_ BitVec 64)))         
+(declare-fun arr-m-m-input-4 () (Array (_ BitVec 64) (_ BitVec 64)   ) )       
+(declare-fun arr-m-m-input-17 () (Array (_ BitVec 64) (_ BitVec 64)))                         
+(declare-fun arr-m-m-input-81 () (Array (_ BitVec 64) (_ BitVec 64)))   
+(declare-fun q () Bool)   
+(declare-fun b () Bool)        
+(declare-fun m () Bool)        
+(define-fun j () Bool 
+            (! 
+              (and       
+                (not at-b@k.f)                        
+                (not at-b@e.c)) :init true)) 
+(define-fun l 
+            () Bool 
+            (!  (let ((a!5 (and                                                                                                       
+                             (= (= m-input-18 b@e.c-p-7 m-input-19 (select b@e.c-p-12 m-input-18))
+                                b                     
+                                (= bool-input-31 (= m-input-19 #x0000000000000000))
+                                )
+                             b at-b@e.c))                                   
+                      (a!11 
+                        (and                   
+                          (= arr-m-m-input-9                     
+                             (store arr-m-m-input-4 m-input-20 #x0000000000000000))
+                          (= b (= arr-m-m-input-9 arr-m-m-input-17))))) 
+                  (let ((n 0))
+                    (and
+                      (= b@e.c-p-12+
+                         (ite q arr-m-m-input-81                
+                              (ite m arr-m-m-input-17 b@e.c-p-12)))        
+                      (= at-b@k.f+
+                         (ite q true false))                                                                                                                
+                      (= b@e.c-p-7+
+                         (ite q b@e.c-p-7                
+                              (ite m m-input-20 b@e.c-p-7))                                                  )                                
+                      (= q-11 a!5 q)        
+                      (= m a!11)))) :trans true)) 
+(define-fun o 
+            () Bool 
+            (! 
+              (not at-b@k.f) :invar-property 0))
+
+
+
+; (let ((a!1 (= (and (= arr-m-m-input-9 (store arr-m-m-input-4 m-input-20 #x0000000000000000)) (= b (= arr-m-m-input-9 arr-m-m-input-17))) m))
+;       (a!2 (= (and (= b@e.c-p-7 m-input-18) (= b@e.c-p-7 m-input-19) (= m-input-19 (select b@e.c-p-12 m-input-18))) b)))
+; (let ((a!3 (and at-b@e.c b a!2 (= b (= bool-input-31 (= m-input-19 #x0000000000000000))))))
+;   (and a!1
+;        (= a!3 q-11)
+;        (= a!3 q)
+;        (= b@e.c-p-7+ (ite q b@e.c-p-7 (ite m m-input-20 b@e.c-p-7)))
+;        (= b@e.c-p-12+ (ite q arr-m-m-input-81 (ite m arr-m-m-input-17 b@e.c-p-12)))
+;        (= q at-b@k.f+))))
+
+; lemma 1
+; [bmc:] AbstractLemmaClause(kForward): (or (distinct ^arr-m-m-input-9 ^arr-m-m-input-17)
+;     (distinct (STORE_Array-bv64-bv64_bv64_bv64_Array-bv64-bv64 ^arr-m-m-input-4 ^b@e.c-p-7+ $K64_0) ^arr-m-m-input-9)
+;     (= $K64_0 (SELECT_Array-bv64-bv64_bv64_bv64 ^b@e.c-p-12+ ^b@e.c-p-7+))
+;     (distinct ^b@e.c-p-12+ ^arr-m-m-input-17))

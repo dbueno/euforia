@@ -1,0 +1,94 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+(set-logic QF_AUFBV)
+
+; state variables
+(declare-fun L1 () Bool)
+(declare-fun L1+ () Bool)
+(declare-fun L2 () Bool)
+(declare-fun L2+ () Bool)
+(declare-fun LF () Bool)
+(declare-fun LF+ () Bool)
+(declare-fun LT () Bool)
+(declare-fun LT+ () Bool)
+(declare-fun A () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun A+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun j () (_ BitVec 64))
+(declare-fun j+ () (_ BitVec 64))
+(declare-fun n () (_ BitVec 64))
+(declare-fun n+ () (_ BitVec 64))
+(declare-fun i () (_ BitVec 64))
+(declare-fun i+ () (_ BitVec 64))
+(define-fun .def0 () Bool (! L1 :next L1+))
+(define-fun .def1 () Bool (! L2 :next L2+))
+(define-fun .def2 () Bool (! LF :next LF+))
+(define-fun .def3 () Bool (! LT :next LT+))
+(define-fun .def4 () Bool (! j  :next j+))
+(define-fun .def5 () Bool (! A  :next A+))
+(define-fun .def6 () Bool (! n  :next n+))
+(define-fun .def6a () Bool (! i  :next i+))
+
+; inputs
+; (declare-fun i () (_ BitVec 64))
+
+; initial state
+(define-fun .def7 () Bool
+            (and L1 (not L2) (not LF) (not LT)
+                 (= j (_ bv0 64))
+                 (= n (_ bv12 64))
+                 (= i (_ bv0 64))
+                 ; (bvule (_ bv0 64) i)
+                 ; (bvult i n)
+                 ; (bvult (_ bv0 64) n)
+                 ; (bvule n (_ bv5 64))
+                 ; (= A ((as const (Array (_ BitVec 64) (_ BitVec 64))) #x000000000000beef))
+                 )
+            )
+(define-fun .def8 () Bool
+            (! .def7 :init true)
+            )
+
+; transition relation
+
+; loop that initializes array[j] = j, for j from 0 to n-1
+(define-fun .def14 () Bool
+            (and L1
+                 (= n+ n)
+                 (= i+ i)
+                 (= A+  (ite (bvult j n) (store A j j) A))
+                 (= j+  (ite (bvult j n) (bvadd j (_ bv1 64)) j))
+                 (= L2+ (not (bvult j n)))
+                 (= L1+ (bvult j n))
+                 (= LF+ LF)
+                 (= LT+ LT)
+                 )
+            )
+
+; test for any element in the array not equaling index
+(define-fun .def15 () Bool
+            (and L2
+                 (= n+ n)
+                 (= i+ i)
+                 (= A+ A)
+                 (= j+ j)
+                 (= L2+ false)
+                 (= L1+ false)
+                 ; (bvule (_ bv0 64) i)
+                 ; (bvult i n)
+                 (= LF+ (not (= (select A i) i)))
+                 (= LT+      (= (select A i) i))
+                 )
+            )
+
+(define-fun .def17 () Bool
+            (! (or .def14 .def15) :trans true))
+
+; property
+(define-fun .def22 () Bool
+            (not LF)
+            )
+(define-fun .def23 () Bool
+            (! .def22 :invar-property 0)
+            )
+(assert true)
+

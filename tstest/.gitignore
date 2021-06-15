@@ -1,0 +1,4 @@
+*.log
+*.o
+/.d
+tstest

@@ -1,0 +1,28 @@
+; filename: "../../vmt2/examples/simple2_safe.c"
+(set-info :source |Printed by VMT_Standalone 0.1 [taco]|)
+; state variable decarations
+(declare-fun @L2* () Bool)
+(declare-fun @L2*+ () Bool)
+(declare-fun @L0* () Bool)
+(declare-fun @L0*+ () Bool)
+; aux variable declarations
+(declare-fun @L1 () Bool)
+; input variable decarations
+; :next defs for state vars
+(define-fun .def0 () Bool (! @L2* :next @L2*+))
+(define-fun .def1 () Bool (! @L0* :next @L0*+))
+; initial state
+(define-fun .def2 () Bool (not @L2*))
+(define-fun .def3 () Bool (and @L0* .def2))
+(define-fun .def4 () Bool (! .def3 :init true))
+; transition relation
+(define-fun .def5 () Bool (or @L1 @L2*))
+(define-fun .def6 () Bool (= @L2*+ .def5))
+(define-fun .def7 () Bool (= @L1 @L0*))
+(define-fun .def8 () Bool (not @L0*+))
+(define-fun .def9 () Bool (and .def8 .def7))
+(define-fun .def10 () Bool (and .def9 .def6))
+(define-fun .def11 () Bool (! .def10 :trans true))
+; property
+(define-fun .def12 () Bool (! true :invar-property 0))
+(assert true)

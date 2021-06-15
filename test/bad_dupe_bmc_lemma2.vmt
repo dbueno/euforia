@@ -1,0 +1,72 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^false\(unreach-call\)$
+(declare-fun c@o.f-j-7 () (_ BitVec 64))
+(declare-fun c@o.f-j-7+ () (_ BitVec 64))
+(define-fun b () (_ BitVec 4) (! c@o.f-j-7 :next c@o.f-j-7+))     
+(declare-fun c() (Array (_ BitVec 64) (_ BitVec 64   ) ) ) 
+(declare-fun at-c@d.h () Bool)
+(declare-fun at-c@d.h+ () Bool)
+(define-fun i () Bool (! at-c@d.h :next at-c@d.h+))
+(declare-fun at-c@o.f () Bool) 
+(define-fun e () Bool (! at-c@o.f :next f))     
+(declare-fun p@.h-j-5 () (Array (_ BitVec 64) (_ BitVec 64)))   
+(declare-fun c@o.f-j-12 () (Array (_ BitVec 64) (_ BitVec 64))) 
+(define-fun g () (Array (_ BitVec 4) (_ BitVec 4)) (! c@o.f-j-12 :next c))
+(declare-fun p() (_ BitVec 64))        
+(declare-fun p@q-j-2 () (Array (_ BitVec 64) (_ BitVec 64)))   
+(declare-fun h () (_ BitVec 64))
+(declare-fun p@q-j-4 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun p@q-j-14 () (_ BitVec 64)    )      
+(declare-fun -0 () (Array (_ BitVec 64) (_ BitVec 64)))  
+(declare-fun 1+ () (Array (_ BitVec 64) (_ BitVec 64)))  
+(declare-fun r-11 () Bool)   
+(declare-fun bool-input-31 () Bool )            
+(declare-fun arr-k-k-input-4 () (Array (_ BitVec 64) (_ BitVec 64)))     
+(declare-fun r-10 () Bool)  
+(declare-fun arr-k-k-input-15 () (Array (_ BitVec 64) (_ BitVec 64)))     
+(declare-fun r() Bool)
+(declare-fun k-input-19 () (_ BitVec 64))          
+(declare-fun k-input-20 () (_ BitVec 64))      
+(declare-fun k-input-18 () (_ BitVec 64))
+(declare-fun arr() (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun bool() Bool)            
+(declare-fun arr-k-k-input-2 () (Array (_ BitVec 64) (_ BitVec 64)))   
+(declare-fun arr-k-k-input-70 () (Array (_ BitVec 64) (_ BitVec 64)))           
+(define-fun l
+            () Bool
+            (!
+              (and      
+                (not at-c@d.h)                       
+                (not at-c@o.f)      ) :init true))
+(define-fun m () Bool
+            (!
+              (let ((a!5 (and 
+                           (= (= k-input-18 c@o.f-j-7 k-input-19                       
+                                 (select c@o.f-j-12 k-input-18))                                      
+                              (= bool-input-31
+                                 (= k-input-19
+                                    #x0000000000000000)))
+                           at-c@o.f))      
+                    (a!11
+                      (and                  
+                        (= arr (store arr-k-k-input-4 k-input-20 #x0000000000000000)))))
+                (let ((a!10 (and
+                              (= (= -0 ((as const (Array (_ BitVec 64) (_ BitVec 64))) #x0000000000000020)) bool 
+                                 (= arr-k-k-input-70 arr)))))  
+                  (and                                                
+                    (= 1+                           
+                       (ite r arr-k-k-input-2 p@q-j-2)          
+                       (ite r p@q-j-4 p@.h-j-5))                                       
+                    (= h (ite r p@q-j-14 p))                                                                               
+                    (= at-c@d.h+
+                       (ite r-11 true false))                                                                                                       
+                    (= c@o.f-j-7+          
+                       (ite r-10                c@o.f-j-7               
+                            (ite r k-input-20 c@o.f-j-7)))                                       
+                    (= c(ite r                arr(ite r arr-k-k-input-15 c)))                                       
+                    (= r-11 a!5 r-10 a!10)       
+                    (= r a!11)                                                                        ))) :trans true))
+(define-fun n
+            () Bool
+            (!
+              (not at-c@d.h) :invar-property 0))

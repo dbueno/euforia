@@ -1,0 +1,80 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;; We will pretend that there is a global axiom that the locations are
+;; disjointly visited
+
+;; State variables: main@%_0_0, main@%accumulator.tr.lcssa.i_0, main@n.tr2.i_0, main@%n.tr2.i_1
+;; Locations: main@entry, main@tailrecurse.i.preheader, main@f.exit, main@tailrecurse.i, main@f.exit.loopexit, main@f.exit.split
+
+
+(main@entry :initial)
+
+(or
+  ;; rule 1
+  (and (and main@entry (= main@%_1_0 (> main@%_0_0 (- 1))) main@%_1_0 (= main@%_2_0 (> main@%_0_0 0)) main@%_2_0)
+       (= main@tailrecurse.i.preheader_arg_1' main@%_0_0)
+        main@tailrecurse.i.preheader')
+  
+
+  
+  
+  ;; rule 2
+  (and (and main@entry (= main@%_1_0 (> main@%_0_0 (- 1))) main@%_1_0 (= main@%_2_0 (> main@%_0_0 0)) (not main@%_2_0) (= main@%accumulator.tr.lcssa.i_0 true))
+       (= main@f.exit_arg_1' main@%accumulator.tr.lcssa.i_0)
+       main@f.exit')
+
+  
+  
+  
+  ;; rule 3
+  (and (and main@tailrecurse.i.preheader' (= main@tailrecurse.i.preheader_arg_1 main@%_0_0)
+         (= main@%n.tr2.i_0 main@%_0_0))
+       (= main@tailrecurse.i_arg_1' main@n.tr2.i_0)
+       main@tailrecurse.i')
+  ;; rule 4
+  (and (and main@tailrecurse.i (= main@tailrecurse.i_arg_1 main@%n.tr2.i_0)
+         (= main@%_3_0 (+ main@%n.tr2.i_0 (- 1)))
+         (= main@%_4_0 (> main@%n.tr2.i_0 1))
+         main@%_4_0
+         (= main@%n.tr2.i_1 main@%_3_0))
+       (= main@tailrecurse.i_arg_1' main@%n.tr2.i_1)
+       main@tailrecurse.i')
+  ;; rule 5
+  (and (and main@tailrecurse.i (= main@tailrecurse.i_arg_1 main@%n.tr2.i_0)
+         (= main@%_3_0 (+ main@%n.tr2.i_0 (- 1)))
+         (= main@%_4_0 (> main@%n.tr2.i_0 1))
+         (not main@%_4_0))
+       main@f.exit.loopexit')
+
+  ;; rule 6
+  (and (and main@f.exit.loopexit (= main@%accumulator.tr.lcssa.i_0 false))
+       (= main@f.exit_arg_1' main@%accumulator.tr.lcssa.i_0)
+       main@f.exit')
+
+  ;; rule 7
+  (and (and main@f.exit (= main@f.exit_arg_1 main@%accumulator.tr.lcssa.i_0)
+         (not main@%accumulator.tr.lcssa.i_0))
+       main@f.exit.split')
+)
+
+(main@f.exit.split :property)

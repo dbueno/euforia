@@ -1,0 +1,67 @@
+; 6 rules
+; 5 relations
+; 1 place vars
+(declare-fun entry () Bool)
+(declare-fun entry+ () Bool)
+(define-fun .def0 () Bool (! entry :next entry+))
+(declare-fun bb0 () Bool)
+(declare-fun bb0+ () Bool)
+(define-fun .def1 () Bool (! bb0 :next bb0+))
+(declare-fun bb1 () Bool)
+(declare-fun bb1+ () Bool)
+(define-fun .def2 () Bool (! bb1 :next bb1+))
+(declare-fun bbsafe () Bool)
+(declare-fun bbsafe+ () Bool)
+(define-fun .def3 () Bool (! bbsafe :next bbsafe+))
+(declare-fun bbunsafe () Bool)
+(declare-fun bbunsafe+ () Bool)
+(define-fun .def4 () Bool (! bbunsafe :next bbunsafe+))
+(declare-fun Int-0 () Int)
+(declare-fun Int-0+ () Int)
+(define-fun .def5 () Int (! Int-0 :next Int-0+))
+; 6 state vars
+(declare-fun V1 () Int) ; input
+(declare-fun V2 () Int) ; input
+(declare-fun V3 () Int) ; input
+(declare-fun V4 () Int) ; input
+(declare-fun V5 () Int) ; input
+(declare-fun V6 () Int) ; input
+(declare-fun rule0 () Bool) ; input
+(declare-fun rule1 () Bool) ; input
+(declare-fun rule2 () Bool) ; input
+(declare-fun rule3 () Bool) ; input
+(declare-fun rule4 () Bool) ; input
+(declare-fun rule5 () Bool) ; input
+; 12 inputs
+(define-fun .def6 () Bool (! (and (not entry) (not bb0) (not bb1) (not bbsafe) (not bbunsafe)) :init true))
+(define-fun .def7 () Bool (! (let ((a!1 (= Int-0+ (ite rule3 V4 (ite rule2 V3 (ite rule1 V1 Int-0)))))
+      (a!2 (or (not rule2)
+               (and bb0 (= V2 Int-0) (not (<= 5 V2)) (= V3 (+ 3 V2)))))
+      (a!3 (or (not rule4) (and bb1 (= V5 Int-0) (not (<= 7 V5))))))
+  (and (= entry+ rule0)
+       (= bb0+ (or rule2 rule1))
+       a!1
+       (= bb1+ rule3)
+       (= bbsafe+ rule4)
+       (= bbunsafe+ rule5)
+       (or (not rule1) (and entry (= V1 0)))
+       a!2
+       (or (not rule3) (and bb0 (= V4 Int-0) (<= 5 V4)))
+       a!3
+       (or (not rule5) (and bb1 (= V6 Int-0) (<= 7 V6)))
+       (or (not rule0) (not rule1))
+       (or (not rule0) (not rule2))
+       (or (not rule0) (not rule3))
+       (or (not rule0) (not rule4))
+       (or (not rule0) (not rule5))
+       (or (not rule1) (not rule2))
+       (or (not rule1) (not rule3))
+       (or (not rule1) (not rule4))
+       (or (not rule1) (not rule5))
+       (or (not rule2) (not rule3))
+       (or (not rule2) (not rule4))
+       (or (not rule2) (not rule5))
+       (or (not rule3) (not rule4))
+       (or (not rule3) (not rule5))
+       (or (not rule4) (not rule5)))) :trans true))
+(define-fun .def8 () Bool (! (not bbunsafe) :invar-property 0))

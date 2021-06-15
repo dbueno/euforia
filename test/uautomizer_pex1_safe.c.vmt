@@ -1,0 +1,233 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+; 7 state variables
+; (including 3 locations)
+(declare-fun main@%shadow.mem.4.0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.4.0+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(define-fun .def0 () (Array (_ BitVec 64) (_ BitVec 64)) (! main@%shadow.mem.4.0 :next main@%shadow.mem.4.0+))
+(declare-fun main@%_1 () (_ BitVec 64))
+(declare-fun main@%_1+ () (_ BitVec 64))
+(define-fun .def3 () (_ BitVec 64) (! main@%_1 :next main@%_1+))
+(declare-fun main@%shadow.mem.8.0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.8.0+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(define-fun .def4 () (Array (_ BitVec 64) (_ BitVec 64)) (! main@%shadow.mem.8.0 :next main@%shadow.mem.8.0+))
+(declare-fun main@%_2 () (_ BitVec 64))
+(declare-fun main@%_2+ () (_ BitVec 64))
+(define-fun .def5 () (_ BitVec 64) (! main@%_2 :next main@%_2+))
+(declare-fun main@entry () Bool)
+(declare-fun main@entry+ () Bool)
+(define-fun .def6 () Bool (! main@entry :next main@entry+))
+(declare-fun main@_11 () Bool)
+(declare-fun main@_11+ () Bool)
+(define-fun .def8 () Bool (! main@_11 :next main@_11+))
+(declare-fun main@verifier.error.split () Bool)
+(declare-fun main@verifier.error.split+ () Bool)
+(define-fun .def9 () Bool (! main@verifier.error.split :next main@verifier.error.split+))
+; 58 inputs
+(declare-fun main@%_23_0 () (_ BitVec 32))
+(declare-fun main@%_24_0 () (_ BitVec 32))
+(declare-fun main@%_19_0 () (_ BitVec 32))
+(declare-fun main@%_20_0 () Bool)
+(declare-fun main@%shadow.mem.8.1_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%_15_0 () (_ BitVec 32))
+(declare-fun main@%_16_0 () Bool)
+(declare-fun main@%_12_0 () (_ BitVec 32))
+(declare-fun main@%_13_0 () Bool)
+(declare-fun @llvm.used_0 () (_ BitVec 64))
+(declare-fun main@%sm5_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm6_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm7_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%_0_0 () (_ BitVec 64))
+(declare-fun main@%_3_0 () (_ BitVec 64))
+(declare-fun main@%_4_0 () (_ BitVec 64))
+(declare-fun main@%_5_0 () (_ BitVec 64))
+(declare-fun main@%sm_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%_6_0 () (_ BitVec 32))
+(declare-fun main@%_7_0 () (_ BitVec 32))
+(declare-fun main@%_8_0 () (_ BitVec 32))
+(declare-fun main@%_9_0 () Bool)
+(declare-fun main@entry_0 () Bool)
+(declare-fun main@%_1_0 () (_ BitVec 64))
+(declare-fun main@%_2_0 () (_ BitVec 64))
+(declare-fun main@%sm1_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm2_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_10_0 () Bool)
+(declare-fun main@_11_0 () Bool)
+(declare-fun main@%shadow.mem.4.0_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.8.0_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.4.0_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.8.0_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_14_0 () Bool)
+(declare-fun main@_18_0 () Bool)
+(declare-fun main@_21_0 () Bool)
+(declare-fun main@%sm3_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_22_0 () Bool)
+(declare-fun |tuple(main@_18_0, main@_22_0)| () Bool)
+(declare-fun main@%shadow.mem.8.1_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.8.1_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm4_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_11_1 () Bool)
+(declare-fun main@%shadow.mem.4.0_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.8.0_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_17_0 () Bool)
+(declare-fun main@verifier.error_0 () Bool)
+(declare-fun main@verifier.error.split_0 () Bool)
+(declare-fun .cond1 () Bool)
+(declare-fun .cond2 () Bool)
+(declare-fun .cond7 () Bool)
+(declare-fun .cond10 () Bool)
+; transitions
+(define-fun .def11 () Bool
+  (= main@%shadow.mem.4.0+ (ite .cond2
+     main@%shadow.mem.4.0_2
+     (ite .cond1 main@%shadow.mem.4.0_1 main@%shadow.mem.4.0))))
+
+(define-fun .def12 () Bool
+  (= main@%_1+ (ite .cond2 main@%_1_0 (ite .cond1 main@%_1_0 main@%_1))))
+
+(define-fun .def13 () Bool
+  (= main@%shadow.mem.8.0+ (ite .cond2
+     main@%shadow.mem.8.0_2
+     (ite .cond1 main@%shadow.mem.8.0_1 main@%shadow.mem.8.0))))
+
+(define-fun .def14 () Bool
+  (= main@%_2+ (ite .cond2 main@%_2_0 (ite .cond1 main@%_2_0 main@%_2))))
+
+(define-fun .def15 () Bool
+  (= main@entry+ (ite .cond7 false false)))
+
+(define-fun .def16 () Bool
+  (= main@_11+ (ite .cond2 true (ite .cond1 true false))))
+
+(define-fun .def17 () Bool
+  (= main@verifier.error.split+ (ite .cond10 true false)))
+
+(define-fun .def18 () Bool
+  (= .cond7 true))
+
+(define-fun .def19 () Bool
+  (= .cond1 (and main@entry
+     true
+     true
+     (bvugt @llvm.used_0 #x0000000000000000)
+     (bvugt main@%_0_0 #x0000000000000000)
+     (bvugt main@%_1_0 #x0000000000000000)
+     (bvugt main@%_2_0 #x0000000000000000)
+     (= main@%_3_0 main@%_0_0)
+     (= main@%_4_0 main@%_1_0)
+     (= main@%_5_0 main@%_2_0)
+     (= main@%sm_0
+        (store main@%sm5_0 main@%_0_0 ((_ zero_extend 32) #x00000000)))
+     (= main@%sm1_0
+        (store main@%sm7_0 main@%_2_0 ((_ zero_extend 32) main@%_6_0)))
+     (= main@%sm2_0
+        (store main@%sm6_0 main@%_1_0 ((_ zero_extend 32) main@%_7_0)))
+     (= main@%_8_0 ((_ extract 31 0) (select main@%sm1_0 main@%_2_0)))
+     (= main@%_9_0 (not (= main@%_8_0 #x00000000)))
+     main@%_9_0
+     (=> main@_10_0 (and main@_10_0 main@entry_0))
+     (=> main@_11_0 (and main@_11_0 main@_10_0))
+     (=> (and main@_11_0 main@_10_0) (= main@%shadow.mem.4.0_0 main@%sm2_0))
+     (=> (and main@_11_0 main@_10_0) (= main@%shadow.mem.8.0_0 main@%sm1_0))
+     (=> (and main@_11_0 main@_10_0)
+         (= main@%shadow.mem.4.0_1 main@%shadow.mem.4.0_0))
+     (=> (and main@_11_0 main@_10_0)
+         (= main@%shadow.mem.8.0_1 main@%shadow.mem.8.0_0))
+     main@_11_0)))
+
+(define-fun .def20 () Bool
+  (= .cond2 (let ((a!1 (=> main@_14_0
+               (= main@%_15_0
+                  ((_ extract 31 0) (select main@%shadow.mem.8.0_0 main@%_2_0)))))
+      (a!2 (=> main@_14_0 (= main@%_16_0 (not (= main@%_15_0 #x00000000)))))
+      (a!3 (=> main@_18_0
+               (= main@%_19_0
+                  ((_ extract 31 0) (select main@%shadow.mem.4.0_0 main@%_1_0)))))
+      (a!4 (=> main@_21_0
+               (= main@%sm3_0
+                  (store main@%shadow.mem.8.0_0
+                         main@%_2_0
+                         ((_ zero_extend 32) #x00000000)))))
+      (a!5 (=> main@_22_0
+               (= main@%_23_0
+                  ((_ extract 31 0) (select main@%shadow.mem.4.0_0 main@%_1_0)))))
+      (a!6 (=> main@_22_0
+               (= main@%sm4_0
+                  (store main@%shadow.mem.4.0_0
+                         main@%_1_0
+                         ((_ zero_extend 32) main@%_24_0))))))
+  (and main@_11
+       (= main@%shadow.mem.4.0 main@%shadow.mem.4.0_0)
+       (= main@%_1 main@%_1_0)
+       (= main@%shadow.mem.8.0 main@%shadow.mem.8.0_0)
+       (= main@%_2 main@%_2_0)
+       true
+       (= main@%_12_0
+          ((_ extract 31 0) (select main@%shadow.mem.4.0_0 main@%_1_0)))
+       (= main@%_13_0 (bvsge main@%_12_0 #x00000000))
+       main@%_13_0
+       (=> main@_14_0 (and main@_14_0 main@_11_0))
+       a!1
+       a!2
+       (=> main@_18_0 (and main@_18_0 main@_14_0))
+       (=> (and main@_18_0 main@_14_0) main@%_16_0)
+       a!3
+       (=> main@_18_0 (= main@%_20_0 (= main@%_19_0 #x00000000)))
+       (=> main@_21_0 (and main@_21_0 main@_18_0))
+       (=> (and main@_21_0 main@_18_0) main@%_20_0)
+       a!4
+       (=> |tuple(main@_18_0, main@_22_0)| main@_18_0)
+       (=> main@_22_0
+           (or (and main@_22_0 main@_21_0) |tuple(main@_18_0, main@_22_0)|))
+       (=> |tuple(main@_18_0, main@_22_0)| (not main@%_20_0))
+       (=> (and main@_22_0 main@_21_0) (= main@%shadow.mem.8.1_0 main@%sm3_0))
+       (=> |tuple(main@_18_0, main@_22_0)|
+           (= main@%shadow.mem.8.1_1 main@%shadow.mem.8.0_0))
+       (=> (and main@_22_0 main@_21_0)
+           (= main@%shadow.mem.8.1_2 main@%shadow.mem.8.1_0))
+       (=> |tuple(main@_18_0, main@_22_0)|
+           (= main@%shadow.mem.8.1_2 main@%shadow.mem.8.1_1))
+       a!5
+       (=> main@_22_0 (= main@%_24_0 (bvadd main@%_23_0 #xffffffff)))
+       a!6
+       (=> main@_11_1 (and main@_11_1 main@_22_0))
+       (=> (and main@_11_1 main@_22_0) (= main@%shadow.mem.4.0_1 main@%sm4_0))
+       (=> (and main@_11_1 main@_22_0)
+           (= main@%shadow.mem.8.0_1 main@%shadow.mem.8.1_2))
+       (=> (and main@_11_1 main@_22_0)
+           (= main@%shadow.mem.4.0_2 main@%shadow.mem.4.0_1))
+       (=> (and main@_11_1 main@_22_0)
+           (= main@%shadow.mem.8.0_2 main@%shadow.mem.8.0_1))
+       main@_11_1))))
+
+(define-fun .def21 () Bool
+  (= .cond10 (let ((a!1 (=> main@_14_0
+               (= main@%_15_0
+                  ((_ extract 31 0) (select main@%shadow.mem.8.0_0 main@%_2_0)))))
+      (a!2 (=> main@_14_0 (= main@%_16_0 (not (= main@%_15_0 #x00000000))))))
+  (and main@_11
+       (= main@%shadow.mem.4.0 main@%shadow.mem.4.0_0)
+       (= main@%_1 main@%_1_0)
+       (= main@%shadow.mem.8.0 main@%shadow.mem.8.0_0)
+       (= main@%_2 main@%_2_0)
+       true
+       (= main@%_12_0
+          ((_ extract 31 0) (select main@%shadow.mem.4.0_0 main@%_1_0)))
+       (= main@%_13_0 (bvsge main@%_12_0 #x00000000))
+       main@%_13_0
+       (=> main@_14_0 (and main@_14_0 main@_11_0))
+       a!1
+       a!2
+       (=> main@_17_0 (and main@_17_0 main@_14_0))
+       (=> (and main@_17_0 main@_14_0) (not main@%_16_0))
+       (=> main@verifier.error_0 (and main@verifier.error_0 main@_17_0))
+       (=> main@verifier.error.split_0
+           (and main@verifier.error.split_0 main@verifier.error_0))
+       main@verifier.error.split_0))))
+
+(define-fun .trans () Bool
+  (! (and .def11 .def12 .def13 .def14 .def15 .def16 .def17 .def18 .def19 .def20 .def21) :trans true))
+; initial state
+(define-fun .def22 () Bool (! (and main@entry (not main@_11) (not main@verifier.error.split)) :init true))
+; property
+(define-fun .def23 () Bool (! (not main@verifier.error.split) :invar-property 0))

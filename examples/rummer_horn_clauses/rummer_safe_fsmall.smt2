@@ -1,0 +1,61 @@
+(set-info :original "/benchmarks/rummer_safe.c.bc")
+(set-info :authors "SeaHorn v.0.1.0-rc3")
+(declare-rel verifier.error (Bool Bool Bool ))
+(declare-rel main_1 (Int Bool Int Int ))
+(declare-var main@%_4_0 Bool )
+(declare-var main@%_0_1 Int )
+(declare-var main@%_1_0 Bool )
+(declare-var main@%_2_0 Bool )
+(declare-var main@%accumulator.tr.lcssa.i_0 Bool )
+(declare-var main@%n.tr2.i_0 Int )
+(declare-var main@%_0_0 Int )
+(declare-var main@%accumulator.tr.lcssa.i_1 Bool )
+(declare-var main@%n.tr2.i_1 Int )
+(declare-var main@%_3_0 Int )
+(rule (verifier.error false false false))
+(rule (verifier.error false true true))
+(rule (verifier.error true false true))
+(rule (verifier.error true true true))
+(rule (main_1 0 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0))
+(rule (=> (and (main_1 0 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0)
+         true
+         (= main@%_1_0 (> main@%_0_1 (- 1)))
+         main@%_1_0
+         (= main@%_2_0 (> main@%_0_1 0))
+         main@%_2_0)
+    (main_1 1 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_1)))
+(rule (=> (and (main_1 0 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0)
+         true
+         (= main@%_1_0 (> main@%_0_1 (- 1)))
+         main@%_1_0
+         (= main@%_2_0 (> main@%_0_1 0))
+         (not main@%_2_0)
+         (= main@%accumulator.tr.lcssa.i_1 true))
+    (main_1 4 main@%accumulator.tr.lcssa.i_1 main@%n.tr2.i_0 main@%_0_1)))
+(rule (=> (and (main_1 1 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0)
+         true
+         (= main@%n.tr2.i_1 main@%_0_0))
+    (main_1 2 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_1 main@%_0_0)))
+(rule (=> (and (main_1 2 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0)
+         true
+         (= main@%_3_0 (+ main@%n.tr2.i_0 (- 1)))
+         (= main@%_4_0 (> main@%n.tr2.i_0 1))
+         main@%_4_0
+         (= main@%n.tr2.i_1 main@%_3_0))
+    (main_1 2 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_1 main@%_0_0)))
+(rule (=> (and (main_1 2 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0)
+         true
+         (= main@%_3_0 (+ main@%n.tr2.i_0 (- 1)))
+         (= main@%_4_0 (> main@%n.tr2.i_0 1))
+         (not main@%_4_0))
+    (main_1 3 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0)))
+(rule (=> (and (main_1 3 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0)
+         true
+         (= main@%accumulator.tr.lcssa.i_1 false))
+    (main_1 4 main@%accumulator.tr.lcssa.i_1 main@%n.tr2.i_0 main@%_0_0)))
+(rule (=> (and (main_1 4 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0)
+         true
+         (not main@%accumulator.tr.lcssa.i_0))
+    (main_1 5 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0)))
+(query (main_1 5 main@%accumulator.tr.lcssa.i_0 main@%n.tr2.i_0 main@%_0_0))
+

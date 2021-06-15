@@ -1,0 +1,168 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+; 2 state variables
+; (including 2 locations)
+(declare-fun main@entry () Bool)
+(declare-fun main@entry+ () Bool)
+(define-fun .def0 () Bool (! main@entry :next main@entry+))
+(declare-fun main@verifier.error.split () Bool)
+(declare-fun main@verifier.error.split+ () Bool)
+(define-fun .def2 () Bool (! main@verifier.error.split :next main@verifier.error.split+))
+; 54 inputs
+(declare-fun main@%_17_0 () (_ BitVec 32))
+(declare-fun main@%_18_0 () Bool)
+(declare-fun main@%SwitchLeaf.i_0 () Bool)
+(declare-fun main@%shadow.mem.20.0_3 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%SwitchLeaf2.i_0 () Bool)
+(declare-fun @llvm.used_0 () (_ BitVec 64))
+(declare-fun main@%sm8_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm9_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm10_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm11_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm12_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%_2_0 () (_ BitVec 64))
+(declare-fun main@%_3_0 () (_ BitVec 64))
+(declare-fun main@%_4_0 () (_ BitVec 64))
+(declare-fun main@%_5_0 () (_ BitVec 64))
+(declare-fun main@%_7_0 () (_ BitVec 64))
+(declare-fun main@%_8_0 () (_ BitVec 64))
+(declare-fun main@%_9_0 () (_ BitVec 64))
+(declare-fun main@%_10_0 () (_ BitVec 64))
+(declare-fun main@%_11_0 () (_ BitVec 64))
+(declare-fun main@%sm_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm1_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@arg.0 () (_ BitVec 32))
+(declare-fun main@arg.0_0 () (_ BitVec 32))
+(declare-fun main@%sm2_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@arg.1 () (_ BitVec 64))
+(declare-fun main@arg.1_0 () (_ BitVec 64))
+(declare-fun main@%_12_0 () (_ BitVec 32))
+(declare-fun main@%sm4_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%Pivot.i_0 () Bool)
+(declare-fun main@entry_0 () Bool)
+(declare-fun main@%_6_0 () (_ BitVec 64))
+(declare-fun main@%sm3_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%_13_0 () (_ BitVec 32))
+(declare-fun main@LeafBlock1.i_0 () Bool)
+(declare-fun main@_15_0 () Bool)
+(declare-fun main@%sm6_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@LeafBlock.i_0 () Bool)
+(declare-fun main@NewDefault.i_0 () Bool)
+(declare-fun |tuple(main@LeafBlock.i_0, main@NewDefault.i_0)| () Bool)
+(declare-fun |tuple(main@LeafBlock1.i_0, main@NewDefault.i_0)| () Bool)
+(declare-fun main@%sm7_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_14_0 () Bool)
+(declare-fun main@%sm5_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_16_0 () Bool)
+(declare-fun main@%shadow.mem.20.0_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.20.0_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.20.0_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_19_0 () Bool)
+(declare-fun main@verifier.error_0 () Bool)
+(declare-fun main@verifier.error.split_0 () Bool)
+(declare-fun .cond1 () Bool)
+(declare-fun .cond3 () Bool)
+; transitions
+(define-fun .def4 () Bool
+  (= main@entry+ (ite .cond1 false false)))
+
+(define-fun .def5 () Bool
+  (= main@verifier.error.split+ (ite .cond3 true false)))
+
+(define-fun .def6 () Bool
+  (= .cond1 true))
+
+(define-fun .def7 () Bool
+  (= .cond3 (let ((a!1 (=> main@_15_0
+               (= main@%sm6_0
+                  (store main@%sm3_0 main@%_6_0 ((_ zero_extend 32) #x00000025)))))
+      (a!2 (=> main@NewDefault.i_0
+               (= main@%sm7_0
+                  (store main@%sm3_0 main@%_6_0 ((_ zero_extend 32) #x00000320)))))
+      (a!3 (=> main@_14_0
+               (= main@%sm5_0
+                  (store main@%sm3_0 main@%_6_0 ((_ zero_extend 32) #x00000007)))))
+      (a!4 (=> main@_16_0
+               (= main@%_17_0
+                  ((_ extract 31 0) (select main@%shadow.mem.20.0_3 main@%_6_0)))))
+      (a!5 (=> main@_16_0 (= main@%_18_0 (not (= main@%_17_0 #x00000000))))))
+  (and main@entry
+       (= main@arg.0 main@arg.0_0)
+       (= main@arg.1 main@arg.1_0)
+       true
+       (bvugt @llvm.used_0 #x0000000000000000)
+       (bvugt main@%_2_0 #x0000000000000000)
+       (bvugt main@%_3_0 #x0000000000000000)
+       (bvugt main@%_4_0 #x0000000000000000)
+       (bvugt main@%_5_0 #x0000000000000000)
+       (bvugt main@%_6_0 #x0000000000000000)
+       (= main@%_7_0 main@%_2_0)
+       (= main@%_8_0 main@%_3_0)
+       (= main@%_9_0 main@%_4_0)
+       (= main@%_10_0 main@%_5_0)
+       (= main@%_11_0 main@%_6_0)
+       (= main@%sm_0
+          (store main@%sm10_0 main@%_2_0 ((_ zero_extend 32) #x00000000)))
+       (= main@%sm1_0
+          (store main@%sm8_0 main@%_3_0 ((_ zero_extend 32) main@arg.0_0)))
+       (= main@%sm2_0 (store main@%sm12_0 main@%_4_0 main@arg.1_0))
+       (= main@%sm3_0
+          (store main@%sm11_0 main@%_6_0 ((_ zero_extend 32) #x00000000)))
+       (= main@%sm4_0
+          (store main@%sm9_0 main@%_5_0 ((_ zero_extend 32) main@%_12_0)))
+       (= main@%_13_0 ((_ extract 31 0) (select main@%sm4_0 main@%_5_0)))
+       (= main@%Pivot.i_0 (bvslt main@%_13_0 #x00000062))
+       (=> main@LeafBlock1.i_0 (and main@LeafBlock1.i_0 main@entry_0))
+       (=> (and main@LeafBlock1.i_0 main@entry_0) (not main@%Pivot.i_0))
+       (=> main@LeafBlock1.i_0
+           (= main@%SwitchLeaf2.i_0 (= main@%_13_0 #x00000062)))
+       (=> main@_15_0 (and main@_15_0 main@LeafBlock1.i_0))
+       (=> (and main@_15_0 main@LeafBlock1.i_0) main@%SwitchLeaf2.i_0)
+       a!1
+       (=> main@LeafBlock.i_0 (and main@LeafBlock.i_0 main@entry_0))
+       (=> (and main@LeafBlock.i_0 main@entry_0) main@%Pivot.i_0)
+       (=> main@LeafBlock.i_0
+           (= main@%SwitchLeaf.i_0 (= main@%_13_0 #x00000061)))
+       (=> |tuple(main@LeafBlock.i_0, main@NewDefault.i_0)| main@LeafBlock.i_0)
+       (=> |tuple(main@LeafBlock1.i_0, main@NewDefault.i_0)|
+           main@LeafBlock1.i_0)
+       (=> main@NewDefault.i_0
+           (or |tuple(main@LeafBlock.i_0, main@NewDefault.i_0)|
+               |tuple(main@LeafBlock1.i_0, main@NewDefault.i_0)|))
+       (=> |tuple(main@LeafBlock.i_0, main@NewDefault.i_0)|
+           (not main@%SwitchLeaf.i_0))
+       (=> |tuple(main@LeafBlock1.i_0, main@NewDefault.i_0)|
+           (not main@%SwitchLeaf2.i_0))
+       a!2
+       (=> main@_14_0 (and main@_14_0 main@LeafBlock.i_0))
+       (=> (and main@_14_0 main@LeafBlock.i_0) main@%SwitchLeaf.i_0)
+       a!3
+       (=> main@_16_0
+           (or (and main@_16_0 main@NewDefault.i_0)
+               (and main@_16_0 main@_15_0)
+               (and main@_16_0 main@_14_0)))
+       (=> (and main@_16_0 main@NewDefault.i_0)
+           (= main@%shadow.mem.20.0_0 main@%sm7_0))
+       (=> (and main@_16_0 main@_15_0) (= main@%shadow.mem.20.0_1 main@%sm6_0))
+       (=> (and main@_16_0 main@_14_0) (= main@%shadow.mem.20.0_2 main@%sm5_0))
+       (=> (and main@_16_0 main@NewDefault.i_0)
+           (= main@%shadow.mem.20.0_3 main@%shadow.mem.20.0_0))
+       (=> (and main@_16_0 main@_15_0)
+           (= main@%shadow.mem.20.0_3 main@%shadow.mem.20.0_1))
+       (=> (and main@_16_0 main@_14_0)
+           (= main@%shadow.mem.20.0_3 main@%shadow.mem.20.0_2))
+       a!4
+       a!5
+       (=> main@_16_0 (not main@%_18_0))
+       (=> main@_19_0 (and main@_19_0 main@_16_0))
+       (=> main@verifier.error_0 (and main@verifier.error_0 main@_19_0))
+       (=> main@verifier.error.split_0
+           (and main@verifier.error.split_0 main@verifier.error_0))
+       main@verifier.error.split_0))))
+
+(define-fun .trans () Bool
+  (! (and .def4 .def5 .def6 .def7) :trans true))
+; initial state
+(define-fun .def8 () Bool (! (and main@entry (not main@verifier.error.split)) :init true))
+; property
+(define-fun .def9 () Bool (! (not main@verifier.error.split) :invar-property 0))

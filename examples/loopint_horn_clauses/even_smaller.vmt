@@ -1,0 +1,49 @@
+(set-info :source |Printe by chc_to_vmt.py|)
+; state variables
+(declare-fun entry () Bool) ; relation = True
+(declare-fun entry+ () Bool)
+(declare-fun bb0 () Bool) ; relation = True
+(declare-fun bb0+ () Bool)
+(declare-fun bb0.a0 () Int) ; relation = False
+(declare-fun bb0.a0+ () Int)
+(declare-fun bb1 () Bool) ; relation = True
+(declare-fun bb1+ () Bool)
+(declare-fun bb1.a0 () Int) ; relation = False
+(declare-fun bb1.a0+ () Int)
+(declare-fun bbsafe () Bool) ; relation = True
+(declare-fun bbsafe+ () Bool)
+(declare-fun bbunsafe () Bool) ; relation = True
+(declare-fun bbunsafe+ () Bool)
+; inputs
+(declare-fun i () Int)
+(declare-fun x () Int)
+; :next defs for state vars
+(define-fun .def0 () Bool (! entry :next entry+))
+(define-fun .def1 () Bool (! bb0 :next bb0+))
+(define-fun .def2 () Int (! bb0.a0 :next bb0.a0+))
+(define-fun .def3 () Bool (! bb1 :next bb1+))
+(define-fun .def4 () Int (! bb1.a0 :next bb1.a0+))
+(define-fun .def5 () Bool (! bbsafe :next bbsafe+))
+(define-fun .def6 () Bool (! bbunsafe :next bbunsafe+))
+; initial state
+; initial state vars set: set()
+(define-fun .def7 () Bool (= entry false))
+(define-fun .def8 () Bool (= bb0 false))
+(define-fun .def9 () Bool (= bb1 false))
+(define-fun .def10 () Bool (= bbsafe false))
+(define-fun .def11 () Bool (= bbunsafe false))
+(define-fun .def12 () Bool (and .def7 .def8 .def9 .def10 .def11))
+(define-fun .def13 () Bool (! .def12 :init true))
+; transition relation
+(define-fun .def14 () Bool (and entry+ (= bb0+ bb0) (= bb0.a0+ bb0.a0) (= bb1+ bb1) (= bb1.a0+ bb1.a0) (= bbsafe+ bbsafe) (= bbunsafe+ bbunsafe)))
+(define-fun .def15 () Bool (and entry (= i 0) bb0+ (= bb0.a0+ i) (= entry+ entry) (= bb1+ bb1) (= bb1.a0+ bb1.a0) (= bbsafe+ bbsafe) (= bbunsafe+ bbunsafe)))
+(define-fun .def16 () Bool (and bb0 (= bb0.a0 i) (< i 5) (= x (+ i 3)) bb0+ (= bb0.a0+ x) (= entry+ entry) (= bb1+ bb1) (= bb1.a0+ bb1.a0) (= bbsafe+ bbsafe) (= bbunsafe+ bbunsafe)))
+(define-fun .def17 () Bool (and bb0 (= bb0.a0 i) (not (< i 5)) bb1+ (= bb1.a0+ i) (= entry+ entry) (= bb0+ bb0) (= bb0.a0+ bb0.a0) (= bbsafe+ bbsafe) (= bbunsafe+ bbunsafe)))
+(define-fun .def18 () Bool (and bb1 (= bb1.a0 i) (< i 7) bbsafe+ (= entry+ entry) (= bb0+ bb0) (= bb0.a0+ bb0.a0) (= bb1+ bb1) (= bb1.a0+ bb1.a0) (= bbunsafe+ bbunsafe)))
+(define-fun .def19 () Bool (and bb1 (= bb1.a0 i) (not (< i 7)) bbunsafe+ (= entry+ entry) (= bb0+ bb0) (= bb0.a0+ bb0.a0) (= bb1+ bb1) (= bb1.a0+ bb1.a0) (= bbsafe+ bbsafe)))
+(define-fun .def20 () Bool (or .def14 .def15 .def16 .def17 .def18 .def19))
+(define-fun .def21 () Bool (! .def20 :trans true))
+; property
+(define-fun .def22 () Bool (not bbunsafe))
+(define-fun .def23 () Bool (! .def22 :invar-property 0))
+(assert true)

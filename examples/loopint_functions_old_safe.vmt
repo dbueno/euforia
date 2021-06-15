@@ -1,0 +1,105 @@
+(declare-fun at-B-1 () Bool)
+(declare-fun at-B-1+ () Bool)
+(define-fun .def0 () Bool (! at-B-1 :next at-B-1+))
+(declare-fun at-B-3 () Bool)
+(declare-fun at-B-3+ () Bool)
+(define-fun .def1 () Bool (! at-B-3 :next at-B-3+))
+(declare-fun at-B-5 () Bool)
+(declare-fun at-B-5+ () Bool)
+(define-fun .def2 () Bool (! at-B-5 :next at-B-5+))
+(declare-fun at-U () Bool)
+(declare-fun at-U+ () Bool)
+(define-fun .def3 () Bool (! at-U :next at-U+))
+(declare-fun at-F-1 () Bool)
+(declare-fun at-F-1+ () Bool)
+(define-fun .def4 () Bool (! at-F-1 :next at-F-1+))
+(declare-fun at-F-4 () Bool)
+(declare-fun at-F-4+ () Bool)
+(define-fun .def5 () Bool (! at-F-4 :next at-F-4+))
+(declare-fun at-F-7 () Bool)
+(declare-fun at-F-7+ () Bool)
+(define-fun .def6 () Bool (! at-F-7 :next at-F-7+))
+(declare-fun at-W () Bool)
+(declare-fun at-W+ () Bool)
+(define-fun .def7 () Bool (! at-W :next at-W+))
+(declare-fun F-arg () (_ BitVec 32))
+(declare-fun F-arg+ () (_ BitVec 32))
+(define-fun .def8 () (_ BitVec 32) (! F-arg :next F-arg+))
+(declare-fun F-ret () (_ BitVec 32))
+(declare-fun F-ret+ () (_ BitVec 32))
+(define-fun .def8a () (_ BitVec 32) (! F-ret :next F-ret+))
+(declare-fun F-j () (_ BitVec 32))
+(declare-fun F-j+ () (_ BitVec 32))
+(define-fun .def9 () (_ BitVec 32) (! F-j :next F-j+))
+(declare-fun F-k () (_ BitVec 32))
+(declare-fun F-k+ () (_ BitVec 32))
+(define-fun .def10 () (_ BitVec 32) (! F-k :next F-k+))
+(declare-fun B-i () (_ BitVec 32))
+(declare-fun B-i+ () (_ BitVec 32))
+(define-fun .def11 () (_ BitVec 32) (! B-i :next B-i+))
+
+(define-fun .def12 () Bool
+ (!  (and at-B-1 (not at-B-3) (not at-B-5) (not at-U) (not at-F-1) (not at-F-4) (not at-F-7) (not at-W)) :init true))
+
+(define-fun .def13 () Bool
+            (= at-W+ (or (and at-B-3 (bvslt B-i (_ bv5 32)))
+                         (and at-W (not at-F-7)))))
+
+(define-fun .def14 () Bool
+            (= at-F-1+ (and at-B-3 (bvslt B-i (_ bv5 32)))))
+
+(define-fun .def18a () Bool
+            (= at-F-4+ (or at-F-1 (and at-F-4 (bvslt F-k (_ bv3 32))))))
+
+(define-fun .def19 () Bool
+            (= at-F-7+ (and at-F-4 (not (bvslt F-k (_ bv3 32))))))
+
+(define-fun .def15 () Bool
+            (= F-arg+ (ite (and at-B-3 (bvslt B-i (_ bv5 32)))
+                           B-i
+                           F-arg)))
+
+(define-fun .def16 () Bool
+            (= F-ret+ (ite (and at-F-4 (not (bvslt F-k (_ bv3 32))))
+                           F-j
+                           F-ret)))
+
+(define-fun .def17 () Bool
+            (= F-j+ (ite at-F-1
+                         F-arg
+                         (ite (and at-F-4 (bvslt F-k (_ bv3 32)))
+                              (bvadd F-j (_ bv1 32))
+                              F-j))))
+              
+(define-fun .def18 () Bool
+           (= F-k+ (ite at-F-1
+                        (_ bv0 32)
+                        (ite (and at-F-4 (bvslt F-k (_ bv3 32)))
+                             (bvadd F-k (_ bv1 32))
+                             F-k))))
+
+(define-fun .def19a () Bool
+            (= at-B-1+ false))
+
+(define-fun .def20 () Bool
+            (= at-B-3+ (or at-B-1 at-F-7)))
+
+(define-fun .def22 () Bool
+            (= at-B-5+ (and at-B-3 (not (bvslt B-i (_ bv5 32))))))
+
+(define-fun .def21 () Bool
+            (= B-i+ (ite at-B-1
+                         (_ bv0 32)
+                         (ite at-F-7
+                              F-ret
+                              B-i))))
+
+(define-fun .def23 () Bool
+            (= at-U+ (and at-B-5 (not (bvslt B-i (_ bv7 32))))))
+
+
+(define-fun .trans () Bool
+            (! (and .def13 .def14 .def15 .def16 .def17 .def18 .def18a .def19 .def19a .def20 .def21 .def22 .def23) :trans true))
+
+(define-fun .property () Bool
+            (! (not at-U) :invar-property 0))

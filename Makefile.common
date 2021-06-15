@@ -1,0 +1,43 @@
+CXX = g++-7
+#LLVM_DIR = $(LIBDIR)/llvm-5.0.0.src/install
+LLVM_DIR = /opt/llvm-5.0.0-with-gcc-7
+CXXFLAGS =  -std=c++1z -fno-rtti -g -O3 -Wall -Wno-reorder -Wno-unused-variable -fno-omit-frame-pointer \
+	    -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS \
+	    -I$(LIBDIR)/boolector/boolector/src -I$(LIBDIR)/spdlog/include -I$(LIBDIR)/z3/src/api -I$(LIBDIR)/z3/src/api/c++ -I$(LLVM_DIR)/include -I$(LIBDIR)/variant/include \
+	    -I$(LIBDIR)/xcode/src $(EXTRA_INCLUDE) $(EXTRA_CXXFLAGS)
+
+DEPDIR := .d
+$(shell mkdir -p $(DEPDIR) >/dev/null)
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$(notdir $*).Td
+
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+COMPILE.cc = $(CXX) $(DEPFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# touch because of clang not being careful about timestamps aieeeeeeeeeeee
+POSTCOMPILE = mv -f $(DEPDIR)/$(notdir $*).Td $(DEPDIR)/$(notdir $*).d; touch $@
+
+
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	$(POSTCOMPILE)
+
+%.o : %.cc
+%.o : %.cc $(DEPDIR)/%.d
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+	$(POSTCOMPILE)
+
+%.o : %.cpp
+%.o : %.cpp $(DEPDIR)/%.d
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+	$(POSTCOMPILE)
+
+# prefix header
+%.hpp.gch : %.hpp
+%.hpp.gch : %.hpp $(DEPDIR)/%.d
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+	$(POSTCOMPILE)
+
+$(DEPDIR)/%.d: ;
+.PRECIOUS: $(DEPDIR)/%.d
+
+

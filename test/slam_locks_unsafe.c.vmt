@@ -1,0 +1,704 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^false\(unreach-call\)$
+; 13 state variables
+; (including 3 locations)
+(declare-fun main@%lock () (_ BitVec 64))
+(declare-fun main@%lock+ () (_ BitVec 64))
+(define-fun .def0 () (_ BitVec 64) (! main@%lock :next main@%lock+))
+(declare-fun main@%nPackets.i () (_ BitVec 64))
+(declare-fun main@%nPackets.i+ () (_ BitVec 64))
+(define-fun .def3 () (_ BitVec 64) (! main@%nPackets.i :next main@%nPackets.i+))
+(declare-fun main@%nPacketsOld.i () (_ BitVec 64))
+(declare-fun main@%nPacketsOld.i+ () (_ BitVec 64))
+(define-fun .def4 () (_ BitVec 64) (! main@%nPacketsOld.i :next main@%nPacketsOld.i+))
+(declare-fun main@%shadow.mem.13.0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.13.0+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(define-fun .def5 () (Array (_ BitVec 64) (_ BitVec 64)) (! main@%shadow.mem.13.0 :next main@%shadow.mem.13.0+))
+(declare-fun main@%shadow.mem.9.0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.9.0+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(define-fun .def6 () (Array (_ BitVec 64) (_ BitVec 64)) (! main@%shadow.mem.9.0 :next main@%shadow.mem.9.0+))
+(declare-fun main@%shadow.mem.0.0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.0.0+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(define-fun .def7 () (Array (_ BitVec 64) (_ BitVec 64)) (! main@%shadow.mem.0.0 :next main@%shadow.mem.0.0+))
+(declare-fun main@%shadow.mem.5.0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.5.0+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(define-fun .def8 () (Array (_ BitVec 64) (_ BitVec 64)) (! main@%shadow.mem.5.0 :next main@%shadow.mem.5.0+))
+(declare-fun main@%shadow.mem.1.0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.1.0+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(define-fun .def9 () (Array (_ BitVec 64) (_ BitVec 64)) (! main@%shadow.mem.1.0 :next main@%shadow.mem.1.0+))
+(declare-fun main@%reqStatus.i () (_ BitVec 64))
+(declare-fun main@%reqStatus.i+ () (_ BitVec 64))
+(define-fun .def10 () (_ BitVec 64) (! main@%reqStatus.i :next main@%reqStatus.i+))
+(declare-fun main@%req.i () (_ BitVec 64))
+(declare-fun main@%req.i+ () (_ BitVec 64))
+(define-fun .def11 () (_ BitVec 64) (! main@%req.i :next main@%req.i+))
+(declare-fun main@entry () Bool)
+(declare-fun main@entry+ () Bool)
+(define-fun .def12 () Bool (! main@entry :next main@entry+))
+(declare-fun main@_6 () Bool)
+(declare-fun main@_6+ () Bool)
+(define-fun .def14 () Bool (! main@_6 :next main@_6+))
+(declare-fun main@verifier.error.split () Bool)
+(declare-fun main@verifier.error.split+ () Bool)
+(define-fun .def15 () Bool (! main@verifier.error.split :next main@verifier.error.split+))
+; 135 inputs
+(declare-fun main@%.b.i1_0 () Bool)
+(declare-fun main@%_41_0 () (_ BitVec 32))
+(declare-fun main@%_37_0 () Bool)
+(declare-fun main@%_34_0 () (_ BitVec 32))
+(declare-fun main@%_35_0 () (_ BitVec 32))
+(declare-fun main@%_36_0 () Bool)
+(declare-fun main@%_31_0 () (_ BitVec 32))
+(declare-fun main@%_32_0 () (_ BitVec 32))
+(declare-fun main@%_27_0 () (_ BitVec 32))
+(declare-fun main@%_29_0 () (_ BitVec 32))
+(declare-fun main@%_24_0 () (_ BitVec 32))
+(declare-fun main@%_25_0 () Bool)
+(declare-fun main@%.b.i3_0 () Bool)
+(declare-fun main@%_20_0 () (_ BitVec 32))
+(declare-fun main@%_21_0 () (_ BitVec 32))
+(declare-fun main@%_22_0 () Bool)
+(declare-fun main@%shadow.mem.0.1_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.0.3_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%_19_0 () Bool)
+(declare-fun main@%_16_0 () (_ BitVec 32))
+(declare-fun main@%_17_0 () Bool)
+(declare-fun main@%.b.i2_0 () Bool)
+(declare-fun main@%_8_0 () (_ BitVec 32))
+(declare-fun main@%_9_0 () Bool)
+(declare-fun main@%_10_0 () (_ BitVec 32))
+(declare-fun main@%_11_0 () (_ BitVec 32))
+(declare-fun main@%_12_0 () (_ BitVec 32))
+(declare-fun main@%_13_0 () (_ BitVec 32))
+(declare-fun main@%_14_0 () Bool)
+(declare-fun main@%.b.i_0 () Bool)
+(declare-fun main@%_38_0 () (_ BitVec 32))
+(declare-fun main@%_39_0 () Bool)
+(declare-fun main@%_7_0 () Bool)
+(declare-fun @llvm.used_0 () (_ BitVec 64))
+(declare-fun main@%sm18_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm19_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm20_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm21_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm22_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm23_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%_0_0 () (_ BitVec 64))
+(declare-fun main@%_1_0 () (_ BitVec 64))
+(declare-fun main@%_2_0 () (_ BitVec 64))
+(declare-fun main@%_3_0 () (_ BitVec 64))
+(declare-fun main@%_4_0 () (_ BitVec 64))
+(declare-fun main@%_5_0 () (_ BitVec 64))
+(declare-fun main@%sm4_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm5_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm9_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.13.0_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.9.0_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.5.0_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@entry_0 () Bool)
+(declare-fun main@%lock_0 () (_ BitVec 64))
+(declare-fun main@%nPackets.i_0 () (_ BitVec 64))
+(declare-fun main@%nPacketsOld.i_0 () (_ BitVec 64))
+(declare-fun main@%req.i_0 () (_ BitVec 64))
+(declare-fun main@%reqStatus.i_0 () (_ BitVec 64))
+(declare-fun main@%sm6_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm7_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm8_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm10_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm11_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_6_0 () Bool)
+(declare-fun main@%shadow.mem.13.0_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.9.0_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.0.0_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.5.0_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.1.0_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.13.0_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.9.0_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.0.0_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.5.0_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.1.0_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@postcall_0 () Bool)
+(declare-fun main@%sm12_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm13_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm14_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%sm15_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_15_0 () Bool)
+(declare-fun main@_18_0 () Bool)
+(declare-fun main@postcall2_0 () Bool)
+(declare-fun main@_23_0 () Bool)
+(declare-fun main@%sm16_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@KeReleaseSpinLock.exit_0 () Bool)
+(declare-fun |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)| () Bool)
+(declare-fun main@%shadow.mem.0.1_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.0.1_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_28_0 () Bool)
+(declare-fun main@_26_0 () Bool)
+(declare-fun main@_30_0 () Bool)
+(declare-fun main@%sm17_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_33_0 () Bool)
+(declare-fun |tuple(main@_15_0, main@_33_0)| () Bool)
+(declare-fun |tuple(main@postcall_0, main@_33_0)| () Bool)
+(declare-fun main@%shadow.mem.0.2_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.1.1_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.0.2_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.1.1_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.0.2_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.1.1_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.0.2_3 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.1.1_3 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_6_1 () Bool)
+(declare-fun main@%shadow.mem.0.0_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.1.0_2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@precall_0 () Bool)
+(declare-fun main@KeAcquireSpinLock_0 () Bool)
+(declare-fun main@_40_0 () Bool)
+(declare-fun main@precall3_0 () Bool)
+(declare-fun main@orig.main.exit_0 () Bool)
+(declare-fun main@precall5_0 () Bool)
+(declare-fun main@KeReleaseSpinLock_0 () Bool)
+(declare-fun main@%shadow.mem.0.3_0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@%shadow.mem.0.3_1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_42_0 () Bool)
+(declare-fun main@verifier.error_0 () Bool)
+(declare-fun main@verifier.error.split_0 () Bool)
+(declare-fun .cond1 () Bool)
+(declare-fun .cond2 () Bool)
+(declare-fun .cond13 () Bool)
+(declare-fun .cond16 () Bool)
+; transitions
+(define-fun .def17 () Bool
+  (= main@%lock+ (ite .cond2 main@%lock_0 (ite .cond1 main@%lock_0 main@%lock))))
+
+(define-fun .def18 () Bool
+  (= main@%nPackets.i+ (ite .cond2 main@%nPackets.i_0 (ite .cond1 main@%nPackets.i_0 main@%nPackets.i))))
+
+(define-fun .def19 () Bool
+  (= main@%nPacketsOld.i+ (ite .cond2
+     main@%nPacketsOld.i_0
+     (ite .cond1 main@%nPacketsOld.i_0 main@%nPacketsOld.i))))
+
+(define-fun .def20 () Bool
+  (= main@%shadow.mem.13.0+ (ite .cond2
+     main@%shadow.mem.13.0_2
+     (ite .cond1 main@%shadow.mem.13.0_1 main@%shadow.mem.13.0))))
+
+(define-fun .def21 () Bool
+  (= main@%shadow.mem.9.0+ (ite .cond2
+     main@%shadow.mem.9.0_2
+     (ite .cond1 main@%shadow.mem.9.0_1 main@%shadow.mem.9.0))))
+
+(define-fun .def22 () Bool
+  (= main@%shadow.mem.0.0+ (ite .cond2
+     main@%shadow.mem.0.0_2
+     (ite .cond1 main@%shadow.mem.0.0_1 main@%shadow.mem.0.0))))
+
+(define-fun .def23 () Bool
+  (= main@%shadow.mem.5.0+ (ite .cond2
+     main@%shadow.mem.5.0_2
+     (ite .cond1 main@%shadow.mem.5.0_1 main@%shadow.mem.5.0))))
+
+(define-fun .def24 () Bool
+  (= main@%shadow.mem.1.0+ (ite .cond2
+     main@%shadow.mem.1.0_2
+     (ite .cond1 main@%shadow.mem.1.0_1 main@%shadow.mem.1.0))))
+
+(define-fun .def25 () Bool
+  (= main@%reqStatus.i+ (ite .cond2
+     main@%reqStatus.i_0
+     (ite .cond1 main@%reqStatus.i_0 main@%reqStatus.i))))
+
+(define-fun .def26 () Bool
+  (= main@%req.i+ (ite .cond2 main@%req.i_0 (ite .cond1 main@%req.i_0 main@%req.i))))
+
+(define-fun .def27 () Bool
+  (= main@entry+ (ite .cond13 false false)))
+
+(define-fun .def28 () Bool
+  (= main@_6+ (ite .cond2 true (ite .cond1 true false))))
+
+(define-fun .def29 () Bool
+  (= main@verifier.error.split+ (ite .cond16 true false)))
+
+(define-fun .def30 () Bool
+  (= .cond13 true))
+
+(define-fun .def31 () Bool
+  (= .cond1 (and main@entry
+     true
+     true
+     (bvugt @llvm.used_0 #x0000000000000000)
+     (bvugt main@%lock_0 #x0000000000000000)
+     (= main@%sm_0 (store main@%sm20_0 main@%lock_0 ((_ zero_extend 63) #b0)))
+     (bvugt main@%nPackets.i_0 #x0000000000000000)
+     (bvugt main@%nPacketsOld.i_0 #x0000000000000000)
+     (bvugt main@%req.i_0 #x0000000000000000)
+     (bvugt main@%reqStatus.i_0 #x0000000000000000)
+     (bvugt main@%_0_0 #x0000000000000000)
+     (= main@%_1_0 main@%nPackets.i_0)
+     (= main@%_2_0 main@%nPacketsOld.i_0)
+     (= main@%_3_0 main@%req.i_0)
+     (= main@%_4_0 main@%reqStatus.i_0)
+     (= main@%_5_0 main@%_0_0)
+     (= main@%sm4_0 (store main@%sm_0 main@%lock_0 ((_ zero_extend 63) #b0)))
+     (= main@%sm5_0
+        (store main@%sm18_0 main@%nPackets.i_0 ((_ zero_extend 32) #x00000000)))
+     (= main@%sm6_0
+        (store main@%sm19_0
+               main@%nPacketsOld.i_0
+               ((_ zero_extend 32) #x00000000)))
+     (= main@%sm7_0
+        (store main@%sm21_0 main@%req.i_0 ((_ zero_extend 32) #x00000000)))
+     (= main@%sm8_0
+        (store main@%sm22_0 main@%reqStatus.i_0 ((_ zero_extend 32) #x00000000)))
+     (= main@%sm9_0
+        (store main@%sm23_0 main@%_0_0 ((_ zero_extend 32) #x00000000)))
+     (= main@%sm10_0 (store main@%sm4_0 main@%lock_0 ((_ zero_extend 63) #b0)))
+     (= main@%sm11_0
+        (store main@%sm5_0 main@%nPackets.i_0 ((_ zero_extend 32) #x00000000)))
+     (=> main@_6_0 (and main@_6_0 main@entry_0))
+     (=> (and main@_6_0 main@entry_0) (= main@%shadow.mem.13.0_0 main@%sm8_0))
+     (=> (and main@_6_0 main@entry_0) (= main@%shadow.mem.9.0_0 main@%sm7_0))
+     (=> (and main@_6_0 main@entry_0) (= main@%shadow.mem.0.0_0 main@%sm10_0))
+     (=> (and main@_6_0 main@entry_0) (= main@%shadow.mem.5.0_0 main@%sm6_0))
+     (=> (and main@_6_0 main@entry_0) (= main@%shadow.mem.1.0_0 main@%sm11_0))
+     (=> (and main@_6_0 main@entry_0)
+         (= main@%shadow.mem.13.0_1 main@%shadow.mem.13.0_0))
+     (=> (and main@_6_0 main@entry_0)
+         (= main@%shadow.mem.9.0_1 main@%shadow.mem.9.0_0))
+     (=> (and main@_6_0 main@entry_0)
+         (= main@%shadow.mem.0.0_1 main@%shadow.mem.0.0_0))
+     (=> (and main@_6_0 main@entry_0)
+         (= main@%shadow.mem.5.0_1 main@%shadow.mem.5.0_0))
+     (=> (and main@_6_0 main@entry_0)
+         (= main@%shadow.mem.1.0_1 main@%shadow.mem.1.0_0))
+     main@_6_0)))
+
+(define-fun .def32 () Bool
+  (= .cond2 (let ((a!1 (= main@%.b.i2_0
+              (not (= (select main@%shadow.mem.0.0_0 main@%lock_0)
+                      #x0000000000000000))))
+      (a!2 (=> main@postcall_0
+               (= main@%_8_0 ((_ zero_extend 31) (ite main@%.b.i2_0 #b1 #b0)))))
+      (a!3 (=> main@postcall_0
+               (= main@%sm12_0
+                  (store main@%shadow.mem.0.0_0
+                         main@%lock_0
+                         ((_ zero_extend 63) #b1)))))
+      (a!4 (=> main@postcall_0
+               (= main@%_10_0
+                  ((_ extract 31 0)
+                    (select main@%shadow.mem.1.0_0 main@%nPackets.i_0)))))
+      (a!5 (=> main@postcall_0
+               (= main@%sm13_0
+                  (store main@%shadow.mem.5.0_0
+                         main@%nPacketsOld.i_0
+                         ((_ zero_extend 32) main@%_10_0)))))
+      (a!6 (=> main@postcall_0
+               (= main@%sm14_0
+                  (store main@%shadow.mem.9.0_0
+                         main@%req.i_0
+                         ((_ zero_extend 32) main@%_11_0)))))
+      (a!7 (=> main@postcall_0
+               (= main@%sm15_0
+                  (store main@%shadow.mem.13.0_0
+                         main@%reqStatus.i_0
+                         ((_ zero_extend 32) main@%_12_0)))))
+      (a!8 (=> main@postcall_0
+               (= main@%_13_0
+                  ((_ extract 31 0) (select main@%sm14_0 main@%req.i_0)))))
+      (a!9 (=> main@postcall_0 (= main@%_14_0 (not (= main@%_13_0 #x00000000)))))
+      (a!10 (=> main@_15_0
+                (= main@%_16_0
+                   ((_ extract 31 0) (select main@%sm15_0 main@%reqStatus.i_0)))))
+      (a!11 (=> main@_15_0 (= main@%_17_0 (not (= main@%_16_0 #x00000000)))))
+      (a!12 (= main@%.b.i3_0
+               (not (= (select main@%sm12_0 main@%lock_0) #x0000000000000000))))
+      (a!13 (=> main@postcall2_0
+                (= main@%_20_0 ((_ zero_extend 31) (ite main@%.b.i3_0 #b1 #b0)))))
+      (a!14 (=> main@postcall2_0
+                (= main@%_22_0 (not (= main@%_21_0 #x00000000)))))
+      (a!15 (=> main@_23_0
+                (= main@%sm16_0
+                   (store main@%sm12_0 main@%lock_0 ((_ zero_extend 63) #b0)))))
+      (a!16 (=> main@KeReleaseSpinLock.exit_0
+                (= main@%_24_0
+                   ((_ extract 31 0) (select main@%sm15_0 main@%reqStatus.i_0)))))
+      (a!17 (=> main@_28_0
+                (= main@%_29_0
+                   ((_ extract 31 0) (select main@%sm15_0 main@%reqStatus.i_0)))))
+      (a!18 (=> main@_26_0
+                (= main@%_27_0
+                   ((_ extract 31 0) (select main@%sm15_0 main@%reqStatus.i_0)))))
+      (a!19 (=> main@_30_0
+                (= main@%_31_0
+                   ((_ extract 31 0)
+                     (select main@%shadow.mem.1.0_0 main@%nPackets.i_0)))))
+      (a!20 (=> main@_30_0
+                (= main@%sm17_0
+                   (store main@%shadow.mem.1.0_0
+                          main@%nPackets.i_0
+                          ((_ zero_extend 32) main@%_32_0)))))
+      (a!21 (=> main@_33_0
+                (= main@%_34_0
+                   ((_ extract 31 0)
+                     (select main@%shadow.mem.1.1_3 main@%nPackets.i_0)))))
+      (a!22 (=> main@_33_0
+                (= main@%_35_0
+                   ((_ extract 31 0)
+                     (select main@%sm13_0 main@%nPacketsOld.i_0)))))
+      (a!23 (=> main@_33_0 (= main@%_36_0 (not (= main@%_34_0 main@%_35_0))))))
+  (and main@_6
+       (= main@%lock main@%lock_0)
+       (= main@%nPackets.i main@%nPackets.i_0)
+       (= main@%nPacketsOld.i main@%nPacketsOld.i_0)
+       (= main@%shadow.mem.13.0 main@%shadow.mem.13.0_0)
+       (= main@%shadow.mem.9.0 main@%shadow.mem.9.0_0)
+       (= main@%shadow.mem.0.0 main@%shadow.mem.0.0_0)
+       (= main@%shadow.mem.5.0 main@%shadow.mem.5.0_0)
+       (= main@%shadow.mem.1.0 main@%shadow.mem.1.0_0)
+       (= main@%reqStatus.i main@%reqStatus.i_0)
+       (= main@%req.i main@%req.i_0)
+       true
+       (=> main@postcall_0 (and main@postcall_0 main@_6_0))
+       (=> (and main@postcall_0 main@_6_0) main@%_7_0)
+       (=> main@postcall_0 a!1)
+       a!2
+       (=> main@postcall_0 (= main@%_9_0 (= main@%_8_0 #x00000000)))
+       (=> main@postcall_0 main@%_9_0)
+       a!3
+       a!4
+       a!5
+       a!6
+       a!7
+       a!8
+       a!9
+       (=> main@_15_0 (and main@_15_0 main@postcall_0))
+       (=> (and main@_15_0 main@postcall_0) main@%_14_0)
+       a!10
+       a!11
+       (=> main@_18_0 (and main@_18_0 main@_15_0))
+       (=> (and main@_18_0 main@_15_0) main@%_17_0)
+       (=> main@postcall2_0 (and main@postcall2_0 main@_18_0))
+       (=> (and main@postcall2_0 main@_18_0) main@%_19_0)
+       (=> main@postcall2_0 a!12)
+       a!13
+       (=> main@postcall2_0 main@%.b.i3_0)
+       a!14
+       (=> main@_23_0 (and main@_23_0 main@postcall2_0))
+       (=> (and main@_23_0 main@postcall2_0) main@%_22_0)
+       a!15
+       (=> |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+           main@postcall2_0)
+       (=> main@KeReleaseSpinLock.exit_0
+           (or |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+               (and main@KeReleaseSpinLock.exit_0 main@_23_0)))
+       (=> |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+           (not main@%_22_0))
+       (=> |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+           (= main@%shadow.mem.0.1_0 main@%sm12_0))
+       (=> (and main@KeReleaseSpinLock.exit_0 main@_23_0)
+           (= main@%shadow.mem.0.1_1 main@%sm16_0))
+       (=> |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+           (= main@%shadow.mem.0.1_2 main@%shadow.mem.0.1_0))
+       (=> (and main@KeReleaseSpinLock.exit_0 main@_23_0)
+           (= main@%shadow.mem.0.1_2 main@%shadow.mem.0.1_1))
+       a!16
+       (=> main@KeReleaseSpinLock.exit_0
+           (= main@%_25_0 (bvsgt main@%_24_0 #x00000000)))
+       (=> main@_28_0 (and main@_28_0 main@KeReleaseSpinLock.exit_0))
+       (=> (and main@_28_0 main@KeReleaseSpinLock.exit_0) (not main@%_25_0))
+       a!17
+       (=> main@_26_0 (and main@_26_0 main@KeReleaseSpinLock.exit_0))
+       (=> (and main@_26_0 main@KeReleaseSpinLock.exit_0) main@%_25_0)
+       a!18
+       (=> main@_30_0
+           (or (and main@_30_0 main@_28_0) (and main@_30_0 main@_26_0)))
+       a!19
+       (=> main@_30_0 (= main@%_32_0 (bvadd main@%_31_0 #x00000001)))
+       a!20
+       (=> |tuple(main@_15_0, main@_33_0)| main@_15_0)
+       (=> |tuple(main@postcall_0, main@_33_0)| main@postcall_0)
+       (=> main@_33_0
+           (or (and main@_33_0 main@_30_0)
+               |tuple(main@_15_0, main@_33_0)|
+               |tuple(main@postcall_0, main@_33_0)|))
+       (=> |tuple(main@_15_0, main@_33_0)| (not main@%_17_0))
+       (=> |tuple(main@postcall_0, main@_33_0)| (not main@%_14_0))
+       (=> (and main@_33_0 main@_30_0)
+           (= main@%shadow.mem.0.2_0 main@%shadow.mem.0.1_2))
+       (=> (and main@_33_0 main@_30_0) (= main@%shadow.mem.1.1_0 main@%sm17_0))
+       (=> |tuple(main@_15_0, main@_33_0)|
+           (= main@%shadow.mem.0.2_1 main@%sm12_0))
+       (=> |tuple(main@_15_0, main@_33_0)|
+           (= main@%shadow.mem.1.1_1 main@%shadow.mem.1.0_0))
+       (=> |tuple(main@postcall_0, main@_33_0)|
+           (= main@%shadow.mem.0.2_2 main@%sm12_0))
+       (=> |tuple(main@postcall_0, main@_33_0)|
+           (= main@%shadow.mem.1.1_2 main@%shadow.mem.1.0_0))
+       (=> (and main@_33_0 main@_30_0)
+           (= main@%shadow.mem.0.2_3 main@%shadow.mem.0.2_0))
+       (=> (and main@_33_0 main@_30_0)
+           (= main@%shadow.mem.1.1_3 main@%shadow.mem.1.1_0))
+       (=> |tuple(main@_15_0, main@_33_0)|
+           (= main@%shadow.mem.0.2_3 main@%shadow.mem.0.2_1))
+       (=> |tuple(main@_15_0, main@_33_0)|
+           (= main@%shadow.mem.1.1_3 main@%shadow.mem.1.1_1))
+       (=> |tuple(main@postcall_0, main@_33_0)|
+           (= main@%shadow.mem.0.2_3 main@%shadow.mem.0.2_2))
+       (=> |tuple(main@postcall_0, main@_33_0)|
+           (= main@%shadow.mem.1.1_3 main@%shadow.mem.1.1_2))
+       a!21
+       a!22
+       a!23
+       (=> main@_6_1 (and main@_6_1 main@_33_0))
+       (=> (and main@_6_1 main@_33_0) main@%_36_0)
+       (=> (and main@_6_1 main@_33_0) (= main@%shadow.mem.13.0_1 main@%sm15_0))
+       (=> (and main@_6_1 main@_33_0) (= main@%shadow.mem.9.0_1 main@%sm14_0))
+       (=> (and main@_6_1 main@_33_0)
+           (= main@%shadow.mem.0.0_1 main@%shadow.mem.0.2_3))
+       (=> (and main@_6_1 main@_33_0) (= main@%shadow.mem.5.0_1 main@%sm13_0))
+       (=> (and main@_6_1 main@_33_0)
+           (= main@%shadow.mem.1.0_1 main@%shadow.mem.1.1_3))
+       (=> (and main@_6_1 main@_33_0)
+           (= main@%shadow.mem.13.0_2 main@%shadow.mem.13.0_1))
+       (=> (and main@_6_1 main@_33_0)
+           (= main@%shadow.mem.9.0_2 main@%shadow.mem.9.0_1))
+       (=> (and main@_6_1 main@_33_0)
+           (= main@%shadow.mem.0.0_2 main@%shadow.mem.0.0_1))
+       (=> (and main@_6_1 main@_33_0)
+           (= main@%shadow.mem.5.0_2 main@%shadow.mem.5.0_1))
+       (=> (and main@_6_1 main@_33_0)
+           (= main@%shadow.mem.1.0_2 main@%shadow.mem.1.0_1))
+       main@_6_1))))
+
+(define-fun .def33 () Bool
+  (= .cond16 (let ((a!1 (= main@%.b.i_0
+              (not (= (select main@%shadow.mem.0.0_0 main@%lock_0)
+                      #x0000000000000000))))
+      (a!2 (=> main@KeAcquireSpinLock_0
+               (= main@%_38_0 ((_ zero_extend 31) (ite main@%.b.i_0 #b1 #b0)))))
+      (a!3 (= main@%.b.i2_0
+              (not (= (select main@%shadow.mem.0.0_0 main@%lock_0)
+                      #x0000000000000000))))
+      (a!4 (=> main@postcall_0
+               (= main@%_8_0 ((_ zero_extend 31) (ite main@%.b.i2_0 #b1 #b0)))))
+      (a!5 (=> main@postcall_0
+               (= main@%sm12_0
+                  (store main@%shadow.mem.0.0_0
+                         main@%lock_0
+                         ((_ zero_extend 63) #b1)))))
+      (a!6 (=> main@postcall_0
+               (= main@%_10_0
+                  ((_ extract 31 0)
+                    (select main@%shadow.mem.1.0_0 main@%nPackets.i_0)))))
+      (a!7 (=> main@postcall_0
+               (= main@%sm13_0
+                  (store main@%shadow.mem.5.0_0
+                         main@%nPacketsOld.i_0
+                         ((_ zero_extend 32) main@%_10_0)))))
+      (a!8 (=> main@postcall_0
+               (= main@%sm14_0
+                  (store main@%shadow.mem.9.0_0
+                         main@%req.i_0
+                         ((_ zero_extend 32) main@%_11_0)))))
+      (a!9 (=> main@postcall_0
+               (= main@%sm15_0
+                  (store main@%shadow.mem.13.0_0
+                         main@%reqStatus.i_0
+                         ((_ zero_extend 32) main@%_12_0)))))
+      (a!10 (=> main@postcall_0
+                (= main@%_13_0
+                   ((_ extract 31 0) (select main@%sm14_0 main@%req.i_0)))))
+      (a!11 (=> main@postcall_0
+                (= main@%_14_0 (not (= main@%_13_0 #x00000000)))))
+      (a!12 (=> main@_15_0
+                (= main@%_16_0
+                   ((_ extract 31 0) (select main@%sm15_0 main@%reqStatus.i_0)))))
+      (a!13 (=> main@_15_0 (= main@%_17_0 (not (= main@%_16_0 #x00000000)))))
+      (a!14 (= main@%.b.i3_0
+               (not (= (select main@%sm12_0 main@%lock_0) #x0000000000000000))))
+      (a!15 (=> main@postcall2_0
+                (= main@%_20_0 ((_ zero_extend 31) (ite main@%.b.i3_0 #b1 #b0)))))
+      (a!16 (=> main@postcall2_0
+                (= main@%_22_0 (not (= main@%_21_0 #x00000000)))))
+      (a!17 (=> main@_23_0
+                (= main@%sm16_0
+                   (store main@%sm12_0 main@%lock_0 ((_ zero_extend 63) #b0)))))
+      (a!18 (=> main@KeReleaseSpinLock.exit_0
+                (= main@%_24_0
+                   ((_ extract 31 0) (select main@%sm15_0 main@%reqStatus.i_0)))))
+      (a!19 (=> main@_28_0
+                (= main@%_29_0
+                   ((_ extract 31 0) (select main@%sm15_0 main@%reqStatus.i_0)))))
+      (a!20 (=> main@_26_0
+                (= main@%_27_0
+                   ((_ extract 31 0) (select main@%sm15_0 main@%reqStatus.i_0)))))
+      (a!21 (=> main@_30_0
+                (= main@%_31_0
+                   ((_ extract 31 0)
+                     (select main@%shadow.mem.1.0_0 main@%nPackets.i_0)))))
+      (a!22 (=> main@_30_0
+                (= main@%sm17_0
+                   (store main@%shadow.mem.1.0_0
+                          main@%nPackets.i_0
+                          ((_ zero_extend 32) main@%_32_0)))))
+      (a!23 (=> main@_33_0
+                (= main@%_34_0
+                   ((_ extract 31 0)
+                     (select main@%shadow.mem.1.1_3 main@%nPackets.i_0)))))
+      (a!24 (=> main@_33_0
+                (= main@%_35_0
+                   ((_ extract 31 0)
+                     (select main@%sm13_0 main@%nPacketsOld.i_0)))))
+      (a!25 (=> main@_33_0 (= main@%_36_0 (not (= main@%_34_0 main@%_35_0)))))
+      (a!26 (= main@%.b.i1_0
+               (not (= (select main@%shadow.mem.0.3_2 main@%lock_0)
+                       #x0000000000000000))))
+      (a!27 (=> main@KeReleaseSpinLock_0
+                (= main@%_41_0 ((_ zero_extend 31) (ite main@%.b.i1_0 #b1 #b0))))))
+  (and main@_6
+       (= main@%lock main@%lock_0)
+       (= main@%nPackets.i main@%nPackets.i_0)
+       (= main@%nPacketsOld.i main@%nPacketsOld.i_0)
+       (= main@%shadow.mem.13.0 main@%shadow.mem.13.0_0)
+       (= main@%shadow.mem.9.0 main@%shadow.mem.9.0_0)
+       (= main@%shadow.mem.0.0 main@%shadow.mem.0.0_0)
+       (= main@%shadow.mem.5.0 main@%shadow.mem.5.0_0)
+       (= main@%shadow.mem.1.0 main@%shadow.mem.1.0_0)
+       (= main@%reqStatus.i main@%reqStatus.i_0)
+       (= main@%req.i main@%req.i_0)
+       true
+       (=> main@precall_0 (and main@precall_0 main@_6_0))
+       (=> (and main@precall_0 main@_6_0) (not main@%_7_0))
+       (=> main@KeAcquireSpinLock_0
+           (and main@KeAcquireSpinLock_0 main@precall_0))
+       (=> main@KeAcquireSpinLock_0 a!1)
+       a!2
+       (=> main@KeAcquireSpinLock_0 (= main@%_39_0 (= main@%_38_0 #x00000000)))
+       (=> main@KeAcquireSpinLock_0 (not main@%_39_0))
+       (=> main@_40_0 (and main@_40_0 main@KeAcquireSpinLock_0))
+       (=> main@postcall_0 (and main@postcall_0 main@_6_0))
+       (=> (and main@postcall_0 main@_6_0) main@%_7_0)
+       (=> main@postcall_0 a!3)
+       a!4
+       (=> main@postcall_0 (= main@%_9_0 (= main@%_8_0 #x00000000)))
+       (=> main@postcall_0 main@%_9_0)
+       a!5
+       a!6
+       a!7
+       a!8
+       a!9
+       a!10
+       a!11
+       (=> main@_15_0 (and main@_15_0 main@postcall_0))
+       (=> (and main@_15_0 main@postcall_0) main@%_14_0)
+       a!12
+       a!13
+       (=> main@_18_0 (and main@_18_0 main@_15_0))
+       (=> (and main@_18_0 main@_15_0) main@%_17_0)
+       (=> main@precall3_0 (and main@precall3_0 main@_18_0))
+       (=> (and main@precall3_0 main@_18_0) (not main@%_19_0))
+       (=> main@postcall2_0 (and main@postcall2_0 main@_18_0))
+       (=> (and main@postcall2_0 main@_18_0) main@%_19_0)
+       (=> main@postcall2_0 a!14)
+       a!15
+       (=> main@postcall2_0 main@%.b.i3_0)
+       a!16
+       (=> main@_23_0 (and main@_23_0 main@postcall2_0))
+       (=> (and main@_23_0 main@postcall2_0) main@%_22_0)
+       a!17
+       (=> |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+           main@postcall2_0)
+       (=> main@KeReleaseSpinLock.exit_0
+           (or |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+               (and main@KeReleaseSpinLock.exit_0 main@_23_0)))
+       (=> |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+           (not main@%_22_0))
+       (=> |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+           (= main@%shadow.mem.0.1_0 main@%sm12_0))
+       (=> (and main@KeReleaseSpinLock.exit_0 main@_23_0)
+           (= main@%shadow.mem.0.1_1 main@%sm16_0))
+       (=> |tuple(main@postcall2_0, main@KeReleaseSpinLock.exit_0)|
+           (= main@%shadow.mem.0.1_2 main@%shadow.mem.0.1_0))
+       (=> (and main@KeReleaseSpinLock.exit_0 main@_23_0)
+           (= main@%shadow.mem.0.1_2 main@%shadow.mem.0.1_1))
+       a!18
+       (=> main@KeReleaseSpinLock.exit_0
+           (= main@%_25_0 (bvsgt main@%_24_0 #x00000000)))
+       (=> main@_28_0 (and main@_28_0 main@KeReleaseSpinLock.exit_0))
+       (=> (and main@_28_0 main@KeReleaseSpinLock.exit_0) (not main@%_25_0))
+       a!19
+       (=> main@_26_0 (and main@_26_0 main@KeReleaseSpinLock.exit_0))
+       (=> (and main@_26_0 main@KeReleaseSpinLock.exit_0) main@%_25_0)
+       a!20
+       (=> main@_30_0
+           (or (and main@_30_0 main@_28_0) (and main@_30_0 main@_26_0)))
+       a!21
+       (=> main@_30_0 (= main@%_32_0 (bvadd main@%_31_0 #x00000001)))
+       a!22
+       (=> |tuple(main@_15_0, main@_33_0)| main@_15_0)
+       (=> |tuple(main@postcall_0, main@_33_0)| main@postcall_0)
+       (=> main@_33_0
+           (or (and main@_33_0 main@_30_0)
+               |tuple(main@_15_0, main@_33_0)|
+               |tuple(main@postcall_0, main@_33_0)|))
+       (=> |tuple(main@_15_0, main@_33_0)| (not main@%_17_0))
+       (=> |tuple(main@postcall_0, main@_33_0)| (not main@%_14_0))
+       (=> (and main@_33_0 main@_30_0)
+           (= main@%shadow.mem.0.2_0 main@%shadow.mem.0.1_2))
+       (=> (and main@_33_0 main@_30_0) (= main@%shadow.mem.1.1_0 main@%sm17_0))
+       (=> |tuple(main@_15_0, main@_33_0)|
+           (= main@%shadow.mem.0.2_1 main@%sm12_0))
+       (=> |tuple(main@_15_0, main@_33_0)|
+           (= main@%shadow.mem.1.1_1 main@%shadow.mem.1.0_0))
+       (=> |tuple(main@postcall_0, main@_33_0)|
+           (= main@%shadow.mem.0.2_2 main@%sm12_0))
+       (=> |tuple(main@postcall_0, main@_33_0)|
+           (= main@%shadow.mem.1.1_2 main@%shadow.mem.1.0_0))
+       (=> (and main@_33_0 main@_30_0)
+           (= main@%shadow.mem.0.2_3 main@%shadow.mem.0.2_0))
+       (=> (and main@_33_0 main@_30_0)
+           (= main@%shadow.mem.1.1_3 main@%shadow.mem.1.1_0))
+       (=> |tuple(main@_15_0, main@_33_0)|
+           (= main@%shadow.mem.0.2_3 main@%shadow.mem.0.2_1))
+       (=> |tuple(main@_15_0, main@_33_0)|
+           (= main@%shadow.mem.1.1_3 main@%shadow.mem.1.1_1))
+       (=> |tuple(main@postcall_0, main@_33_0)|
+           (= main@%shadow.mem.0.2_3 main@%shadow.mem.0.2_2))
+       (=> |tuple(main@postcall_0, main@_33_0)|
+           (= main@%shadow.mem.1.1_3 main@%shadow.mem.1.1_2))
+       a!23
+       a!24
+       a!25
+       (=> main@orig.main.exit_0 (and main@orig.main.exit_0 main@_33_0))
+       (=> (and main@orig.main.exit_0 main@_33_0) (not main@%_36_0))
+       (=> main@orig.main.exit_0 (not main@%_37_0))
+       (=> main@precall5_0 (and main@precall5_0 main@orig.main.exit_0))
+       (=> main@KeReleaseSpinLock_0
+           (or (and main@KeReleaseSpinLock_0 main@precall5_0)
+               (and main@KeReleaseSpinLock_0 main@precall3_0)))
+       (=> (and main@KeReleaseSpinLock_0 main@precall5_0)
+           (= main@%shadow.mem.0.3_0 main@%shadow.mem.0.2_3))
+       (=> (and main@KeReleaseSpinLock_0 main@precall3_0)
+           (= main@%shadow.mem.0.3_1 main@%sm12_0))
+       (=> (and main@KeReleaseSpinLock_0 main@precall5_0)
+           (= main@%shadow.mem.0.3_2 main@%shadow.mem.0.3_0))
+       (=> (and main@KeReleaseSpinLock_0 main@precall3_0)
+           (= main@%shadow.mem.0.3_2 main@%shadow.mem.0.3_1))
+       (=> main@KeReleaseSpinLock_0 a!26)
+       a!27
+       (=> main@KeReleaseSpinLock_0 (not main@%.b.i1_0))
+       (=> main@_42_0 (and main@_42_0 main@KeReleaseSpinLock_0))
+       (=> main@verifier.error_0
+           (or (and main@verifier.error_0 main@_42_0)
+               (and main@verifier.error_0 main@_40_0)))
+       (=> main@verifier.error.split_0
+           (and main@verifier.error.split_0 main@verifier.error_0))
+       main@verifier.error.split_0))))
+
+(define-fun .trans () Bool
+  (! (and .def17 .def18 .def19 .def20 .def21 .def22 .def23 .def24 .def25 .def26 .def27 .def28 .def29 .def30 .def31 .def32 .def33) :trans true))
+; initial state
+(define-fun .def34 () Bool (! (and main@entry (not main@_6) (not main@verifier.error.split)) :init true))
+; property
+(define-fun .def35 () Bool (! (not main@verifier.error.split) :invar-property 0))

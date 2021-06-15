@@ -1,0 +1,55 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+; translated based on the c code
+; @L0:
+; int i = 0;
+; do {
+; @L1:
+;   __VERIFIER_assert(i < 7); // not included in translation
+;   i += 3;
+; } while (i < 5);
+; @L2:
+; __VERIFIER_assert(i < 7); // goes to @L2
+; @L3:
+
+; @L1+   = @L0 | (@L1 & ((i+3) < 5))
+; @L2+   = @L2 | (@L1 & !((i+3) < 5) & !((i+3) < 7))
+; @L3+   = @L3 | (@L1 & !((i+3) < 5) & ((i+3) < 7))
+; i+    = ITE(@L0, 0, ITE(@L1, i+3, i))
+
+; state variables
+(declare-fun @L0 () Bool)
+(declare-fun @L0+ () Bool)
+(declare-fun @L1 () Bool)
+(declare-fun @L1+ () Bool)
+(declare-fun @L2 () Bool)
+(declare-fun @L2+ () Bool)
+(declare-fun @L3 () Bool)
+(declare-fun @L3+ () Bool)
+(declare-fun X () (Array (_ BitVec 8) (_ BitVec 32)))
+(declare-fun X+ () (Array (_ BitVec 8) (_ BitVec 32)))
+; inputs
+; :next defs for state vars
+(define-fun .def0 () Bool (! @L0 :next @L0+))
+(define-fun .def1 () Bool (! @L1 :next @L1+))
+(define-fun .def2 () Bool (! @L2 :next @L2+))
+(define-fun .def3 () Bool (! @L3 :next @L3+))
+(define-fun .def5a () (Array (_ BitVec 8) (_ BitVec 32)) (! X :next X+))
+; initial state
+(define-fun .def7 () Bool (and @L0
+                               (not @L1) (not @L2) (not @L3)
+                               (= (select X #x00) #x00000000)))
+(define-fun .def13 () Bool (! .def7 :init true))
+; transition relation
+(define-fun .def14 () Bool (= @L0+ false))
+(define-fun .def18 () (_ BitVec 32) (bvadd (select X #x00) #x00000003))
+(define-fun .def15 () Bool (= @L1+ (or @L0 (and @L1 (bvslt .def18 #x00000005)))))
+(define-fun .def16 () Bool (= @L2+ (or @L2 (and @L1 (not (bvslt .def18 #x00000005)) (not (bvslt .def18 #x00000007))))))
+(define-fun .def17 () Bool (= @L3+ (or @L3 (and @L1 (not (bvslt .def18 #x00000005)) (bvslt .def18 #x00000007)))))
+(define-fun .def19 () Bool (= X+ (ite @L0 (store X #x00 #x00000000) (ite @L1 (store X #x00 .def18) X))))
+(define-fun .def20 () Bool (and .def14 .def15 .def16 .def17 .def19))
+(define-fun .def21 () Bool (! .def20 :trans true))
+; property
+(define-fun .def22 () Bool (not @L2))
+(define-fun .def23 () Bool (! .def22 :invar-property 0))
+(assert true)

@@ -1,0 +1,383 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+; 25 state variables
+; (including 12 locations)
+(declare-fun |select(g@%sm2, @a)| () (_ BitVec 32))
+(declare-fun |select(g@%sm2, @a)+| () (_ BitVec 32))
+(define-fun .def0 () (_ BitVec 32) (! |select(g@%sm2, @a)| :next |select(g@%sm2, @a)+|))
+(declare-fun |select(g@%sm1, @a)| () (_ BitVec 32))
+(declare-fun |select(g@%sm1, @a)+| () (_ BitVec 32))
+(define-fun .def3 () (_ BitVec 32) (! |select(g@%sm1, @a)| :next |select(g@%sm1, @a)+|))
+(declare-fun g@arg.0 () (_ BitVec 32))
+(declare-fun g@arg.0+ () (_ BitVec 32))
+(define-fun .def4 () (_ BitVec 32) (! g@arg.0 :next g@arg.0+))
+(declare-fun g@_sm2 () Bool)
+(declare-fun g@_sm2+ () Bool)
+(define-fun .def5 () Bool (! g@_sm2 :next g@_sm2+))
+(declare-fun g@.split () Bool)
+(declare-fun g@.split+ () Bool)
+(define-fun .def6 () Bool (! g@.split :next g@.split+))
+(declare-fun |select(f@%sm4, @a)| () (_ BitVec 32))
+(declare-fun |select(f@%sm4, @a)+| () (_ BitVec 32))
+(define-fun .def7 () (_ BitVec 32) (! |select(f@%sm4, @a)| :next |select(f@%sm4, @a)+|))
+(declare-fun |select(f@%shadow.mem.12.0, @a)| () (_ BitVec 32))
+(declare-fun |select(f@%shadow.mem.12.0, @a)+| () (_ BitVec 32))
+(define-fun .def13 () (_ BitVec 32) (! |select(f@%shadow.mem.12.0, @a)| :next |select(f@%shadow.mem.12.0, @a)+|))
+(declare-fun |select(f@%sh, @a)| () (_ BitVec 32))
+(declare-fun |select(f@%sh, @a)+| () (_ BitVec 32))
+(define-fun .def14 () (_ BitVec 32) (! |select(f@%sh, @a)| :next |select(f@%sh, @a)+|))
+(declare-fun f@%_br11 () (_ BitVec 32))
+(declare-fun f@%_br11+ () (_ BitVec 32))
+(define-fun .def15 () (_ BitVec 32) (! f@%_br11 :next f@%_br11+))
+(declare-fun f@arg.0 () (_ BitVec 32))
+(declare-fun f@arg.0+ () (_ BitVec 32))
+(define-fun .def16 () (_ BitVec 32) (! f@arg.0 :next f@arg.0+))
+(declare-fun f@arg.1 () (_ BitVec 32))
+(declare-fun f@arg.1+ () (_ BitVec 32))
+(define-fun .def17 () (_ BitVec 32) (! f@arg.1 :next f@arg.1+))
+(declare-fun f@_sm4 () Bool)
+(declare-fun f@_sm4+ () Bool)
+(define-fun .def18 () Bool (! f@_sm4 :next f@_sm4+))
+(declare-fun f@_sh () Bool)
+(declare-fun f@_sh+ () Bool)
+(define-fun .def19 () Bool (! f@_sh :next f@_sh+))
+(declare-fun f@_br12 () Bool)
+(declare-fun f@_br12+ () Bool)
+(define-fun .def20 () Bool (! f@_br12 :next f@_br12+))
+(declare-fun f@_shadow.mem.12.0 () Bool)
+(declare-fun f@_shadow.mem.12.0+ () Bool)
+(define-fun .def21 () Bool (! f@_shadow.mem.12.0 :next f@_shadow.mem.12.0+))
+(declare-fun wait@g-ret-to-f@_sh () Bool)
+(declare-fun wait@g-ret-to-f@_sh+ () Bool)
+(define-fun .def22 () Bool (! wait@g-ret-to-f@_sh :next wait@g-ret-to-f@_sh+))
+(declare-fun |select(main@%sh, @a)| () (_ BitVec 32))
+(declare-fun |select(main@%sh, @a)+| () (_ BitVec 32))
+(define-fun .def24 () (_ BitVec 32) (! |select(main@%sh, @a)| :next |select(main@%sh, @a)+|))
+(declare-fun |select(main@%sm1, @a)| () (_ BitVec 32))
+(declare-fun |select(main@%sm1, @a)+| () (_ BitVec 32))
+(define-fun .def26 () (_ BitVec 32) (! |select(main@%sm1, @a)| :next |select(main@%sm1, @a)+|))
+(declare-fun main@%_4 () (_ BitVec 32))
+(declare-fun main@%_4+ () (_ BitVec 32))
+(define-fun .def28 () (_ BitVec 32) (! main@%_4 :next main@%_4+))
+(declare-fun |select(main@%sm4, @a)| () (_ BitVec 32))
+(declare-fun |select(main@%sm4, @a)+| () (_ BitVec 32))
+(define-fun .def29 () (_ BitVec 32) (! |select(main@%sm4, @a)| :next |select(main@%sm4, @a)+|))
+(declare-fun main@entry () Bool)
+(declare-fun main@entry+ () Bool)
+(define-fun .def30 () Bool (! main@entry :next main@entry+))
+(declare-fun main@_5 () Bool)
+(declare-fun main@_5+ () Bool)
+(define-fun .def32 () Bool (! main@_5 :next main@_5+))
+(declare-fun main@_6 () Bool)
+(declare-fun main@_6+ () Bool)
+(define-fun .def33 () Bool (! main@_6 :next main@_6+))
+(declare-fun main@verifier.error.split () Bool)
+(declare-fun main@verifier.error.split+ () Bool)
+(define-fun .def34 () Bool (! main@verifier.error.split :next main@verifier.error.split+))
+(declare-fun wait@f-ret-to-main@_5 () Bool)
+(declare-fun wait@f-ret-to-main@_5+ () Bool)
+(define-fun .def36 () Bool (! wait@f-ret-to-main@_5 :next wait@f-ret-to-main@_5+))
+; 92 inputs
+(declare-fun g@%sm3_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun g@%_sm_0 () (_ BitVec 32))
+(declare-fun g@%sm_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun g@%_4_0 () (_ BitVec 32))
+(declare-fun g@%_sm1_0 () (_ BitVec 32))
+(declare-fun |select(g@%sm1, @a)_0| () (_ BitVec 32))
+(declare-fun g@_sm2_0 () Bool)
+(declare-fun g@.split_0 () Bool)
+(declare-fun f@%_br11_0 () (_ BitVec 32))
+(declare-fun f@%_sm3_0 () (_ BitVec 32))
+(declare-fun f@%sm5_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun f@%sm6_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun f@%sm7_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun f@%_call8_0 () (_ BitVec 32))
+(declare-fun f@%sm1_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun f@%_call9_0 () (_ BitVec 32))
+(declare-fun f@%_8_0 () (_ BitVec 32))
+(declare-fun f@%_sm2_0 () (_ BitVec 32))
+(declare-fun f@%_10_0 () (_ BitVec 32))
+(declare-fun f@%_br_0 () Bool)
+(declare-fun |select(f@%shadow.mem.12.0, @a)_0| () (_ BitVec 32))
+(declare-fun f@_sm4_0 () Bool)
+(declare-fun f@%_call_0 () (_ BitVec 32))
+(declare-fun f@%_sm_0 () (_ BitVec 32))
+(declare-fun f@%sm_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun f@%sm2_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun f@_call10_0 () Bool)
+(declare-fun f@_sh_0 () Bool)
+(declare-fun f@_call13_0 () Bool)
+(declare-fun |select(f@%sm3, @a)_0| () (_ BitVec 32))
+(declare-fun f@_shadow.mem.12.0_0 () Bool)
+(declare-fun |select(f@%shadow.mem.12.0, @a)_1| () (_ BitVec 32))
+(declare-fun |select(f@%sh, @a)_0| () (_ BitVec 32))
+(declare-fun f@_br12_0 () Bool)
+(declare-fun main@%_7_0 () (_ BitVec 32))
+(declare-fun main@%_8_0 () Bool)
+(declare-fun |select(main@%sm1, @a)_0| () (_ BitVec 32))
+(declare-fun main@%_4_0 () (_ BitVec 32))
+(declare-fun @a_0 () (_ BitVec 32))
+(declare-fun @llvm.used_0 () (_ BitVec 32))
+(declare-fun main@%sm5_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun main@%sm6_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun |select(main@%sm, @a)_0| () (_ BitVec 32))
+(declare-fun main@%_0_0 () (_ BitVec 32))
+(declare-fun main@%_1_0 () (_ BitVec 32))
+(declare-fun main@%_2_0 () (_ BitVec 32))
+(declare-fun main@%_3_0 () (_ BitVec 32))
+(declare-fun main@%sm2_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun main@%sm3_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun main@entry_0 () Bool)
+(declare-fun main@_5_0 () Bool)
+(declare-fun |select(main@%sh, @a)_0| () (_ BitVec 32))
+(declare-fun main@_6_0 () Bool)
+(declare-fun main@_9_0 () Bool)
+(declare-fun main@verifier.error_0 () Bool)
+(declare-fun main@verifier.error.split_0 () Bool)
+(declare-fun .cond1 () Bool)
+(declare-fun .cond2 () Bool)
+(declare-fun .cond8 () Bool)
+(declare-fun .cond9 () Bool)
+(declare-fun .cond10 () Bool)
+(declare-fun .cond11 () Bool)
+(declare-fun .cond12 () Bool)
+(declare-fun .cond23 () Bool)
+(declare-fun .cond25 () Bool)
+(declare-fun .cond27 () Bool)
+(declare-fun .cond31 () Bool)
+(declare-fun .cond35 () Bool)
+(declare-fun .cond37 () Bool)
+; transitions
+(define-fun .def38 () Bool
+  (= |select(g@%sm2, @a)+| (ite .cond2
+     |select(f@%sm4, @a)|
+     (ite .cond1 |select(g@%sm2, @a)| |select(g@%sm2, @a)|))))
+
+(define-fun .def39 () Bool
+  (= |select(g@%sm1, @a)+| (ite .cond1 |select(g@%sm1, @a)_0| |select(g@%sm1, @a)|)))
+
+(define-fun .def40 () Bool
+  (= g@arg.0+ (ite .cond2 f@%_br11 (ite .cond1 g@arg.0 g@arg.0))))
+
+(define-fun .def41 () Bool
+  (= g@_sm2+ (ite .cond2 true false)))
+
+(define-fun .def42 () Bool
+  (= g@.split+ (ite .cond1 true false)))
+
+(define-fun .def43 () Bool
+  (= |select(f@%sm4, @a)+| (let ((a!1 (ite .cond11
+                |select(f@%sm4, @a)|
+                (ite .cond10
+                     |select(f@%sm4, @a)|
+                     (ite .cond9
+                          |select(f@%sm4, @a)|
+                          (ite .cond8 |select(f@%sm4, @a)| |select(f@%sm4, @a)|))))))
+  (ite .cond12 |select(main@%sm1, @a)| a!1))))
+
+(define-fun .def44 () Bool
+  (= |select(f@%shadow.mem.12.0, @a)+| (ite .cond11
+     |select(f@%shadow.mem.12.0, @a)_1|
+     (ite .cond9
+          |select(f@%shadow.mem.12.0, @a)_1|
+          |select(f@%shadow.mem.12.0, @a)|))))
+
+(define-fun .def45 () Bool
+  (= |select(f@%sh, @a)+| (ite .cond10 |select(f@%sh, @a)_0| |select(f@%sh, @a)|)))
+
+(define-fun .def46 () Bool
+  (= f@%_br11+ (ite .cond8 f@%_br11_0 f@%_br11)))
+
+(define-fun .def47 () Bool
+  (= f@arg.0+ (let ((a!1 (ite .cond11
+                f@arg.0
+                (ite .cond10
+                     f@arg.0
+                     (ite .cond9 f@arg.0 (ite .cond8 f@arg.0 f@arg.0))))))
+  (ite .cond12 main@%_4 a!1))))
+
+(define-fun .def48 () Bool
+  (= f@arg.1+ (let ((a!1 (ite .cond11
+                f@arg.1
+                (ite .cond10
+                     f@arg.1
+                     (ite .cond9 f@arg.1 (ite .cond8 f@arg.1 f@arg.1))))))
+  (ite .cond12 #x00000002 a!1))))
+
+(define-fun .def49 () Bool
+  (= f@_sm4+ (ite .cond12 true false)))
+
+(define-fun .def50 () Bool
+  (= f@_sh+ (ite .cond8 true false)))
+
+(define-fun .def51 () Bool
+  (= f@_br12+ (ite .cond10 true false)))
+
+(define-fun .def52 () Bool
+  (= f@_shadow.mem.12.0+ (ite .cond11 true (ite .cond9 true false))))
+
+(define-fun .def53 () Bool
+  (= wait@g-ret-to-f@_sh+ (ite .cond10 false (ite .cond2 true (ite .cond23 true false)))))
+
+(define-fun .def54 () Bool
+  (= |select(main@%sh, @a)+| (ite .cond25 |select(main@%sh, @a)_0| |select(main@%sh, @a)|)))
+
+(define-fun .def55 () Bool
+  (= |select(main@%sm1, @a)+| (ite .cond27 |select(main@%sm1, @a)_0| |select(main@%sm1, @a)|)))
+
+(define-fun .def56 () Bool
+  (= main@%_4+ (ite .cond27 main@%_4_0 main@%_4)))
+
+(define-fun .def57 () Bool
+  (= |select(main@%sm4, @a)+| |select(main@%sm4, @a)|))
+
+(define-fun .def58 () Bool
+  (= main@entry+ (ite .cond31 false false)))
+
+(define-fun .def59 () Bool
+  (= main@_5+ (ite .cond27 true false)))
+
+(define-fun .def60 () Bool
+  (= main@_6+ (ite .cond25 true false)))
+
+(define-fun .def61 () Bool
+  (= main@verifier.error.split+ (ite .cond35 true false)))
+
+(define-fun .def62 () Bool
+  (= wait@f-ret-to-main@_5+ (ite .cond25 false (ite .cond12 true (ite .cond37 true false)))))
+
+(define-fun .def63 () Bool
+  (= .cond31 true))
+
+(define-fun .def64 () Bool
+  (= .cond1 (and g@_sm2
+     true
+     (bvugt g@%_sm_0 #x00000000)
+     (= g@%sm_0 (store g@%sm3_0 g@%_sm_0 g@arg.0))
+     (= g@%_4_0 (select g@%sm_0 g@%_sm_0))
+     (= g@%_sm1_0 (bvmul #x00000002 g@%_4_0))
+     (= |select(g@%sm1, @a)_0| g@%_sm1_0)
+     (=> g@.split_0 (and g@.split_0 g@_sm2_0))
+     g@.split_0)))
+
+(define-fun .def65 () Bool
+  (= .cond8 (and f@_sm4
+     true
+     (bvugt f@%_call_0 #x00000000)
+     (bvugt f@%_call8_0 #x00000000)
+     (bvugt f@%_sm_0 #x00000000)
+     (= f@%sm_0 (store f@%sm5_0 f@%_call_0 f@arg.0))
+     (= f@%sm1_0 (store f@%sm7_0 f@%_call8_0 f@arg.1))
+     (= f@%_call9_0 (select f@%sm_0 f@%_call_0))
+     (= f@%_8_0 (select f@%sm1_0 f@%_call8_0))
+     (= f@%_sm2_0 (bvadd f@%_call9_0 f@%_8_0))
+     (= f@%sm2_0 (store f@%sm6_0 f@%_sm_0 f@%_sm2_0))
+     (= f@%_10_0 (select f@%sm_0 f@%_call_0))
+     (= f@%_br_0 (= f@%_10_0 #x00000003))
+     (=> f@_call10_0 (and f@_call10_0 f@_sm4_0))
+     (=> (and f@_call10_0 f@_sm4_0) f@%_br_0)
+     (=> f@_call10_0 (= f@%_br11_0 (select f@%sm_0 f@%_call_0)))
+     (=> f@_sh_0 (and f@_sh_0 f@_call10_0))
+     f@_sh_0)))
+
+(define-fun .def66 () Bool
+  (= .cond9 (and f@_sm4
+     true
+     (bvugt f@%_call_0 #x00000000)
+     (bvugt f@%_call8_0 #x00000000)
+     (bvugt f@%_sm_0 #x00000000)
+     (= f@%sm_0 (store f@%sm5_0 f@%_call_0 f@arg.0))
+     (= f@%sm1_0 (store f@%sm7_0 f@%_call8_0 f@arg.1))
+     (= f@%_call9_0 (select f@%sm_0 f@%_call_0))
+     (= f@%_8_0 (select f@%sm1_0 f@%_call8_0))
+     (= f@%_sm2_0 (bvadd f@%_call9_0 f@%_8_0))
+     (= f@%sm2_0 (store f@%sm6_0 f@%_sm_0 f@%_sm2_0))
+     (= f@%_10_0 (select f@%sm_0 f@%_call_0))
+     (= f@%_br_0 (= f@%_10_0 #x00000003))
+     (=> f@_call13_0 (and f@_call13_0 f@_sm4_0))
+     (=> (and f@_call13_0 f@_sm4_0) (not f@%_br_0))
+     (=> f@_call13_0 (= f@%_sm3_0 (select f@%sm2_0 f@%_sm_0)))
+     (=> f@_call13_0 (= |select(f@%sm3, @a)_0| f@%_sm3_0))
+     (=> f@_shadow.mem.12.0_0 (and f@_shadow.mem.12.0_0 f@_call13_0))
+     (=> (and f@_shadow.mem.12.0_0 f@_call13_0)
+         (= |select(f@%shadow.mem.12.0, @a)_0| |select(f@%sm3, @a)_0|))
+     (=> (and f@_shadow.mem.12.0_0 f@_call13_0)
+         (= |select(f@%shadow.mem.12.0, @a)_1|
+            |select(f@%shadow.mem.12.0, @a)_0|))
+     f@_shadow.mem.12.0_0)))
+
+(define-fun .def67 () Bool
+  (= .cond2 (and f@_sh true true)))
+
+(define-fun .def68 () Bool
+  (= .cond23 wait@g-ret-to-f@_sh))
+
+(define-fun .def69 () Bool
+  (= .cond10 (and (or (and g@.split wait@g-ret-to-f@_sh) (and f@_sh (not true)))
+     true
+     (=> f@_br12_0 (and f@_br12_0 f@_sh_0))
+     f@_br12_0
+     (=> (and g@.split wait@g-ret-to-f@_sh)
+         (= |select(f@%sh, @a)_0| |select(g@%sm1, @a)|)))))
+
+(define-fun .def70 () Bool
+  (= .cond11 (and f@_br12
+     true
+     (=> f@_shadow.mem.12.0_0 (and f@_shadow.mem.12.0_0 f@_br12_0))
+     (=> (and f@_shadow.mem.12.0_0 f@_br12_0)
+         (= |select(f@%shadow.mem.12.0, @a)_0| |select(f@%sh, @a)|))
+     (=> (and f@_shadow.mem.12.0_0 f@_br12_0)
+         (= |select(f@%shadow.mem.12.0, @a)_1|
+            |select(f@%shadow.mem.12.0, @a)_0|))
+     f@_shadow.mem.12.0_0)))
+
+(define-fun .def71 () Bool
+  (= .cond27 (and main@entry
+     true
+     (bvugt @a_0 #x00000000)
+     (bvugt @llvm.used_0 #x00000000)
+     (= |select(main@%sm, @a)_0| #x00000000)
+     (bvugt main@%_0_0 #x00000000)
+     (bvugt main@%_1_0 #x00000000)
+     (= main@%_2_0 main@%_0_0)
+     (= main@%_3_0 main@%_1_0)
+     (= |select(main@%sm1, @a)_0| #x00000000)
+     (= main@%sm2_0 (store main@%sm6_0 main@%_0_0 #x00000000))
+     (= main@%sm3_0 (store main@%sm5_0 main@%_1_0 #x00000003))
+     (= main@%_4_0 (select main@%sm3_0 main@%_1_0))
+     (=> main@_5_0 (and main@_5_0 main@entry_0))
+     main@_5_0)))
+
+(define-fun .def72 () Bool
+  (= .cond12 (and main@_5 true true)))
+
+(define-fun .def73 () Bool
+  (= .cond37 wait@f-ret-to-main@_5))
+
+(define-fun .def74 () Bool
+  (= .cond25 (and (or (and f@_shadow.mem.12.0 wait@f-ret-to-main@_5)
+         (and main@_5 (not true)))
+     true
+     (=> main@_6_0 (and main@_6_0 main@_5_0))
+     main@_6_0
+     (=> (and f@_shadow.mem.12.0 wait@f-ret-to-main@_5)
+         (= |select(main@%sh, @a)_0| |select(f@%shadow.mem.12.0, @a)|)))))
+
+(define-fun .def75 () Bool
+  (= .cond35 (and main@_6
+     true
+     (= main@%_7_0 |select(main@%sh, @a)|)
+     (= main@%_8_0 (= main@%_7_0 #x00000006))
+     (not main@%_8_0)
+     (=> main@_9_0 (and main@_9_0 main@_6_0))
+     (=> main@verifier.error_0 (and main@verifier.error_0 main@_9_0))
+     (=> main@verifier.error.split_0
+         (and main@verifier.error.split_0 main@verifier.error_0))
+     main@verifier.error.split_0)))
+
+(define-fun .trans () Bool
+  (! (and .def38 .def39 .def40 .def41 .def42 .def43 .def44 .def45 .def46 .def47 .def48 .def49 .def50 .def51 .def52 .def53 .def54 .def55 .def56 .def57 .def58 .def59 .def60 .def61 .def62 .def63 .def64 .def65 .def66 .def67 .def68 .def69 .def70 .def71 .def72 .def73 .def74 .def75) :trans true))
+; initial state
+(define-fun .def76 () Bool (! (and main@entry (not g@_sm2) (not g@.split) (not f@_sm4) (not f@_sh) (not f@_br12) (not f@_shadow.mem.12.0) (not wait@g-ret-to-f@_sh) (not main@_5) (not main@_6) (not main@verifier.error.split) (not wait@f-ret-to-main@_5)) :init true))
+; property
+(define-fun .def77 () Bool (! (not main@verifier.error.split) :invar-property 0))

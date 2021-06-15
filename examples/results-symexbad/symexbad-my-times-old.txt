@@ -1,0 +1,48 @@
+10
+[2016-08-06 13:12:41.537] [pdr] [critical] beginning search
+[2016-08-06 13:12:45.129] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+11
+[2016-08-06 13:13:01.542] [pdr] [critical] beginning search
+[2016-08-06 13:13:05.937] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+12
+[2016-08-06 13:13:19.254] [pdr] [critical] beginning search
+[2016-08-06 13:13:24.510] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+13
+[2016-08-06 13:13:38.122] [pdr] [critical] beginning search
+[2016-08-06 13:13:44.550] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+14
+[2016-08-06 13:13:58.422] [pdr] [critical] beginning search
+[2016-08-06 13:14:06.248] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+15
+[2016-08-06 13:14:34.886] [pdr] [critical] beginning search
+[2016-08-06 13:14:43.741] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+16
+[2016-08-06 13:14:57.558] [pdr] [critical] beginning search
+[2016-08-06 13:15:07.772] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+17
+[2016-08-06 13:15:20.759] [pdr] [critical] beginning search
+[2016-08-06 13:15:32.457] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+18
+[2016-08-06 13:15:45.888] [pdr] [critical] beginning search
+[2016-08-06 13:15:59.256] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+19
+[2016-08-06 13:16:19.834] [pdr] [critical] beginning search
+[2016-08-06 13:16:35.465] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+20
+[2016-08-06 13:16:51.589] [pdr] [critical] beginning search
+[2016-08-06 13:17:08.673] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+21
+[2016-08-06 13:18:02.172] [pdr] [critical] beginning search
+[2016-08-06 13:18:21.144] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+22
+[2016-08-06 13:18:49.361] [pdr] [critical] beginning search
+[2016-08-06 13:19:12.661] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+23
+[2016-08-06 13:19:33.929] [pdr] [critical] beginning search
+[2016-08-06 13:19:58.154] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+24
+[2016-08-06 13:20:12.070] [pdr] [critical] beginning search
+[2016-08-06 13:20:38.585] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)
+25
+[2016-08-06 13:20:59.063] [pdr] [critical] beginning search
+[2016-08-06 13:21:28.689] [*cx] [debug] z: cube[1]{ @L-cond.true-main "P" } (/Users/dbueno/work/apica.cpp/equiv/xcode/APICA/src/counterexample.cpp #136)

@@ -1,0 +1,41 @@
+LIBDIR = $(shell pwd)/..
+include Makefile.common
+SRCS = EUForia/main.cpp
+EXTRA_INCLUDE = -Isrc
+LDFLAGS = -L$(LLVM_DIR)/lib -L$(LIBDIR)/z3/build
+#EXTRA_INCLUDE = -include src/PrefixHeader.hpp
+
+all: bin/EUForia3
+
+bin/EUForia3: EUForia_cmd
+	cp $^ $@
+
+#-Xlinker -rpath -Xlinker $(LIBDIR)/llvm-dsa/install/lib \
+#-Xlinker -rpath -Xlinker $(LIBDIR)/z3/build \
+
+EUForia_cmd: src/libeuforia.a EUForia/main.o $(LIBDIR)/boolector/boolector/build/libboolector.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) EUForia/main.o -o $@ \
+	    -Wl,-rpath,$(LLVM_DIR)/lib -Wl,-rpath,$(LIBDIR)/z3/build \
+	    src/libeuforia.a $(LIBDIR)/boolector/boolector/build/libboolector.a $(LIBDIR)/boolector/lingeling/liblgl.a -lLLVM -lz3 
+
+src/libeuforia.a: force_look
+	$(MAKE) -C src
+
+EUForia/main.o: force_look
+	$(MAKE) -C EUForia
+
+.PHONY: tags
+tags:
+	ctags --c++-kinds=+p --c-kinds=+p -R src EUForia $(LLVM_DIR)/include $(LIBDIR)/z3/src
+
+force_look:
+	@true
+
+.PHONY: clean
+clean:
+	rm -f *.o
+	rm -f EUForia_cmd
+	$(MAKE) -C EUForia clean
+	$(MAKE) -C src clean
+
+-include $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRCS)))

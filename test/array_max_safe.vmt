@@ -1,0 +1,40 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+(declare-fun X () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun X+ () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun p () (_ BitVec 32))
+(declare-fun p+ () (_ BitVec 32))
+(declare-fun c () (_ BitVec 32))
+(declare-fun c+ () (_ BitVec 32))
+(declare-fun m () (_ BitVec 32))
+(declare-fun m+ () (_ BitVec 32))
+(declare-fun done () Bool)
+(declare-fun done+ () Bool)
+; input variable decarations
+(declare-fun SIZE () (_ BitVec 32))
+; :next defs for state vars
+(define-fun .def0 () (Array (_ BitVec 32) (_ BitVec 32)) (! X :next X+))
+(define-fun .def2 () (_ BitVec 32) (! p :next p+))
+(define-fun .def3 () (_ BitVec 32) (! c :next c+))
+(define-fun .def4 () (_ BitVec 32) (! m :next m+))
+(define-fun .def5 () Bool (! done :next done+))
+; initial state
+(define-fun .def10 () Bool (= p #x00000000))
+(define-fun .def11 () Bool (not done))
+(define-fun .def11a () Bool (= m #x00000000))
+(define-fun .def11b () Bool (= c #x00000000))
+(define-fun .def19 () Bool (and .def11 .def10 .def11a .def11b))
+(define-fun .def20 () Bool (! .def19 :init true))
+; transition relation
+(define-fun .def21 () Bool (= p+ (ite (bvult p SIZE) (bvadd p #x00000001) p)))
+(define-fun .def22 () Bool (= c+ (ite (bvult p SIZE) (select X p) c)))
+(define-fun .def23 () Bool (= m+ (ite (bvugt c m) c m)))
+(define-fun .def24 () Bool (= X+ X))
+(define-fun .def25 () Bool (= done+ (not (bvult p SIZE))))
+(define-fun .def26 () Bool (= SIZE #x00000003))
+(define-fun .def27 () Bool (and .def21 .def22 .def23 .def24 .def25 .def26))
+(define-fun .def28 () Bool (! .def27 :trans true))
+; property
+(define-fun .def29 () Bool (or (not done) (bvule (select X #x00000000) m)))
+(define-fun .def30 () Bool (! .def29 :invar-property 0))
+(assert true)

@@ -1,0 +1,14 @@
+#include <string>
+#include <iostream>
+
+#define MAJOR_VERSION @EUFORIA_MAJOR@
+#define MINOR_VERSION @EUFORIA_MINOR@
+
+namespace euforia {
+unsigned euforia_major_version = MAJOR_VERSION;
+unsigned euforia_minor_version = MINOR_VERSION;
+
+void PrintVersion(std::ostream& os) {
+  os << MAJOR_VERSION << "." << MINOR_VERSION;
+}
+}

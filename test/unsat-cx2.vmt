@@ -1,0 +1,83 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+(set-logic QF_AUFBV)
+
+; state variables
+(declare-fun X-P1   () (_ BitVec 8))
+(declare-fun X-P1+  () (_ BitVec 8))
+(declare-fun X-P2   () (_ BitVec 8))
+(declare-fun X-P2+  () (_ BitVec 8))
+(declare-fun X-W1   () (_ BitVec 8))
+(declare-fun X-W1+  () (_ BitVec 8))
+(declare-fun X-W2   () (_ BitVec 8))
+(declare-fun X-W2+  () (_ BitVec 8))
+(declare-fun X-Q1   () (_ BitVec 8))
+(declare-fun X-Q1+  () (_ BitVec 8))
+(declare-fun X-Q2   () (_ BitVec 8))
+(declare-fun X-Q2+  () (_ BitVec 8))
+(declare-fun L-P    () Bool)
+(declare-fun L-P+   () Bool)
+(declare-fun L-W    () Bool)
+(declare-fun L-W+   () Bool)
+(declare-fun L-Q    () Bool)
+(declare-fun L-Q+   () Bool)
+(declare-fun L-U    () Bool)
+(declare-fun L-U+   () Bool)
+(define-fun .def1  () (_ BitVec 8) (! X-P1 :next X-P1+))
+(define-fun .def2  () (_ BitVec 8) (! X-P2 :next X-P2+))
+(define-fun .def3  () (_ BitVec 8) (! X-W1 :next X-W1+))
+(define-fun .def4  () (_ BitVec 8) (! X-W2 :next X-W2+))
+(define-fun .def5  () (_ BitVec 8) (! X-Q1 :next X-Q1+))
+(define-fun .def6  () (_ BitVec 8) (! X-Q2 :next X-Q2+))
+(define-fun .def7  () Bool (! L-P :next L-P+))
+(define-fun .def8  () Bool (! L-W :next L-W+))
+(define-fun .def9  () Bool (! L-Q :next L-Q+))
+(define-fun .def10 () Bool (! L-U :next L-U+))
+(define-fun .preserve () Bool
+            (and
+              (= L-P+ L-P)
+              (= L-W+ L-W)
+              (= L-Q+ L-Q)
+              (= L-U+ L-U)
+              (= X-P1+ X-P1)
+              (= X-P2+ X-P2)
+              (= X-W1+ X-W1)
+              (= X-W2+ X-W2)
+              (= X-Q1+ X-Q1)
+              (= X-Q2+ X-Q2)
+              ))
+(declare-fun P ((_ BitVec 8)) Bool)
+
+; inputs
+(declare-fun x () (_ BitVec 8))
+(declare-fun y () (_ BitVec 8))
+(declare-fun z () (_ BitVec 8))
+
+(define-fun .init () Bool
+            (!
+              (and (not L-P) (not L-U))
+              :init true)
+            )
+
+(define-fun .trans () Bool
+            (! 
+              (or
+                (and L-P+ (= X-P1+ x) (bvugt x (_ bv25 8))
+                     (= L-U+ L-U)
+                     )
+                (and L-P (= X-P1 x) (not (bvugt x (_ bv25 8))) L-U+
+                     (= L-P+ L-P)
+                     (= X-P1+ X-P1)
+                     )
+                )
+              :trans true))
+
+(define-fun .prop () Bool
+            (! 
+              (not L-U)
+              :invar-property 0))
+
+(assert true)
+
+
+

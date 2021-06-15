@@ -1,0 +1,7 @@
+#define GIT_REV "@GIT_REV@"
+#define GIT_BRANCH "@GIT_BRANCH@"
+#define GIT_TAG "@GIT_TAG@"
+
+const char *git_version = GIT_REV;
+const char *git_branch = GIT_BRANCH;
+const char *git_tag = GIT_TAG;

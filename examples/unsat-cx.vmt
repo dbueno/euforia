@@ -1,0 +1,134 @@
+;; This example shows a case where euforia returns a counterexample that is
+;; abstractly unsat. During backward reachability, at each step of the
+;; counterexample the models of the UFs can be different from other steps. In
+;; particular, the models can be mutually exclusive.
+;;
+;; I would like to be able to prove that every counterexample returned is an
+;; abstract execution.
+;;
+;; I think the way to fix this is to make pre-image generalization *complete*
+;; for all the terms in the formula. Right now, UPs in particular aren't
+;; instantiated on all possible pre-image terms (under the model).
+
+(set-logic QF_AUFBV)
+
+; state variables
+(declare-fun X-P1   () (_ BitVec 8))
+(declare-fun X-P1+  () (_ BitVec 8))
+(declare-fun X-P2   () (_ BitVec 8))
+(declare-fun X-P2+  () (_ BitVec 8))
+(declare-fun X-W1   () (_ BitVec 8))
+(declare-fun X-W1+  () (_ BitVec 8))
+(declare-fun X-W2   () (_ BitVec 8))
+(declare-fun X-W2+  () (_ BitVec 8))
+(declare-fun X-Q1   () (_ BitVec 8))
+(declare-fun X-Q1+  () (_ BitVec 8))
+(declare-fun X-Q2   () (_ BitVec 8))
+(declare-fun X-Q2+  () (_ BitVec 8))
+(declare-fun L-P    () Bool)
+(declare-fun L-P+   () Bool)
+(declare-fun L-W    () Bool)
+(declare-fun L-W+   () Bool)
+(declare-fun L-Q    () Bool)
+(declare-fun L-Q+   () Bool)
+(declare-fun L-U    () Bool)
+(declare-fun L-U+   () Bool)
+(define-fun .def1  () (_ BitVec 8) (! X-P1 :next X-P1+))
+(define-fun .def2  () (_ BitVec 8) (! X-P2 :next X-P2+))
+(define-fun .def3  () (_ BitVec 8) (! X-W1 :next X-W1+))
+(define-fun .def4  () (_ BitVec 8) (! X-W2 :next X-W2+))
+(define-fun .def5  () (_ BitVec 8) (! X-Q1 :next X-Q1+))
+(define-fun .def6  () (_ BitVec 8) (! X-Q2 :next X-Q2+))
+(define-fun .def7  () Bool (! L-P :next L-P+))
+(define-fun .def8  () Bool (! L-W :next L-W+))
+(define-fun .def9  () Bool (! L-Q :next L-Q+))
+(define-fun .def10 () Bool (! L-U :next L-U+))
+(define-fun .preserve () Bool
+            (and
+              (= L-P+ L-P)
+              (= L-W+ L-W)
+              (= L-Q+ L-Q)
+              (= L-U+ L-U)
+              (= X-P1+ X-P1)
+              (= X-P2+ X-P2)
+              (= X-W1+ X-W1)
+              (= X-W2+ X-W2)
+              (= X-Q1+ X-Q1)
+              (= X-Q2+ X-Q2)
+              ))
+
+; inputs
+(declare-fun x () (_ BitVec 8))
+(declare-fun y () (_ BitVec 8))
+(declare-fun z () (_ BitVec 8))
+
+(define-fun .init () Bool
+            (!
+              (and (not L-P) (not L-W) (not L-Q) (not L-U))
+              :init true)
+            )
+
+(define-fun .trans () Bool
+            (! 
+              (or
+                (and (bvule x y) L-P+ (= X-P1+ x) (= X-P2+ y)
+                     (= L-W+ L-W)
+                     (= L-Q+ L-Q)
+                     (= L-U+ L-U)
+                     (= X-W1+ X-W1)
+                     (= X-W2+ X-W2)
+                     (= X-Q1+ X-Q1)
+                     (= X-Q2+ X-Q2)
+                     )
+                (and L-P (= X-P1 x) (= X-P2 y) 
+                     ;(not (= y (_ bv255 8))) (= z (bvadd y (_ bv1 8)))
+                     (bvule y z) L-P+ (= X-P1+ x) (= X-P2+ z)
+                     (= L-W+ L-W)
+                     (= L-Q+ L-Q)
+                     (= L-U+ L-U)
+                     (= X-W1+ X-W1)
+                     (= X-W2+ X-W2)
+                     (= X-Q1+ X-Q1)
+                     (= X-Q2+ X-Q2)
+                     )
+                (and L-P (= X-P1 x) (= X-P2 y) L-W+ (= X-W1+ x) (= X-W2+ y)
+                     (= L-P+ L-P)
+                     (= L-Q+ L-Q)
+                     (= L-U+ L-U)
+                     (= X-P1+ X-P1)
+                     (= X-P2+ X-P2)
+                     (= X-Q1+ X-Q1)
+                     (= X-Q2+ X-Q2)
+                     )
+                (and L-W L-P (= X-W1 x) (= X-W2 y) (= X-P1 y) (= X-P2 z) L-Q+ (= X-Q1+ x) (= X-Q2+ z)
+                     (bvule x z)
+                     (= L-P+ L-P)
+                     (= L-W+ L-W)
+                     (= L-U+ L-U)
+                     (= X-P1+ X-P1)
+                     (= X-P2+ X-P2)
+                     (= X-W1+ X-W1)
+                     (= X-W2+ X-W2)
+                     )
+                (and L-Q (= X-Q1 x) (= X-Q2 y) L-U+ (not (bvule x y))
+                     (= L-P+ L-P)
+                     (= L-W+ L-W)
+                     (= L-Q+ L-Q)
+                     (= X-P1+ X-P1)
+                     (= X-P2+ X-P2)
+                     (= X-W1+ X-W1)
+                     (= X-W2+ X-W2)
+                     (= X-Q1+ X-Q1)
+                     (= X-Q2+ X-Q2)
+                     )
+                )
+              :trans true))
+
+(define-fun .prop () Bool
+            (! 
+              (not L-U)
+              :invar-property 0))
+
+(assert true)
+
+

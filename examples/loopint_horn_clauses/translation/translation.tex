@@ -1,0 +1,249 @@
+\documentclass{article}
+\overfullrule=1mm
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{stmaryrd}
+\usepackage{amsmath}
+
+\newcommand{\DeclareRel}[1]{\texttt{(declare-rel #1 )}}
+\newcommand{\DeclareVar}[1]{\texttt{(declare-var #1 )}}
+\newcommand{\Xlate}[1]{\llbracket #1 \rrbracket}
+\DeclareMathOperator{\VarVersion}{V}
+\DeclareMathOperator{\Preserve}{Pres}
+
+\begin{document}
+
+
+\hypertarget{abstract}{%
+\section{Abstract}\label{abstract}}
+
+Relational formats describe which relations may be established by which
+other relations. Transition systems describe which states may be reached
+by which other states. We describe a safety-property-preserving
+translation between a relational program description and a transition
+system description. We identify a state for each element of a relation;
+transitions through the system corresponding to relation derivations.
+
+\hypertarget{relational-chc-description---what-relations-elements-can-you-establish}{%
+\section{Relational CHC description - what relations elements can you
+establish}\label{relational-chc-description---what-relations-elements-can-you-establish}}
+
+A relational CHC description is a set of rules and a query. The rules
+are horn clauses which tell you how you can establish certain relations.
+A relation may be established outright or conditionally.
+
+Here is an example program.
+
+\begin{verbatim}
+entry:
+i = 0
+bb0: do { i += 3; }
+while (i < 5)
+bb1: assert(i < 7)
+either goes to bbsafe or bbunsafe
+\end{verbatim}
+
+Below is one way to express this program as Horn clauses.
+The labels are translated into relations.
+Each relation is (potentially) defined over
+program variables.
+In this example, relations bb0 and bb1 use
+the values for i, so they take the current value of i as a parameter.
+
+\begin{verbatim}
+(declare-rel entry ())
+(declare-rel bb0 (Int))
+(declare-rel bb1 (Int))
+(declare-rel bbsafe ())
+(declare-rel bbunsafe ())
+\end{verbatim}
+
+We use i and x as (universally-quantified) variables inside the rules.
+Essentially, these variables are temporaries.
+
+\begin{verbatim}
+(declare-var i Int)
+(declare-var x Int)
+\end{verbatim}
+
+The rules correspond to steps in the execution of the program. We can
+always get to entry, so we have a single rule for that. Each (rule
+(=\textgreater{} X Y)) has a head Y and a body X. The body is the
+condition upon which the head Y is established.
+
+\begin{verbatim}
+(rule entry)
+(rule (=> (and entry (= i 0))
+          (bb0 i)))
+(rule (=> (and (bb0 i) (< i 5) (= x (+ i 3)))
+          (bb0 x)))
+(rule (=> (and (bb0 i) (not (< i 5)))
+          (bb1 i)))
+(rule (=> (and (bb1 i) (< i 7))
+          bbsafe))
+(rule (=> (and (bb1 i) (not (< i 7)))
+          bbunsafe))
+(query bbunsafe)
+\end{verbatim}
+
+For example, in these rules, we can establish the relation
+\texttt{(bb0\ 0)} as long as we're at \texttt{entry} and \texttt{i=0}.
+Note that \texttt{i} is universally quantified, so \texttt{i=0} is
+really defining what \texttt{i} we're talking about.
+
+In order to establish the query (\texttt{bbunsafe}), we would reason
+backward to see what allows us to establish it (the last rule).
+Recursively, we would reason backwards again to establish that rule's
+body, etc.
+
+\hypertarget{constructs-in-the-chc-language}{%
+\subsection{Constructs in the CHC
+language}\label{constructs-in-the-chc-language}}
+
+\begin{verbatim}
+(declare-var [var] [sort]) Declare a variable that is universally quantified in Horn clauses.
+(declare-rel [relation-name] ([sorts])) Declare relation signature. Relations are uninterpreted.
+(rule [universal-horn-formula]) Assert a rule or a fact as a universally quantified Horn formula.
+(query [relation-name]) Pose a query. Is the relation non-empty.
+(set-predicate-representation [function-name] [symbol]+) Specify the representation of a predicate.
+\end{verbatim}
+
+From here: \url{https://rise4fun.com/z3/tutorialcontent/fixedpoints}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypertarget{transition-system-description---what-states-can-you-reach}{%
+\section{Transition system description - what states can you
+reach}\label{transition-system-description---what-states-can-you-reach}}
+
+A transition system describes how to reach states in the states space.
+Since we want to relate Horn systems to transition systems, we have to show what it means to
+establish a relation.
+
+The state space of our transition system will be composed of individual relation elements.
+If the relation $(1,2)\in R$ is entailed by our Horn clauses, a corresponding state $x=1$, $y=2$ will be reachable in the transition system.
+For a relation of arity $k$, we associate $k+1$ state variables.
+One variable is Boolean, an indicator variable meaning, if true, ``the current state specifies an element of the relation.''
+The other $k$ variables specify which element of the relation it is.
+Every Horn \texttt{rule} corresponds to a transition, allowing more elements to be related.
+\texttt{query} corresponds to the safety property.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypertarget{translation-rules}{%
+\subsection{Translation rules}\label{translation-rules}}
+
+Recall that a transition system is defined over $(X, Y, X')$ using
+formulas $I$, $T$, $P$. Initially the sets $X$, $Y$, $X'$ are empty and $I$, $T$, $P$,
+are true.
+
+\paragraph{The state space}
+The following two CHC directives affect the state space of our transition system encoding.
+\begin{center}
+(declare-var $x$ $s$) -- Declare a variable that is universally quantified in Horn clauses.
+\end{center}
+
+The translation of this adds a variable $x$ of sort $s$ to $Y$.
+
+\begin{center}
+(declare-rel $R$ ($s_0 \ldots s_k$))  -- Declare relation signature. Relations are uninterpreted.
+\end{center}
+
+First, add a Boolean state variable $R$ to $X$. Next, for each formal
+parameter position {$i$} of $R$, associate to it a unique
+state variable $R_i$ of sort $s_i$. 
+The correspondence to the Horn system is that a relation $(a,b,c,\ldots)\in R$ is derivable if and only if the state $(R \wedge R_0 = a \wedge R_1 = b \wedge R_2 = c \wedge \ldots)$ is reachable.
+
+\paragraph{The transition relation}
+
+\begin{center}
+(rule $f$) -- Assert a rule or a fact as a universally quantified Horn formula.
+\end{center}
+
+A rule is translated to a conjunction over current and next state variables.
+The
+conjunction then becomes a a disjunct of $T$. A rule is separated into
+a \emph{head} and optional \emph{body}. A relation occurrence's
+translation depends on whether we are translating the body (which gives
+conditions) or the head (which gives a result).
+Let's define a helper, $\VarVersion(x)$, that returns the state variable $x$ if we're translating the body and the state variable $x'$ if we're translating the head.
+
+Head or body is translated like so:
+\begin{align}
+  \Xlate{(R~x_0~x_1~\ldots~x_k)} &\rightarrow  \VarVersion(R) \wedge \VarVersion(R_0)=\Xlate{x_0} \wedge \ldots \wedge \VarVersion(R_k)=\Xlate{x_k} & \\
+  \Xlate{(\text{and}~x~y)} &\rightarrow \Xlate{x} \wedge \Xlate{y} & \\
+  \Xlate{(\text{not}~x)} &\rightarrow \neg\Xlate{x} & \\
+  \Xlate{x} &\rightarrow \VarVersion(x) & \qquad{} \text{if $x \in X$} \\
+  \Xlate{a} &\rightarrow a & 
+\end{align}
+The last case simply sends constants and primary input to their syntacticaly-identical counterparts.
+Finally, the transition rule is formed by preserved the variable not updated in the translation of the rule.
+
+Let's assume we're given three relations, R, Q, and Z.
+Q is 0-arity and R and Z are 1-arity.
+Then the following rule
+\begin{center}
+  \texttt{(rule (=> (and (R x) (= a (+ x 3))) (Z a)))}
+\end{center}
+has the following translation:
+\begin{equation}
+  R \wedge (R_0 = x) \wedge  (a = (x+3)) \wedge Z' \wedge Z_0'=a \wedge Q' = Q
+\end{equation}
+
+\begin{verbatim}
+(query [relation-name]) Pose a query. Is the relation non-empty.
+(set-predicate-representation [function-name] [symbol]+) Specify the representation of a predicate.
+\end{verbatim}
+ 
+When the transition system steps into a state where the
+indicator variable \texttt{R} is true and its argument variables satisfy
+\texttt{R1\ =\ a1}, \texttt{R2\ =\ a2}, \ldots{}, \texttt{Rn\ =\ an},
+then the relation \texttt{(R\ a1\ ..\ an)} is established.
+
+%\subsection{Example}
+
+\begin{figure}
+\begin{verbatim}
+(declare-rel entry ())
+(declare-rel bb0 (Int))
+(declare-rel bb1 (Int))
+(declare-rel bbsafe ())
+(declare-rel bbunsafe ())
+(declare-var i Int)
+(declare-var x Int)
+(rule entry)
+(rule (=> (and entry (= i 0))
+          (bb0 i)))
+(rule (=> (and (bb0 i) (< i 5) (= x (+ i 3)))
+          (bb0 x)))
+(rule (=> (and (bb0 i) (not (< i 5)))
+          (bb1 i)))
+(rule (=> (and (bb1 i) (< i 7))
+          bbsafe))
+(rule (=> (and (bb1 i) (not (< i 7)))
+          bbunsafe))
+(query bbunsafe)
+\end{verbatim}
+
+% XXX use \mathrm in a newcommand to make the things look better
+State variables $X = \{ entry, bb0, bb0_{0}, bb1, bb1_{0}, bbsafe, bbunsafe \}$
+
+Primary inputs $Y = \{ i, x \}$
+
+Initial state $I = \{ \neg entry, \neg bb0, \neg bb1, \neg bbsafe, \neg bbunsafe \}$
+
+\begin{align}
+  entry' \wedge \Preserve \\
+entry \wedge i=1 \wedge bb0' \wedge bb0_{0}'=i \wedge \Preserve \\
+bb0 \wedge bb0_{0} =i \wedge i<5 \wedge x=(i+3)) \wedge bb0' \wedge bb0_{0}'=x \wedge \Preserve \\
+bb0 \wedge bb0_{0}=i \wedge \neg (i<5) \wedge bb1' \wedge bb1_{0}'=i \wedge \Preserve \\
+bb1 \wedge bb1_{0}=i \wedge i<7 \wedge bbsafe' \wedge \Preserve \\
+bb1 \wedge bb1_{0}=i \wedge \neg (i<7) \wedge bbunsafe' \wedge \Preserve
+\end{align}
+
+Property: $\neg bbunsafe$
+
+\caption{The Horn clauses given above are reproduced here along with their translation. Each occurrences of $\Preserve$ refers to a formula that preserves the values of the state variables not modified in the corresponding equation.}
+\end{figure}
+
+
+\end{document}

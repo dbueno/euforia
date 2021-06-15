@@ -1,0 +1,57 @@
+; @L0:
+; int i = 0;
+; @L1:
+;   t = i
+;   i += 3;
+;   if (t < 5) goto @L1
+; @L2:
+; __VERIFIER_assert(i < 7); // goes to @L4
+; @L3:
+
+; @L0+   = false
+; @L1+   = @L0 | (@L1 & (i < 5))
+; @L2+   = @L1 & !(i < 5)
+; @L3+   = @L3 | (@L2 & (i < 7))
+; @L4+ = @L4 | (@L2 & !(i < 7))
+; i+    = ITE(@L0, input, ITE(@L1, i+3, i))
+
+; state variables
+(declare-fun @L0 () Bool)
+(declare-fun @L0+ () Bool)
+(declare-fun @L1 () Bool)
+(declare-fun @L1+ () Bool)
+(declare-fun @L2 () Bool)
+(declare-fun @L2+ () Bool)
+(declare-fun @L3 () Bool)
+(declare-fun @L3+ () Bool)
+(declare-fun @L4 () Bool)
+(declare-fun @L4+ () Bool)
+(declare-fun i () (_ BitVec 32))
+(declare-fun i+ () (_ BitVec 32))
+(declare-fun x () (_ BitVec 32))
+; inputs
+; :next defs for state vars
+(define-fun .def0 () Bool (! @L0 :next @L0+))
+(define-fun .def1 () Bool (! @L1 :next @L1+))
+(define-fun .def2 () Bool (! @L2 :next @L2+))
+(define-fun .def3 () Bool (! @L3 :next @L3+))
+(define-fun .def4 () Bool (! @L4 :next @L4+))
+(define-fun .def5 () (_ BitVec 32) (! i :next i+))
+; initial state
+(define-fun .def7 () Bool (and @L0
+                               (not @L1) (not @L2) (not @L3) (not @L4)
+                               (= i #x00000000)))
+(define-fun .def13 () Bool (! .def7 :init true))
+; transition relation
+(define-fun .def14 () Bool (= @L0+ false))
+(define-fun .def15 () Bool (= @L1+ (or @L0 (and @L1 (bvslt i #x00000005)))))
+(define-fun .def16 () Bool (= @L2+ (and @L1 (not (bvslt i #x00000005)))))
+(define-fun .def17 () Bool (= @L3+ (or @L3 (and @L2 (bvslt i #x00000007)))))
+(define-fun .def18 () Bool (= @L4+ (or @L4 (and @L2 (not (bvslt i #x00000007))))))
+(define-fun .def19 () Bool (= i+ (ite @L0 #x00000000 (ite @L1 (bvadd i #x00000003) i))))
+(define-fun .def20 () Bool (and .def14 .def15 .def16 .def17 .def18 .def19))
+(define-fun .def21 () Bool (! .def20 :trans true))
+; property
+(define-fun .def22 () Bool (not @L4))
+(define-fun .def23 () Bool (! .def22 :invar-property 0))
+(assert true)

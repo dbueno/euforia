@@ -1,0 +1,372 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+; 9 rules
+; 4 relations
+; 11 state vars
+(declare-fun at-main@_6 () Bool)
+(declare-fun at-main@_6+ () Bool)
+(define-fun .def0 () Bool (! at-main@_6 :next at-main@_6+))
+(declare-fun at-main@entry () Bool)
+(declare-fun at-main@entry+ () Bool)
+(define-fun .def1 () Bool (! at-main@entry :next at-main@entry+))
+(declare-fun at-main@verifier.error.split () Bool)
+(declare-fun at-main@verifier.error.split+ () Bool)
+(define-fun .def2 () Bool (! at-main@verifier.error.split :next at-main@verifier.error.split+))
+(declare-fun at-verifier.error () Bool)
+(declare-fun at-verifier.error+ () Bool)
+(define-fun .def3 () Bool (! at-verifier.error :next at-verifier.error+))
+(declare-fun main@_6-place-0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_6-place-0+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(define-fun .def4 () (Array (_ BitVec 64) (_ BitVec 64)) (! main@_6-place-0 :next main@_6-place-0+))
+(declare-fun main@_6-place-1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun main@_6-place-1+ () (Array (_ BitVec 64) (_ BitVec 64)))
+(define-fun .def5 () (Array (_ BitVec 64) (_ BitVec 64)) (! main@_6-place-1 :next main@_6-place-1+))
+(declare-fun main@_6-place-2 () (_ BitVec 64))
+(declare-fun main@_6-place-2+ () (_ BitVec 64))
+(define-fun .def6 () (_ BitVec 64) (! main@_6-place-2 :next main@_6-place-2+))
+(declare-fun main@_6-place-3 () (_ BitVec 64))
+(declare-fun main@_6-place-3+ () (_ BitVec 64))
+(define-fun .def7 () (_ BitVec 64) (! main@_6-place-3 :next main@_6-place-3+))
+(declare-fun verifier.error-place-0 () Bool)
+(declare-fun verifier.error-place-0+ () Bool)
+(define-fun .def8 () Bool (! verifier.error-place-0 :next verifier.error-place-0+))
+(declare-fun verifier.error-place-1 () Bool)
+(declare-fun verifier.error-place-1+ () Bool)
+(define-fun .def9 () Bool (! verifier.error-place-1 :next verifier.error-place-1+))
+(declare-fun verifier.error-place-2 () Bool)
+(declare-fun verifier.error-place-2+ () Bool)
+(define-fun .def10 () Bool (! verifier.error-place-2 :next verifier.error-place-2+))
+; 78 inputs
+(declare-fun arr-bv64-bv64-input-0 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-10 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-11 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-12 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-13 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-14 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-15 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-16 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-17 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-18 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-2 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-3 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-4 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-5 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-6 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-7 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-8 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun arr-bv64-bv64-input-9 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun bool-input-0 () Bool)
+(declare-fun bool-input-1 () Bool)
+(declare-fun bool-input-10 () Bool)
+(declare-fun bool-input-11 () Bool)
+(declare-fun bool-input-12 () Bool)
+(declare-fun bool-input-13 () Bool)
+(declare-fun bool-input-14 () Bool)
+(declare-fun bool-input-15 () Bool)
+(declare-fun bool-input-16 () Bool)
+(declare-fun bool-input-17 () Bool)
+(declare-fun bool-input-18 () Bool)
+(declare-fun bool-input-19 () Bool)
+(declare-fun bool-input-2 () Bool)
+(declare-fun bool-input-20 () Bool)
+(declare-fun bool-input-21 () Bool)
+(declare-fun bool-input-22 () Bool)
+(declare-fun bool-input-23 () Bool)
+(declare-fun bool-input-24 () Bool)
+(declare-fun bool-input-25 () Bool)
+(declare-fun bool-input-26 () Bool)
+(declare-fun bool-input-27 () Bool)
+(declare-fun bool-input-28 () Bool)
+(declare-fun bool-input-29 () Bool)
+(declare-fun bool-input-3 () Bool)
+(declare-fun bool-input-30 () Bool)
+(declare-fun bool-input-4 () Bool)
+(declare-fun bool-input-5 () Bool)
+(declare-fun bool-input-6 () Bool)
+(declare-fun bool-input-7 () Bool)
+(declare-fun bool-input-8 () Bool)
+(declare-fun bool-input-9 () Bool)
+(declare-fun bv32-input-0 () (_ BitVec 32))
+(declare-fun bv32-input-1 () (_ BitVec 32))
+(declare-fun bv32-input-2 () (_ BitVec 32))
+(declare-fun bv32-input-3 () (_ BitVec 32))
+(declare-fun bv32-input-4 () (_ BitVec 32))
+(declare-fun bv32-input-5 () (_ BitVec 32))
+(declare-fun bv32-input-6 () (_ BitVec 32))
+(declare-fun bv32-input-7 () (_ BitVec 32))
+(declare-fun bv32-input-8 () (_ BitVec 32))
+(declare-fun bv64-input-0 () (_ BitVec 64))
+(declare-fun bv64-input-1 () (_ BitVec 64))
+(declare-fun bv64-input-2 () (_ BitVec 64))
+(declare-fun bv64-input-3 () (_ BitVec 64))
+(declare-fun bv64-input-4 () (_ BitVec 64))
+(declare-fun bv64-input-5 () (_ BitVec 64))
+(declare-fun bv64-input-6 () (_ BitVec 64))
+(declare-fun cmdr!0 () Bool)
+(declare-fun cmdr!1 () Bool)
+(declare-fun cmdr!2 () Bool)
+(declare-fun r-0 () Bool)
+(declare-fun r-1 () Bool)
+(declare-fun r-2 () Bool)
+(declare-fun r-3 () Bool)
+(declare-fun r-4 () Bool)
+(declare-fun r-5 () Bool)
+(declare-fun r-6 () Bool)
+(declare-fun r-7 () Bool)
+(declare-fun r-8 () Bool)
+(define-fun .def11 () Bool (! (and (not at-verifier.error)
+     (not at-main@entry)
+     (not at-main@verifier.error.split)
+     (not at-main@_6)) :init true))
+(define-fun .def12 () Bool (! (let ((a!1 (and (not r-2) (or r-1 (and (not r-0) verifier.error-place-1))))
+      (a!2 (= verifier.error-place-2+
+              (or r-3 r-2 r-1 (and (not r-0) verifier.error-place-2))))
+      (a!3 (= verifier.error-place-0+
+              (or r-3 r-2 (and (not r-1) (not r-0) verifier.error-place-0))))
+      (a!4 (=> bool-input-2
+               (= bv32-input-1
+                  ((_ extract 31 0) (select main@_6-place-0 main@_6-place-3)))))
+      (a!6 (=> bool-input-0
+               (= bv32-input-1
+                  ((_ extract 31 0) (select main@_6-place-0 main@_6-place-3)))))
+      (a!7 (=> bool-input-6
+               (= bv32-input-2
+                  ((_ extract 31 0) (select main@_6-place-1 main@_6-place-2)))))
+      (a!8 (=> bool-input-10
+               (= bv32-input-3
+                  ((_ extract 31 0) (select main@_6-place-1 main@_6-place-2)))))
+      (a!9 (=> bool-input-12
+               (= arr-bv64-bv64-input-0
+                  (store main@_6-place-0
+                         main@_6-place-3
+                         ((_ zero_extend 32) bv32-input-4)))))
+      (a!10 (=> bool-input-14
+                (= bv32-input-5
+                   ((_ extract 31 0) (select main@_6-place-1 main@_6-place-2)))))
+      (a!11 (=> bool-input-25
+                (= bv32-input-6
+                   ((_ extract 31 0)
+                     (select arr-bv64-bv64-input-13 main@_6-place-3)))))
+      (a!12 (=> bool-input-19
+                (= bv32-input-7
+                   ((_ extract 31 0) (select main@_6-place-1 main@_6-place-2)))))
+      (a!13 (=> bool-input-18
+                (= bv32-input-8
+                   ((_ extract 31 0)
+                     (select arr-bv64-bv64-input-13 main@_6-place-3)))))
+      (a!14 (=> bool-input-22
+                (= arr-bv64-bv64-input-4
+                   (store main@_6-place-1
+                          main@_6-place-2
+                          ((_ zero_extend 32) #x00000002)))))
+      (a!15 (=> bool-input-28
+                (= arr-bv64-bv64-input-10
+                   (store main@_6-place-1
+                          main@_6-place-2
+                          ((_ zero_extend 32) #x00000001)))))
+      (a!17 (and at-main@entry
+                 bool-input-1
+                 (bvugt bv64-input-0 #x0000000000000000)
+                 (bvugt bv64-input-4 #x0000000000000000)
+                 (bvugt bv64-input-6 #x0000000000000000)
+                 (bvugt bv64-input-5 #x0000000000000000)
+                 (= bv64-input-1 bv64-input-4)
+                 (= bv64-input-2 bv64-input-6)
+                 (= bv64-input-3 bv64-input-5)
+                 (= arr-bv64-bv64-input-0
+                    (store arr-bv64-bv64-input-1
+                           bv64-input-4
+                           ((_ zero_extend 32) #x00000000)))
+                 (= arr-bv64-bv64-input-4
+                    (store arr-bv64-bv64-input-2
+                           bv64-input-6
+                           ((_ zero_extend 32) #x00000000)))
+                 (= arr-bv64-bv64-input-5
+                    (store arr-bv64-bv64-input-3
+                           bv64-input-5
+                           ((_ zero_extend 32) #x00000000)))
+                 (=> bool-input-1 (and bool-input-1 bool-input-0))
+                 (=> (and bool-input-1 bool-input-0)
+                     (= arr-bv64-bv64-input-6 arr-bv64-bv64-input-4))
+                 (=> (and bool-input-1 bool-input-0)
+                     (= arr-bv64-bv64-input-7 arr-bv64-bv64-input-5))
+                 (=> (and bool-input-1 bool-input-0)
+                     (= arr-bv64-bv64-input-8 arr-bv64-bv64-input-6))
+                 (=> (and bool-input-1 bool-input-0)
+                     (= arr-bv64-bv64-input-9 arr-bv64-bv64-input-7)))))
+(let ((a!5 (and (= main@_6-place-3 main@_6-place-3)
+                (= bv32-input-0
+                   ((_ extract 31 0) (select main@_6-place-1 main@_6-place-2)))
+                (= bool-input-1 (distinct #x00000002 bv32-input-0))
+                (=> bool-input-2 (and bool-input-2 bool-input-0))
+                (=> (and bool-input-2 bool-input-0) (not bool-input-1))
+                a!4
+                (=> bool-input-2
+                    (= bool-input-3 (distinct bv32-input-1 #x00000000)))
+                (=> bool-input-4 (and bool-input-4 bool-input-2))
+                (=> (and bool-input-4 bool-input-2) bool-input-3)
+                (=> bool-input-5 (and bool-input-5 bool-input-4))
+                (=> bool-input-6 (and bool-input-6 bool-input-5))
+                bool-input-6
+                at-main@_6
+                (= main@_6-place-0 main@_6-place-0)
+                (= main@_6-place-1 main@_6-place-1)
+                (= main@_6-place-2 main@_6-place-2)))
+      (a!16 (and (= main@_6-place-3 main@_6-place-3)
+                 (= bv32-input-0
+                    ((_ extract 31 0) (select main@_6-place-1 main@_6-place-2)))
+                 (= bool-input-5 (distinct #x00000002 bv32-input-0))
+                 (=> bool-input-0 (and bool-input-0 bool-input-1))
+                 (=> (and bool-input-0 bool-input-1) (not bool-input-5))
+                 a!6
+                 (=> bool-input-0
+                     (= bool-input-3 (distinct bv32-input-1 #x00000000)))
+                 (=> bool-input-2 bool-input-0)
+                 (=> bool-input-4 bool-input-1)
+                 (=> bool-input-6 (or bool-input-2 bool-input-4))
+                 (=> bool-input-2 (not bool-input-3))
+                 (=> bool-input-4 bool-input-5)
+                 a!7
+                 (=> bool-input-6 (= bool-input-9 (= bv32-input-2 #x00000000)))
+                 (=> bool-input-10 (and bool-input-10 bool-input-6))
+                 (=> (and bool-input-10 bool-input-6) (not bool-input-9))
+                 a!8
+                 (=> bool-input-10
+                     (= bool-input-11 (= bv32-input-3 #x00000001)))
+                 (=> bool-input-7 bool-input-10)
+                 (=> bool-input-8 bool-input-6)
+                 (=> bool-input-12 (or bool-input-7 bool-input-8))
+                 (=> bool-input-7 bool-input-11)
+                 (=> bool-input-8 bool-input-9)
+                 a!9
+                 (=> bool-input-13 bool-input-10)
+                 (=> bool-input-14
+                     (or (and bool-input-14 bool-input-12) bool-input-13))
+                 (=> bool-input-13 (not bool-input-11))
+                 (=> (and bool-input-14 bool-input-12)
+                     (= arr-bv64-bv64-input-2 arr-bv64-bv64-input-0))
+                 (=> bool-input-13 (= arr-bv64-bv64-input-3 main@_6-place-0))
+                 (=> (and bool-input-14 bool-input-12)
+                     (= arr-bv64-bv64-input-13 arr-bv64-bv64-input-2))
+                 (=> bool-input-13
+                     (= arr-bv64-bv64-input-13 arr-bv64-bv64-input-3))
+                 a!10
+                 (=> bool-input-14
+                     (= bool-input-17 (= bv32-input-5 #x00000000)))
+                 (=> bool-input-25 (and bool-input-25 bool-input-14))
+                 (=> (and bool-input-25 bool-input-14) bool-input-17)
+                 a!11
+                 (=> bool-input-25
+                     (= bool-input-26 (distinct #x00000000 bv32-input-6)))
+                 (=> bool-input-15 bool-input-25)
+                 (=> bool-input-16 bool-input-14)
+                 (=> bool-input-19 (or bool-input-15 bool-input-16))
+                 (=> bool-input-15 (not bool-input-26))
+                 (=> bool-input-16 (not bool-input-17))
+                 a!12
+                 (=> bool-input-19
+                     (= bool-input-21 (= bv32-input-7 #x00000001)))
+                 (=> bool-input-18 (and bool-input-18 bool-input-19))
+                 (=> (and bool-input-18 bool-input-19) bool-input-21)
+                 a!13
+                 (=> bool-input-18
+                     (= bool-input-20 (distinct bv32-input-8 #x00000000)))
+                 (=> bool-input-22 (and bool-input-22 bool-input-18))
+                 (=> (and bool-input-22 bool-input-18) (not bool-input-20))
+                 a!14
+                 (=> bool-input-23 bool-input-18)
+                 (=> bool-input-24 bool-input-19)
+                 (=> bool-input-27
+                     (or (and bool-input-27 bool-input-22)
+                         bool-input-23
+                         bool-input-24))
+                 (=> bool-input-23 bool-input-20)
+                 (=> bool-input-24 (not bool-input-21))
+                 (=> (and bool-input-27 bool-input-22)
+                     (= arr-bv64-bv64-input-5 arr-bv64-bv64-input-4))
+                 (=> bool-input-23 (= arr-bv64-bv64-input-6 main@_6-place-1))
+                 (=> bool-input-24 (= arr-bv64-bv64-input-7 main@_6-place-1))
+                 (=> (and bool-input-27 bool-input-22)
+                     (= arr-bv64-bv64-input-9 arr-bv64-bv64-input-5))
+                 (=> bool-input-23
+                     (= arr-bv64-bv64-input-9 arr-bv64-bv64-input-6))
+                 (=> bool-input-24
+                     (= arr-bv64-bv64-input-9 arr-bv64-bv64-input-7))
+                 (=> bool-input-28 (and bool-input-28 bool-input-25))
+                 (=> (and bool-input-28 bool-input-25) bool-input-26)
+                 a!15
+                 (=> bool-input-29
+                     (or (and bool-input-29 bool-input-27)
+                         (and bool-input-29 bool-input-28)))
+                 (=> (and bool-input-29 bool-input-27)
+                     (= arr-bv64-bv64-input-11 arr-bv64-bv64-input-9))
+                 (=> (and bool-input-29 bool-input-28)
+                     (= arr-bv64-bv64-input-12 arr-bv64-bv64-input-10))
+                 (=> (and bool-input-29 bool-input-27)
+                     (= arr-bv64-bv64-input-14 arr-bv64-bv64-input-11))
+                 (=> (and bool-input-29 bool-input-28)
+                     (= arr-bv64-bv64-input-14 arr-bv64-bv64-input-12))
+                 (=> bool-input-30 (and bool-input-30 bool-input-29))
+                 (=> (and bool-input-30 bool-input-29)
+                     (= arr-bv64-bv64-input-15 arr-bv64-bv64-input-13))
+                 (=> (and bool-input-30 bool-input-29)
+                     (= arr-bv64-bv64-input-16 arr-bv64-bv64-input-14))
+                 (=> (and bool-input-30 bool-input-29)
+                     (= arr-bv64-bv64-input-17 arr-bv64-bv64-input-15))
+                 (=> (and bool-input-30 bool-input-29)
+                     (= arr-bv64-bv64-input-18 arr-bv64-bv64-input-16))
+                 bool-input-30
+                 at-main@_6
+                 (= main@_6-place-0 main@_6-place-0)
+                 (= main@_6-place-1 main@_6-place-1)
+                 (= main@_6-place-2 main@_6-place-2))))
+  (and (= at-verifier.error+ (or r-3 r-2 r-1 at-verifier.error r-0))
+       (= verifier.error-place-1+ (or r-3 a!1))
+       (or (not r-5) (not r-7))
+       (or (not r-5) (not r-6))
+       (or (not r-5) cmdr!0)
+       (or (not r-7) (not r-6))
+       (or (not r-7) cmdr!0)
+       (or (not r-6) cmdr!0)
+       (or (not r-3) (not r-8))
+       (or (not r-3) (not r-1))
+       (or (not r-3) cmdr!1)
+       (or (not r-8) (not r-1))
+       (or (not r-8) cmdr!1)
+       (or (not r-1) cmdr!1)
+       (or (not r-2) (not r-4))
+       (or (not r-2) (not r-0))
+       (or (not r-2) cmdr!2)
+       (or (not r-4) (not r-0))
+       (or (not r-4) cmdr!2)
+       (or (not r-0) cmdr!2)
+       (or (not cmdr!0) (not cmdr!1))
+       (or (not cmdr!0) (not cmdr!2))
+       (or (not cmdr!1) (not cmdr!2))
+       a!2
+       a!3
+       (= at-main@entry+ (or at-main@entry r-4))
+       (= main@_6-place-2+
+          (ite r-6 main@_6-place-2 (ite r-5 bv64-input-5 main@_6-place-2)))
+       (= at-main@_6+ (or r-6 at-main@_6 r-5))
+       (= main@_6-place-0+
+          (ite r-6
+               arr-bv64-bv64-input-17
+               (ite r-5 arr-bv64-bv64-input-8 main@_6-place-0)))
+       (= at-main@verifier.error.split+ (or at-main@verifier.error.split r-7))
+       (= main@_6-place-1+
+          (ite r-6
+               arr-bv64-bv64-input-18
+               (ite r-5 arr-bv64-bv64-input-9 main@_6-place-1)))
+       (= main@_6-place-3+
+          (ite r-6 main@_6-place-3 (ite r-5 bv64-input-6 main@_6-place-3)))
+       (=> r-7 a!5)
+       (=> r-6 a!16)
+       (=> r-5 a!17)
+       (=> r-4 true)
+       (=> r-3 true)
+       (=> r-2 true)
+       (=> r-0 true)
+       (=> r-1 true)))) :trans true))
+(define-fun .def13 () Bool (! (not at-main@verifier.error.split) :invar-property 0))

@@ -1,0 +1,119 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+(set-info :source "Seahorn-VMT")
+; 7 state variables
+; (including 6 locations)
+(set-info :num-calls "0")
+(set-info :num-functions "0")
+(declare-fun main@%_0 () (_ BitVec 32))
+(declare-fun main@%_0+ () (_ BitVec 32))
+(define-fun .def0 () (_ BitVec 32) (! main@%_0 :next main@%_0+))
+(declare-fun main@entry () Bool)
+(declare-fun main@entry+ () Bool)
+(define-fun .def2 () Bool (! main@entry :next main@entry+))
+(declare-fun main@f.exit.thread () Bool)
+(declare-fun main@f.exit.thread+ () Bool)
+(define-fun .def3 () Bool (! main@f.exit.thread :next main@f.exit.thread+))
+(declare-fun main@f.exit () Bool)
+(declare-fun main@f.exit+ () Bool)
+(define-fun .def5 () Bool (! main@f.exit :next main@f.exit+))
+(declare-fun main@_3 () Bool)
+(declare-fun main@_3+ () Bool)
+(define-fun .def6 () Bool (! main@_3 :next main@_3+))
+(declare-fun main@verifier.error () Bool)
+(declare-fun main@verifier.error+ () Bool)
+(define-fun .def9 () Bool (! main@verifier.error :next main@verifier.error+))
+(declare-fun main@verifier.error.split () Bool)
+(declare-fun main@verifier.error.split+ () Bool)
+(define-fun .def12 () Bool (! main@verifier.error.split :next main@verifier.error.split+))
+; 19 inputs
+(declare-fun main@%_2_0 () Bool)
+(declare-fun @llvm.used_0 () (_ BitVec 64))
+(declare-fun main@%_1_0 () Bool)
+(declare-fun main@%_0_0 () (_ BitVec 32))
+(declare-fun .cond1 () Bool)
+(declare-fun .cond4 () Bool)
+(declare-fun .cond7 () Bool)
+(declare-fun .cond8 () Bool)
+(declare-fun .cond10 () Bool)
+(declare-fun .cond11 () Bool)
+(declare-fun .cond13 () Bool)
+(declare-fun .cmdr0 () Bool)
+(declare-fun .cmdr1 () Bool)
+; transitions
+(define-fun .def14 () Bool
+  (= main@%_0+ (ite .cond1 main@%_0_0 main@%_0)))
+
+(define-fun .def15 () Bool
+  (= main@entry+ (ite true false false)))
+
+(define-fun .def16 () Bool
+  (= main@f.exit.thread+ (ite .cond4 true false)))
+
+(define-fun .def17 () Bool
+  (= main@f.exit+ (ite .cond1 true false)))
+
+(define-fun .def18 () Bool
+  (= main@_3+ (ite .cond8 true (ite .cond7 true false))))
+
+(define-fun .def19 () Bool
+  (= main@verifier.error+ (ite .cond11 true (ite .cond10 true false))))
+
+(define-fun .def20 () Bool
+  (= main@verifier.error.split+ (ite .cond13 true false)))
+
+(define-fun .def21 () Bool
+  (=> .cond4 (and main@entry
+     true
+     (bvugt @llvm.used_0 #x0000000000000000)
+     (= main@%_1_0 (= main@%_0_0 #x00000003))
+     main@%_1_0
+     main@%_1_0)))
+
+(define-fun .def22 () Bool
+  (=> .cond1 (and main@entry
+     true
+     (bvugt @llvm.used_0 #x0000000000000000)
+     (= main@%_1_0 (= main@%_0_0 #x00000003))
+     main@%_1_0
+     (not main@%_1_0))))
+
+(define-fun .def23 () Bool
+  (=> .cond7 (and main@f.exit.thread true)))
+
+(define-fun .def24 () Bool
+  (=> .cond8 (and main@f.exit true (= main@%_2_0 (= main@%_0 #x00000008)) main@%_2_0)))
+
+(define-fun .def25 () Bool
+  (=> .cond10 (and main@f.exit true (= main@%_2_0 (= main@%_0 #x00000008)) (not main@%_2_0))))
+
+(define-fun .def26 () Bool
+  (=> .cond11 (and main@_3 true false)))
+
+(define-fun .def27 () Bool
+  (=> .cond13 (and main@verifier.error true)))
+
+(define-fun .one-hot-cond () Bool
+  (and (or (not .cond1) (not .cond4))
+     (or (not .cond1) (not .cond7))
+     (or (not .cond1) (not (not .cmdr0)))
+     (or (not .cond4) (not .cond7))
+     (or (not .cond4) (not (not .cmdr0)))
+     (or (not .cond7) (not (not .cmdr0)))
+     (or (not .cond8) (not .cond10))
+     (or (not .cond8) (not .cond11))
+     (or (not .cond8) (not .cond13))
+     (or (not .cond8) (not (not .cmdr1)))
+     (or (not .cond10) (not .cond11))
+     (or (not .cond10) (not .cond13))
+     (or (not .cond10) (not (not .cmdr1)))
+     (or (not .cond11) (not .cond13))
+     (or (not .cond11) (not (not .cmdr1)))
+     (or (not .cond13) (not (not .cmdr1)))
+     (or (not .cmdr0) (not .cmdr1))))
+(define-fun .trans () Bool
+  (! (and .one-hot-cond .def14 .def15 .def16 .def17 .def18 .def19 .def20 .def21 .def22 .def23 .def24 .def25 .def26 .def27) :trans true))
+; initial state
+(define-fun .def28 () Bool (! (and main@entry (not main@f.exit.thread) (not main@f.exit) (not main@_3) (not main@verifier.error) (not main@verifier.error.split)) :init true))
+; property
+(define-fun .def29 () Bool (! (not main@verifier.error.split) :invar-property 0))

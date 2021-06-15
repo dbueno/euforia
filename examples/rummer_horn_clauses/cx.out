@@ -1,0 +1,18 @@
+unsat
+Function: main
+// why no predicate on input? just says true?
+main@entry: true
+// where is tailrecurse.i.preheader?
+main@tailrecurse.i:
+		([+ // input - %0 - 1 <= -1, 0 - 1 <= -1, ok this constrains nothing
+  main@%_0 // input
+  -1*main@%n.tr2.i
+  -1*main@%accumulator.tr1.i
+]<=-1)
+	((main@%accumulator.tr1.i+(-1*main@%_0))<=0) // tmp - input <= 0
+	([+ // n + tmp - input <= 1
+  main@%n.tr2.i
+  main@%accumulator.tr1.i
+  -1*main@%_0
+]<=1)
+main@f.exit.split: false

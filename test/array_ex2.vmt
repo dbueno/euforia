@@ -1,0 +1,45 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+(set-logic QF_AUFBV)
+
+; state variables
+(declare-fun Fail () Bool)
+(declare-fun Fail+ () Bool)
+(declare-fun L1 () Bool)
+(declare-fun L1+ () Bool)
+(declare-fun L2 () Bool)
+(declare-fun L2+ () Bool)
+(declare-fun L3 () Bool)
+(declare-fun L3+ () Bool)
+(declare-fun A () (Array (_ BitVec 32) (_ BitVec 8)))
+(declare-fun A+ () (Array (_ BitVec 32) (_ BitVec 8)))
+(define-fun .def0 () Bool (! Fail :next Fail+))
+(define-fun .def1 () Bool (! L1 :next L1+))
+(define-fun .def2 () Bool (! L2 :next L2+))
+(define-fun .def3 () Bool (! L3 :next L3+))
+(define-fun .def4 () Bool (! A :next A+))
+
+; initial state, not in Fail
+(define-fun .init () Bool
+            (! (and L1 (not L2) (not L3) (not Fail)) :init true))
+
+(define-fun .trans1 () Bool
+    (ite L1 (and (= (select A+ (_ bv6 32)) (bvadd (select A+ (_ bv4 32)) (_ bv1 8)))
+                 (not L1+)
+                 L2+
+                 (= L3+ L3)
+                 (= Fail+ Fail))
+    (ite L2 (and (ite (= (select A (_ bv4 32)) (_ bv6 8))
+                      (ite (not (= (select A (_ bv6 32)) (_ bv7 8)))
+                           (and Fail+ (not L3+))
+                           (and (not Fail+) L3+))
+                      (and (not Fail+) L3+))
+                 (= L1+ L1) (not L2+))
+         (and (= A+ A) (= L1+ L1) (= L2+ L2) (= L3+ L3) (= Fail+ Fail)))))
+
+(define-fun .trans () Bool
+(! .trans1 :trans true))
+
+(define-fun .property () Bool
+    (! (not Fail) :invar-property 0))
+

@@ -1,0 +1,177 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+; 13 state variables
+; (including 7 locations)
+(declare-fun g@%_br () (_ BitVec 32))
+(declare-fun g@%_br+ () (_ BitVec 32))
+(define-fun .def0 () (_ BitVec 32) (! g@%_br :next g@%_br+))
+(declare-fun g@arg.0 () (_ BitVec 32))
+(declare-fun g@arg.0+ () (_ BitVec 32))
+(define-fun .def2 () (_ BitVec 32) (! g@arg.0 :next g@arg.0+))
+(declare-fun g@_sm1 () Bool)
+(declare-fun g@_sm1+ () Bool)
+(define-fun .def4 () Bool (! g@_sm1 :next g@_sm1+))
+(declare-fun g@.split () Bool)
+(declare-fun g@.split+ () Bool)
+(define-fun .def5 () Bool (! g@.split :next g@.split+))
+(declare-fun main@%sm1 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun main@%sm1+ () (Array (_ BitVec 32) (_ BitVec 32)))
+(define-fun .def6 () (Array (_ BitVec 32) (_ BitVec 32)) (! main@%sm1 :next main@%sm1+))
+(declare-fun main@%_6 () (_ BitVec 32))
+(declare-fun main@%_6+ () (_ BitVec 32))
+(define-fun .def9 () (_ BitVec 32) (! main@%_6 :next main@%_6+))
+(declare-fun main@%_1 () (_ BitVec 32))
+(declare-fun main@%_1+ () (_ BitVec 32))
+(define-fun .def10 () (_ BitVec 32) (! main@%_1 :next main@%_1+))
+(declare-fun main@%_4 () (_ BitVec 32))
+(declare-fun main@%_4+ () (_ BitVec 32))
+(define-fun .def11 () (_ BitVec 32) (! main@%_4 :next main@%_4+))
+(declare-fun main@entry () Bool)
+(declare-fun main@entry+ () Bool)
+(define-fun .def12 () Bool (! main@entry :next main@entry+))
+(declare-fun main@_5 () Bool)
+(declare-fun main@_5+ () Bool)
+(define-fun .def14 () Bool (! main@_5 :next main@_5+))
+(declare-fun main@_7 () Bool)
+(declare-fun main@_7+ () Bool)
+(define-fun .def15 () Bool (! main@_7 :next main@_7+))
+(declare-fun main@verifier.error.split () Bool)
+(declare-fun main@verifier.error.split+ () Bool)
+(define-fun .def16 () Bool (! main@verifier.error.split :next main@verifier.error.split+))
+(declare-fun wait@g-ret-to-main@_5 () Bool)
+(declare-fun wait@g-ret-to-main@_5+ () Bool)
+(define-fun .def18 () Bool (! wait@g-ret-to-main@_5 :next wait@g-ret-to-main@_5+))
+; 46 inputs
+(declare-fun g@%sm1_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun g@%_sm_0 () (_ BitVec 32))
+(declare-fun g@%sm_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun g@%_4_0 () (_ BitVec 32))
+(declare-fun g@%_br_0 () (_ BitVec 32))
+(declare-fun g@_sm1_0 () Bool)
+(declare-fun g@.split_0 () Bool)
+(declare-fun main@%sm2_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun main@%_8_0 () (_ BitVec 32))
+(declare-fun main@%_9_0 () Bool)
+(declare-fun main@%_4_0 () (_ BitVec 32))
+(declare-fun @llvm.used_0 () (_ BitVec 32))
+(declare-fun main@%sm3_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun main@%sm4_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun main@%_0_0 () (_ BitVec 32))
+(declare-fun main@%_2_0 () (_ BitVec 32))
+(declare-fun main@%_3_0 () (_ BitVec 32))
+(declare-fun main@%sm_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun main@entry_0 () Bool)
+(declare-fun main@%_1_0 () (_ BitVec 32))
+(declare-fun main@%sm1_0 () (Array (_ BitVec 32) (_ BitVec 32)))
+(declare-fun main@_5_0 () Bool)
+(declare-fun main@%_6_0 () (_ BitVec 32))
+(declare-fun main@_7_0 () Bool)
+(declare-fun main@_10_0 () Bool)
+(declare-fun main@verifier.error_0 () Bool)
+(declare-fun main@verifier.error.split_0 () Bool)
+(declare-fun .cond1 () Bool)
+(declare-fun .cond3 () Bool)
+(declare-fun .cond7 () Bool)
+(declare-fun .cond8 () Bool)
+(declare-fun .cond13 () Bool)
+(declare-fun .cond17 () Bool)
+(declare-fun .cond19 () Bool)
+; transitions
+(define-fun .def20 () Bool
+  (= g@%_br+ (ite .cond1 g@%_br_0 g@%_br)))
+
+(define-fun .def21 () Bool
+  (= g@arg.0+ (ite .cond3 main@%_4 (ite .cond1 g@arg.0 g@arg.0))))
+
+(define-fun .def22 () Bool
+  (= g@_sm1+ (ite .cond3 true false)))
+
+(define-fun .def23 () Bool
+  (= g@.split+ (ite .cond1 true false)))
+
+(define-fun .def24 () Bool
+  (= main@%sm1+ (ite .cond8 main@%sm1 (ite .cond7 main@%sm1_0 main@%sm1))))
+
+(define-fun .def25 () Bool
+  (= main@%_6+ (ite .cond8 main@%_6_0 main@%_6)))
+
+(define-fun .def26 () Bool
+  (= main@%_1+ (ite .cond8 main@%_1 (ite .cond7 main@%_1_0 main@%_1))))
+
+(define-fun .def27 () Bool
+  (= main@%_4+ (ite .cond7 main@%_4_0 main@%_4)))
+
+(define-fun .def28 () Bool
+  (= main@entry+ (ite .cond13 false false)))
+
+(define-fun .def29 () Bool
+  (= main@_5+ (ite .cond7 true false)))
+
+(define-fun .def30 () Bool
+  (= main@_7+ (ite .cond8 true false)))
+
+(define-fun .def31 () Bool
+  (= main@verifier.error.split+ (ite .cond17 true false)))
+
+(define-fun .def32 () Bool
+  (= wait@g-ret-to-main@_5+ (ite .cond8 false (ite .cond3 true (ite .cond19 true false)))))
+
+(define-fun .def33 () Bool
+  (= .cond13 true))
+
+(define-fun .def34 () Bool
+  (= .cond1 (and g@_sm1
+     true
+     (bvugt g@%_sm_0 #x00000000)
+     (= g@%sm_0 (store g@%sm1_0 g@%_sm_0 g@arg.0))
+     (= g@%_4_0 (select g@%sm_0 g@%_sm_0))
+     (= g@%_br_0 (bvmul #x00000002 g@%_4_0))
+     (=> g@.split_0 (and g@.split_0 g@_sm1_0))
+     g@.split_0)))
+
+(define-fun .def35 () Bool
+  (= .cond7 (and main@entry
+     true
+     (bvugt @llvm.used_0 #x00000000)
+     (bvugt main@%_0_0 #x00000000)
+     (bvugt main@%_1_0 #x00000000)
+     (= main@%_2_0 main@%_0_0)
+     (= main@%_3_0 main@%_1_0)
+     (= main@%sm_0 (store main@%sm3_0 main@%_0_0 #x00000000))
+     (= main@%sm1_0 (store main@%sm4_0 main@%_1_0 #x00000003))
+     (= main@%_4_0 (select main@%sm1_0 main@%_1_0))
+     (=> main@_5_0 (and main@_5_0 main@entry_0))
+     main@_5_0)))
+
+(define-fun .def36 () Bool
+  (= .cond3 (and main@_5 true true)))
+
+(define-fun .def37 () Bool
+  (= .cond19 wait@g-ret-to-main@_5))
+
+(define-fun .def38 () Bool
+  (= .cond8 (and (or (and g@.split wait@g-ret-to-main@_5) (and main@_5 (not true)))
+     true
+     (=> main@_7_0 (and main@_7_0 main@_5_0))
+     main@_7_0
+     (=> (and g@.split wait@g-ret-to-main@_5) (= main@%_6_0 g@%_br)))))
+
+(define-fun .def39 () Bool
+  (= .cond17 (and main@_7
+     true
+     (= main@%sm2_0 (store main@%sm1 main@%_1 main@%_6))
+     (= main@%_8_0 (select main@%sm2_0 main@%_1))
+     (= main@%_9_0 (= main@%_8_0 #x00000006))
+     (not main@%_9_0)
+     (=> main@_10_0 (and main@_10_0 main@_7_0))
+     (=> main@verifier.error_0 (and main@verifier.error_0 main@_10_0))
+     (=> main@verifier.error.split_0
+         (and main@verifier.error.split_0 main@verifier.error_0))
+     main@verifier.error.split_0)))
+
+(define-fun .trans () Bool
+  (! (and .def20 .def21 .def22 .def23 .def24 .def25 .def26 .def27 .def28 .def29 .def30 .def31 .def32 .def33 .def34 .def35 .def36 .def37 .def38 .def39) :trans true))
+; initial state
+(define-fun .def40 () Bool (! (and main@entry (not g@_sm1) (not g@.split) (not main@_5) (not main@_7) (not main@verifier.error.split) (not wait@g-ret-to-main@_5)) :init true))
+; property
+(define-fun .def41 () Bool (! (not main@verifier.error.split) :invar-property 0))

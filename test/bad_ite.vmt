@@ -1,0 +1,15 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^false\(unreach-call\)$
+(declare-fun at-b@c.d () Bool)
+(declare-fun at-b@c.d+ () Bool)
+(define-fun e () Bool (! at-b@c.d :next at-b@c.d+ ))
+(declare-fun arr-f-f-m-1 () (Array (_ BitVec 64) (_ BitVec 64)))
+(declare-fun g-5 () Bool   )
+(declare-fun g-7 () Bool)
+(declare-fun g-9 () Bool)
+(declare-fun g-4 () Bool    )
+(declare-fun arr-f-f-h-3 () (Array (_ BitVec 64) (_ BitVec 64)) )
+(declare-fun arr-f-f-h-1 () (Array (_ BitVec 64) (_ BitVec 64 )))
+(define-fun i () Bool (! (and                         (not at-b@c.d)      ) :init j))
+(define-fun k () Bool (! (let ((a!7 (ite g-9                 arr-f-f-m-1                 (ite g-7                      arr-f-f-h-3                      (ite g-5                           arr-f-f-m-1                           (ite g-4 arr-f-f-h-1 arr-f-f-m-1))))))   (and                                                                                                                                                                                                                                                                                                                                         (= arr-f-f-m-1 a!7)                                                                                                                                                                )) :trans j))
+(define-fun l () Bool (! (not at-b@c.d) :invar-property 0))         

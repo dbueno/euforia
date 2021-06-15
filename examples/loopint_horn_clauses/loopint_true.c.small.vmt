@@ -1,0 +1,90 @@
+(set-info :source |Printe by chc_to_vmt.py|)
+; state variables
+(declare-fun verifier.error () Bool) ; relation = True
+(declare-fun verifier.error+ () Bool)
+(declare-fun verifier.error.a0 () Bool) ; relation = False
+(declare-fun verifier.error.a0+ () Bool)
+(declare-fun verifier.error.a1 () Bool) ; relation = False
+(declare-fun verifier.error.a1+ () Bool)
+(declare-fun verifier.error.a2 () Bool) ; relation = False
+(declare-fun verifier.error.a2+ () Bool)
+(declare-fun main@entry () Bool) ; relation = True
+(declare-fun main@entry+ () Bool)
+(declare-fun main@_bb () Bool) ; relation = True
+(declare-fun main@_bb+ () Bool)
+(declare-fun main@_bb.a0 () Int) ; relation = False
+(declare-fun main@_bb.a0+ () Int)
+(declare-fun main@_bb1 () Bool) ; relation = True
+(declare-fun main@_bb1+ () Bool)
+(declare-fun main@_bb1.a0 () Int) ; relation = False
+(declare-fun main@_bb1.a0+ () Int)
+(declare-fun main@_bb2 () Bool) ; relation = True
+(declare-fun main@_bb2+ () Bool)
+(declare-fun main@_bb2.a0 () Int) ; relation = False
+(declare-fun main@_bb2.a0+ () Int)
+(declare-fun main@verifier.error.loopexit () Bool) ; relation = True
+(declare-fun main@verifier.error.loopexit+ () Bool)
+(declare-fun main@verifier.error () Bool) ; relation = True
+(declare-fun main@verifier.error+ () Bool)
+(declare-fun main@verifier.error.split () Bool) ; relation = True
+(declare-fun main@verifier.error.split+ () Bool)
+; inputs
+(declare-fun main@%_8_0 () Bool)
+(declare-fun main@%_6_0 () Bool)
+(declare-fun main@%_3_0 () Bool)
+(declare-fun main@%_1_0 () Bool)
+(declare-fun main@%_0_0 () Int)
+(declare-fun main@%i.0.i_0 () Int)
+(declare-fun main@%_5_0 () Int)
+(declare-fun main@%i.0.i_1 () Int)
+(declare-fun main@%.lcssa_0 () Int)
+; :next defs for state vars
+(define-fun .def0 () Bool (! verifier.error :next verifier.error+))
+(define-fun .def1 () Bool (! verifier.error.a0 :next verifier.error.a0+))
+(define-fun .def2 () Bool (! verifier.error.a1 :next verifier.error.a1+))
+(define-fun .def3 () Bool (! verifier.error.a2 :next verifier.error.a2+))
+(define-fun .def4 () Bool (! main@entry :next main@entry+))
+(define-fun .def5 () Bool (! main@_bb :next main@_bb+))
+(define-fun .def6 () Int (! main@_bb.a0 :next main@_bb.a0+))
+(define-fun .def7 () Bool (! main@_bb1 :next main@_bb1+))
+(define-fun .def8 () Int (! main@_bb1.a0 :next main@_bb1.a0+))
+(define-fun .def9 () Bool (! main@_bb2 :next main@_bb2+))
+(define-fun .def10 () Int (! main@_bb2.a0 :next main@_bb2.a0+))
+(define-fun .def11 () Bool (! main@verifier.error.loopexit :next main@verifier.error.loopexit+))
+(define-fun .def12 () Bool (! main@verifier.error :next main@verifier.error+))
+(define-fun .def13 () Bool (! main@verifier.error.split :next main@verifier.error.split+))
+; initial state
+; initial state vars set: set()
+(define-fun .def14 () Bool (= verifier.error false))
+(define-fun .def15 () Bool (= verifier.error.a0 false))
+(define-fun .def16 () Bool (= verifier.error.a1 false))
+(define-fun .def17 () Bool (= verifier.error.a2 false))
+(define-fun .def18 () Bool (= main@entry false))
+(define-fun .def19 () Bool (= main@_bb false))
+(define-fun .def20 () Bool (= main@_bb1 false))
+(define-fun .def21 () Bool (= main@_bb2 false))
+(define-fun .def22 () Bool (= main@verifier.error.loopexit false))
+(define-fun .def23 () Bool (= main@verifier.error false))
+(define-fun .def24 () Bool (= main@verifier.error.split false))
+(define-fun .def25 () Bool (and .def14 .def15 .def16 .def17 .def18 .def19 .def20 .def21 .def22 .def23 .def24))
+(define-fun .def26 () Bool (! .def25 :init true))
+; transition relation
+(define-fun .def27 () Bool (and verifier.error+ (= verifier.error.a0+ false) (= verifier.error.a1+ false) (= verifier.error.a2+ false) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def28 () Bool (and verifier.error+ (= verifier.error.a0+ false) (= verifier.error.a1+ true) (= verifier.error.a2+ true) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def29 () Bool (and verifier.error+ (= verifier.error.a0+ true) (= verifier.error.a1+ false) (= verifier.error.a2+ true) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def30 () Bool (and verifier.error+ (= verifier.error.a0+ true) (= verifier.error.a1+ true) (= verifier.error.a2+ true) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def31 () Bool (and main@entry+ (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def32 () Bool (and main@entry true (= main@%_1_0 (= main@%_0_0 0)) main@%_1_0 (= main@%i.0.i_0 main@%_0_0) main@_bb+ (= main@_bb.a0+ main@%i.0.i_0) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def33 () Bool (and main@_bb (= main@_bb.a0 main@%i.0.i_0) true (= main@%_3_0 (< main@%i.0.i_0 7)) main@%_3_0 main@_bb1+ (= main@_bb1.a0+ main@%i.0.i_0) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def34 () Bool (and main@_bb (= main@_bb.a0 main@%i.0.i_0) true (= main@%_3_0 (< main@%i.0.i_0 7)) (not main@%_3_0) main@verifier.error.loopexit+ (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def35 () Bool (and main@_bb1 (= main@_bb1.a0 main@%i.0.i_0) true (= main@%_5_0 (+ main@%i.0.i_0 3)) (= main@%_6_0 (< main@%_5_0 5)) main@%_6_0 (= main@%i.0.i_1 main@%_5_0) main@_bb+ (= main@_bb.a0+ main@%i.0.i_1) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def36 () Bool (and main@_bb1 (= main@_bb1.a0 main@%i.0.i_0) true (= main@%_5_0 (+ main@%i.0.i_0 3)) (= main@%_6_0 (< main@%_5_0 5)) (not main@%_6_0) (= main@%.lcssa_0 main@%_5_0) main@_bb2+ (= main@_bb2.a0+ main@%.lcssa_0) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def37 () Bool (and main@_bb2 (= main@_bb2.a0 main@%.lcssa_0) true (= main@%_8_0 (< main@%.lcssa_0 7)) (not main@%_8_0) main@verifier.error+ (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def38 () Bool (and main@verifier.error.loopexit main@verifier.error+ (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error.split+ main@verifier.error.split)))
+(define-fun .def39 () Bool (and main@verifier.error main@verifier.error.split+ (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@_bb+ main@_bb) (= main@_bb.a0+ main@_bb.a0) (= main@_bb1+ main@_bb1) (= main@_bb1.a0+ main@_bb1.a0) (= main@_bb2+ main@_bb2) (= main@_bb2.a0+ main@_bb2.a0) (= main@verifier.error.loopexit+ main@verifier.error.loopexit) (= main@verifier.error+ main@verifier.error)))
+(define-fun .def40 () Bool (or .def27 .def28 .def29 .def30 .def31 .def32 .def33 .def34 .def35 .def36 .def37 .def38 .def39))
+(define-fun .def41 () Bool (! .def40 :trans true))
+; property
+(define-fun .def42 () Bool (not main@verifier.error.split))
+(define-fun .def43 () Bool (! .def42 :invar-property 0))
+(assert true)

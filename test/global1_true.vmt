@@ -1,0 +1,45 @@
+; RUN: euforia %s | OutputCheckSmt2 %s
+; CHECK: ^true\(unreach-call\)$
+; filename: "../../vmt2/examples/global1_true.c"
+(set-info :source |Printed by VMT_Standalone 0.1 [taco]|)
+; state variable decarations
+(declare-fun @L4* () Bool)
+(declare-fun @L4*+ () Bool)
+(declare-fun @L2* () Bool)
+(declare-fun @L2*+ () Bool)
+(declare-fun @L0* () Bool)
+(declare-fun @L0*+ () Bool)
+; aux variable declarations
+(declare-fun %tobool-main () Bool)
+(declare-fun @L3 () Bool)
+(declare-fun @L1 () Bool)
+; input variable decarations
+; :next defs for state vars
+(define-fun .def0 () Bool (! @L4* :next @L4*+))
+(define-fun .def1 () Bool (! @L2* :next @L2*+))
+(define-fun .def2 () Bool (! @L0* :next @L0*+))
+; initial state
+(define-fun .def3 () Bool (not @L2*))
+(define-fun .def4 () Bool (not @L4*))
+(define-fun .def5 () Bool (and @L0* .def4 .def3))
+(define-fun .def6 () Bool (! .def5 :init true))
+; transition relation
+(define-fun .def7 () Bool (or @L3 @L4*))
+(define-fun .def8 () Bool (= @L4*+ .def7))
+(define-fun .def9 () Bool (not %tobool-main))
+(define-fun .def10 () Bool (and @L1 .def9))
+(define-fun .def11 () Bool (= @L3 .def10))
+(define-fun .def12 () Bool (and @L1 %tobool-main))
+(define-fun .def13 () Bool (or .def12 @L2*))
+(define-fun .def14 () Bool (= @L2*+ .def13))
+(define-fun .def15 () Bool (= @L1 @L0*))
+(define-fun .def16 () Bool (not @L0*+))
+(define-fun .def17 () Bool (and .def16 .def15))
+(define-fun .def18 () Bool (and .def17 .def9))
+(define-fun .def19 () Bool (and .def18 .def14))
+(define-fun .def20 () Bool (and .def19 .def11))
+(define-fun .def21 () Bool (and .def20 .def8))
+(define-fun .def22 () Bool (! .def21 :trans true))
+; property
+(define-fun .def23 () Bool (! .def3 :invar-property 0))
+(assert true)

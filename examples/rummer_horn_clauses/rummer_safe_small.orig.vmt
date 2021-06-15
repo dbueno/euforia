@@ -1,0 +1,105 @@
+(set-info :source |Printe by chc_to_vmt.py|)
+; state variables
+(declare-fun verifier.error () Bool) ; relation = True
+(declare-fun verifier.error+ () Bool)
+(declare-fun verifier.error.a0 () Bool) ; relation = False
+(declare-fun verifier.error.a0+ () Bool)
+(declare-fun verifier.error.a1 () Bool) ; relation = False
+(declare-fun verifier.error.a1+ () Bool)
+(declare-fun verifier.error.a2 () Bool) ; relation = False
+(declare-fun verifier.error.a2+ () Bool)
+(declare-fun main@entry () Bool) ; relation = True
+(declare-fun main@entry+ () Bool)
+(declare-fun main@tailrecurse.i.preheader () Bool) ; relation = True
+(declare-fun main@tailrecurse.i.preheader+ () Bool)
+(declare-fun main@tailrecurse.i.preheader.a0 () Int) ; relation = False
+(declare-fun main@tailrecurse.i.preheader.a0+ () Int)
+(declare-fun main@tailrecurse.i () Bool) ; relation = True
+(declare-fun main@tailrecurse.i+ () Bool)
+(declare-fun main@tailrecurse.i.a0 () Int) ; relation = False
+(declare-fun main@tailrecurse.i.a0+ () Int)
+(declare-fun main@tailrecurse.i.a1 () Int) ; relation = False
+(declare-fun main@tailrecurse.i.a1+ () Int)
+(declare-fun main@tailrecurse.i.a2 () Int) ; relation = False
+(declare-fun main@tailrecurse.i.a2+ () Int)
+(declare-fun main@f.exit.loopexit () Bool) ; relation = True
+(declare-fun main@f.exit.loopexit+ () Bool)
+(declare-fun main@f.exit.loopexit.a0 () Int) ; relation = False
+(declare-fun main@f.exit.loopexit.a0+ () Int)
+(declare-fun main@f.exit.loopexit.a1 () Int) ; relation = False
+(declare-fun main@f.exit.loopexit.a1+ () Int)
+(declare-fun main@f.exit () Bool) ; relation = True
+(declare-fun main@f.exit+ () Bool)
+(declare-fun main@f.exit.a0 () Int) ; relation = False
+(declare-fun main@f.exit.a0+ () Int)
+(declare-fun main@f.exit.a1 () Int) ; relation = False
+(declare-fun main@f.exit.a1+ () Int)
+(declare-fun main@f.exit.split () Bool) ; relation = True
+(declare-fun main@f.exit.split+ () Bool)
+; inputs
+(declare-fun main@%_6_0 () Int)
+(declare-fun main@%_7_0 () Bool)
+(declare-fun main@%_5_0 () Bool)
+(declare-fun main@%_1_0 () Bool)
+(declare-fun main@%_2_0 () Bool)
+(declare-fun main@%_0_0 () Int)
+(declare-fun main@%accumulator.tr.lcssa.i_0 () Int)
+(declare-fun main@%n.tr2.i_0 () Int)
+(declare-fun main@%accumulator.tr1.i_0 () Int)
+(declare-fun main@%_3_0 () Int)
+(declare-fun main@%_4_0 () Int)
+(declare-fun main@%n.tr2.i_1 () Int)
+(declare-fun main@%accumulator.tr1.i_1 () Int)
+(declare-fun main@%.lcssa_0 () Int)
+; :next defs for state vars
+(define-fun .def0 () Bool (! verifier.error :next verifier.error+))
+(define-fun .def1 () Bool (! verifier.error.a0 :next verifier.error.a0+))
+(define-fun .def2 () Bool (! verifier.error.a1 :next verifier.error.a1+))
+(define-fun .def3 () Bool (! verifier.error.a2 :next verifier.error.a2+))
+(define-fun .def4 () Bool (! main@entry :next main@entry+))
+(define-fun .def5 () Bool (! main@tailrecurse.i.preheader :next main@tailrecurse.i.preheader+))
+(define-fun .def6 () Int (! main@tailrecurse.i.preheader.a0 :next main@tailrecurse.i.preheader.a0+))
+(define-fun .def7 () Bool (! main@tailrecurse.i :next main@tailrecurse.i+))
+(define-fun .def8 () Int (! main@tailrecurse.i.a0 :next main@tailrecurse.i.a0+))
+(define-fun .def9 () Int (! main@tailrecurse.i.a1 :next main@tailrecurse.i.a1+))
+(define-fun .def10 () Int (! main@tailrecurse.i.a2 :next main@tailrecurse.i.a2+))
+(define-fun .def11 () Bool (! main@f.exit.loopexit :next main@f.exit.loopexit+))
+(define-fun .def12 () Int (! main@f.exit.loopexit.a0 :next main@f.exit.loopexit.a0+))
+(define-fun .def13 () Int (! main@f.exit.loopexit.a1 :next main@f.exit.loopexit.a1+))
+(define-fun .def14 () Bool (! main@f.exit :next main@f.exit+))
+(define-fun .def15 () Int (! main@f.exit.a0 :next main@f.exit.a0+))
+(define-fun .def16 () Int (! main@f.exit.a1 :next main@f.exit.a1+))
+(define-fun .def17 () Bool (! main@f.exit.split :next main@f.exit.split+))
+; initial state
+; initial state vars set: set()
+(define-fun .def18 () Bool (= verifier.error false))
+(define-fun .def19 () Bool (= verifier.error.a0 false))
+(define-fun .def20 () Bool (= verifier.error.a1 false))
+(define-fun .def21 () Bool (= verifier.error.a2 false))
+(define-fun .def22 () Bool (= main@entry false))
+(define-fun .def23 () Bool (= main@tailrecurse.i.preheader false))
+(define-fun .def24 () Bool (= main@tailrecurse.i false))
+(define-fun .def25 () Bool (= main@f.exit.loopexit false))
+(define-fun .def26 () Bool (= main@f.exit false))
+(define-fun .def27 () Bool (= main@f.exit.split false))
+(define-fun .def28 () Bool (and .def18 .def19 .def20 .def21 .def22 .def23 .def24 .def25 .def26 .def27))
+(define-fun .def29 () Bool (! .def28 :init true))
+; transition relation
+(define-fun .def30 () Bool (and verifier.error+ (= verifier.error.a0+ false) (= verifier.error.a1+ false) (= verifier.error.a2+ false) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def31 () Bool (and verifier.error+ (= verifier.error.a0+ false) (= verifier.error.a1+ true) (= verifier.error.a2+ true) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def32 () Bool (and verifier.error+ (= verifier.error.a0+ true) (= verifier.error.a1+ false) (= verifier.error.a2+ true) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def33 () Bool (and verifier.error+ (= verifier.error.a0+ true) (= verifier.error.a1+ true) (= verifier.error.a2+ true) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def34 () Bool (and main@entry+ (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def35 () Bool (and main@entry true (= main@%_1_0 (> main@%_0_0 (- 1))) main@%_1_0 (= main@%_2_0 (> main@%_0_0 0)) main@%_2_0 main@tailrecurse.i.preheader+ (= main@tailrecurse.i.preheader.a0+ main@%_0_0) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def36 () Bool (and main@entry true (= main@%_1_0 (> main@%_0_0 (- 1))) main@%_1_0 (= main@%_2_0 (> main@%_0_0 0)) (not main@%_2_0) (= main@%accumulator.tr.lcssa.i_0 1) main@f.exit+ (= main@f.exit.a0+ main@%_0_0) (= main@f.exit.a1+ main@%accumulator.tr.lcssa.i_0) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def37 () Bool (and main@tailrecurse.i.preheader (= main@tailrecurse.i.preheader.a0 main@%_0_0) true (= main@%n.tr2.i_0 main@%_0_0) (= main@%accumulator.tr1.i_0 1) main@tailrecurse.i+ (= main@tailrecurse.i.a0+ main@%_0_0) (= main@tailrecurse.i.a1+ main@%n.tr2.i_0) (= main@tailrecurse.i.a2+ main@%accumulator.tr1.i_0) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def38 () Bool (and main@tailrecurse.i (= main@tailrecurse.i.a0 main@%_0_0) (= main@tailrecurse.i.a1 main@%n.tr2.i_0) (= main@tailrecurse.i.a2 main@%accumulator.tr1.i_0) true (= main@%_3_0 (+ main@%n.tr2.i_0 (- 1))) (= main@%_4_0 (+ main@%accumulator.tr1.i_0 1)) (= main@%_5_0 (> main@%n.tr2.i_0 1)) main@%_5_0 (= main@%n.tr2.i_1 main@%_3_0) (= main@%accumulator.tr1.i_1 main@%_4_0) main@tailrecurse.i+ (= main@tailrecurse.i.a0+ main@%_0_0) (= main@tailrecurse.i.a1+ main@%n.tr2.i_1) (= main@tailrecurse.i.a2+ main@%accumulator.tr1.i_1) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def39 () Bool (and main@tailrecurse.i (= main@tailrecurse.i.a0 main@%_0_0) (= main@tailrecurse.i.a1 main@%n.tr2.i_0) (= main@tailrecurse.i.a2 main@%accumulator.tr1.i_0) true (= main@%_3_0 (+ main@%n.tr2.i_0 (- 1))) (= main@%_4_0 (+ main@%accumulator.tr1.i_0 1)) (= main@%_5_0 (> main@%n.tr2.i_0 1)) (not main@%_5_0) (= main@%.lcssa_0 main@%_4_0) main@f.exit.loopexit+ (= main@f.exit.loopexit.a0+ main@%_0_0) (= main@f.exit.loopexit.a1+ main@%.lcssa_0) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def40 () Bool (and main@f.exit.loopexit (= main@f.exit.loopexit.a0 main@%_0_0) (= main@f.exit.loopexit.a1 main@%.lcssa_0) true (= main@%accumulator.tr.lcssa.i_0 main@%.lcssa_0) main@f.exit+ (= main@f.exit.a0+ main@%_0_0) (= main@f.exit.a1+ main@%accumulator.tr.lcssa.i_0) (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit.split+ main@f.exit.split)))
+(define-fun .def41 () Bool (and main@f.exit (= main@f.exit.a0 main@%_0_0) (= main@f.exit.a1 main@%accumulator.tr.lcssa.i_0) true (= main@%_6_0 (+ main@%_0_0 1)) (= main@%_7_0 (= main@%accumulator.tr.lcssa.i_0 main@%_6_0)) (not main@%_7_0) main@f.exit.split+ (= verifier.error+ verifier.error) (= verifier.error.a0+ verifier.error.a0) (= verifier.error.a1+ verifier.error.a1) (= verifier.error.a2+ verifier.error.a2) (= main@entry+ main@entry) (= main@tailrecurse.i.preheader+ main@tailrecurse.i.preheader) (= main@tailrecurse.i.preheader.a0+ main@tailrecurse.i.preheader.a0) (= main@tailrecurse.i+ main@tailrecurse.i) (= main@tailrecurse.i.a0+ main@tailrecurse.i.a0) (= main@tailrecurse.i.a1+ main@tailrecurse.i.a1) (= main@tailrecurse.i.a2+ main@tailrecurse.i.a2) (= main@f.exit.loopexit+ main@f.exit.loopexit) (= main@f.exit.loopexit.a0+ main@f.exit.loopexit.a0) (= main@f.exit.loopexit.a1+ main@f.exit.loopexit.a1) (= main@f.exit+ main@f.exit) (= main@f.exit.a0+ main@f.exit.a0) (= main@f.exit.a1+ main@f.exit.a1)))
+(define-fun .def42 () Bool (or .def30 .def31 .def32 .def33 .def34 .def35 .def36 .def37 .def38 .def39 .def40 .def41))
+(define-fun .def43 () Bool (! .def42 :trans true))
+; property
+(define-fun .def44 () Bool (not main@f.exit.split))
+(define-fun .def45 () Bool (! .def44 :invar-property 0))
+(assert true)
