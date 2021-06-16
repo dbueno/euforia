@@ -30,8 +30,11 @@ in
   pname = "euforia";
   version = "1.0";
 
-  src = ./euforia-1.0.tar.gz;
-  
+  src =
+    with builtins; filterSource
+    (path: _:
+    !elem (baseNameOf path) [ ".git" "result" "bin" ]) ./.;
+
   mathsat = import ./mathsat.nix;
 
   z3 = pkgs.z3.overrideAttrs (attr: with attr; rec {
