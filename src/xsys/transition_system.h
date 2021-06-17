@@ -12,6 +12,8 @@
 #include <string>
 #include <map>
 
+#include "cube.h"
+#include "supp/cube_insert_iterator.h"
 #include "supp/expr_rewriter.h"
 #include "supp/expr_substitution.h"
 #include "supp/ip_rep.h"
@@ -27,6 +29,7 @@ class AbstractModel;
 class CheckerSat;
 struct TSlice;
 class Statistics;
+class CubeInsertIterator;
 
 
 // ========= master superclass for transition systems
@@ -195,6 +198,8 @@ class TransitionSystem {
   //! uninterpreted constants
   bool is_trans_formula(const z3::expr&) const;
 
+  CubeInsertIterator cube_inserter(Cube& c) const;
+
   void collect_static_statistics(Statistics *st) const;
 
   //^--------------------------------------------------------------------------^
@@ -308,7 +313,6 @@ class TransitionSystem {
   z3::context& ctx_;
   z3::params simplify_params_;
 };
-
 
 
 

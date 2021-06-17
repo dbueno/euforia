@@ -8,6 +8,7 @@
 #include <stdexcept>
 
 #include "cube.h"
+#include "supp/cube_insert_iterator.h"
 #include "supp/expr_dot_formatter.h"
 #include "supp/expr_iterators.h"
 #include "supp/expr_supp.h"
@@ -282,6 +283,10 @@ void TransitionSystem::SimplifyPreimage(Cube& z) const {
 std::shared_ptr<AbstractModel>
 TransitionSystem::GetModel(const shared_ptr<Model>& m) const {
   return std::make_shared<AbstractModel>(m, *this);
+}
+
+CubeInsertIterator TransitionSystem::cube_inserter(Cube& c) const {
+  return CubeInsertIterator(*this, c);
 }
 
 

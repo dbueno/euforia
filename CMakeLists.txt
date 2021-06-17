@@ -297,6 +297,7 @@ set(LIBEUFORIA_SOURCES
     src/supp/tseitin_rewriter.cc
     src/supp/marco.cc
     src/supp/statistics.cc
+    src/supp/cube_insert_iterator.cc
     src/supp/pp/doc.cc
     src/xsys/transition_system.cc
     src/xsys/vmt_transition_system.cc
