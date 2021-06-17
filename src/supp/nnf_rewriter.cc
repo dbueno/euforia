@@ -43,7 +43,7 @@ z3::expr NnfRewriter::visitNOT(const z3::expr& e) {
     case Z3_OP_XOR:
       e_new = expr_not(Arg(arg, 0));
       for (auto it = ExprFlatKindIterator::begin(arg, Z3_OP_XOR),
-           ie = ExprFlatKindIterator::end(); it != ie; ++it) {
+           ie = ExprFlatKindIterator::end(Z3_OP_XOR); it != ie; ++it) {
         e_new = e_new ^ *it;
       }
       break;

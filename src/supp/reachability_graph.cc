@@ -10,6 +10,8 @@
 #include "supp/expr_normalize.h"
 #include "xsys/transition_system.h"
 #include "xsys/var_info_traversal.h"
+#include "supp/expr_supp.h"
+#include "supp/fmt_supp.h"
 
 
 using namespace std;

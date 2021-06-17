@@ -8,6 +8,7 @@
 #include "supp/expr_supp.h"
 #include "expr_graph_traits.h"
 
+#include <boost/iterator/iterator_facade.hpp>
 #include <boost/range.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <deque>
@@ -68,61 +69,39 @@ static inline auto ExprDescendents(const z3::expr& e) {
 //^----------------------------------------------------------------------------^
 
 //! Iterator over all subexpressions of the same kind nested at the top level
-class ExprFlatKindIterator {
+class ExprFlatKindIterator : public boost::iterator_facade<
+    ExprFlatKindIterator,
+    const z3::expr,
+    boost::forward_traversal_tag,
+    const z3::expr> {
  public:
-  using value_type = const z3::expr;
-  using difference_type = unsigned;
-  using reference = value_type;
-  using pointer = value_type*;
-  using iterator_category = std::input_iterator_tag;
-
   inline static ExprFlatKindIterator begin(const z3::expr& e,
                                            Z3_decl_kind kind) {
     return ExprFlatKindIterator(e, kind);
   }
 
-  inline static ExprFlatKindIterator end() {
-    return ExprFlatKindIterator();
-  }
-
-  inline bool operator==(const ExprFlatKindIterator& it) {
-    return queue_ == it.queue_;
-  }
-
-  inline bool operator!=(const ExprFlatKindIterator& it) {
-    return !(*this == it);
-  }
-
-  inline ExprFlatKindIterator& operator++() {
-    queue_.pop_back();
-    Advance();
-    return *this;
-  }
-
-  ExprFlatKindIterator operator++(int) {
-    ExprFlatKindIterator copy(*this);
-    Advance();
-    return copy;
-  }
-
-  inline value_type operator*() const {
-    return queue_.back();
-  }
-
-  inline ProxyHolder<value_type> operator->() const {
-    return ProxyHolder<value_type>(**this);
+  inline static ExprFlatKindIterator end(Z3_decl_kind kind) {
+    return ExprFlatKindIterator(kind);
   }
 
  private:
-  inline explicit ExprFlatKindIterator(const z3::ExprWrapper& e,
-                                       Z3_decl_kind kind)
-      : queue_({e}), kind_(kind) {
-    Advance();
-  }
-  
-  inline ExprFlatKindIterator() {}
+  friend class boost::iterator_core_access;
 
-  void Advance() {
+  ExprFlatKindIterator(z3::expr e, Z3_decl_kind kind)
+      : queue_({e}), kind_(kind) {
+    FindNext();
+    // invariant on queue_ holds
+  }
+  ExprFlatKindIterator(Z3_decl_kind k) : kind_(k) {}
+
+  void increment() { queue_.pop_back(); FindNext(); }
+  const z3::expr dereference() const { return queue_.back(); }
+
+  bool equal(const ExprFlatKindIterator& other) const {
+    return queue_ == other.queue_ && kind_ == other.kind_;
+  }
+
+  void FindNext() {
     while (!queue_.empty()) {
       const z3::expr& back = queue_.back();
       if (back.is_app() && back.decl().decl_kind() == kind_) {
@@ -136,11 +115,18 @@ class ExprFlatKindIterator {
     }
   }
 
-  // invariant is that the f the queue is nonempty, queue's back() element is
-  // not an or()
+  // invariant is that either queue is empty or queue's back() element is
+  // not a kind_ node
   std::deque<z3::ExprWrapper> queue_;
-  Z3_decl_kind kind_;
+  const Z3_decl_kind kind_;
 };
+
+static auto ExprFlatKinds(const z3::expr& e, Z3_decl_kind k) {
+  return boost::iterator_range<ExprFlatKindIterator>(
+      ExprFlatKindIterator::begin(e, k),
+      ExprFlatKindIterator::end(k));
+}
+
 
 //^----------------------------------------------------------------------------^
 
@@ -152,7 +138,7 @@ class ExprConjunctIterator {
   }
 
   inline static auto end() {
-    return ExprFlatKindIterator::end();
+    return ExprFlatKindIterator::end(Z3_OP_AND);
   }
 };
 
@@ -172,7 +158,7 @@ class ExprDisjunctIterator {
   }
 
   inline static auto end() {
-    return ExprFlatKindIterator::end();
+    return ExprFlatKindIterator::end(Z3_OP_OR);
   }
 };
 

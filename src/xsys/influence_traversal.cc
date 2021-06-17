@@ -10,6 +10,7 @@
 #include "supp/model_justifier.h"
 #include "xsys/transition_system.h"
 #include "supp/z3_solver.h"
+#include "supp/fmt_supp.h"
 
 using namespace std;
 using namespace llvm;

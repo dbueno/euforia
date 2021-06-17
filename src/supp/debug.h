@@ -5,6 +5,15 @@
 #ifndef EUFORIA_DEBUG_H_
 #define EUFORIA_DEBUG_H_
 
+#include <iostream>
+
+#define ENSURE(x) if (!(x)) { \
+  std::cerr << "ENSURE violation: " << #x << "\n"; \
+  exit(1); \
+}
+
+
+
 
 #ifdef NDEBUG
 #define DEBUG_CODE(code) do {} while (0)

@@ -83,9 +83,9 @@ class ExprRewriter : public Rewriter<SubClass, z3::expr, Ret, Set,
   class CachedArgIterator {
    public:
     using difference_type = std::ptrdiff_t;
-    using value_type = z3::expr;
-    using reference = const z3::expr&;
-    using pointer = const z3::expr*;
+    using value_type = Ret;
+    using reference = const Ret&;
+    using pointer = const Ret*;
     using iterator_category = std::forward_iterator_tag;
 
     CachedArgIterator(const Cache& c, ExprArgIterator it) 

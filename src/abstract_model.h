@@ -54,6 +54,8 @@ class UninterpretedPartition {
   
   std::ostream& Print(std::ostream& os) const;
   
+  pp::DocPtr Pp() const;
+
  private:
   AbstractModel& model_;
   ExprMap<ExprSet> cells_; // TERM!val!3 -> all terms we know about in this class
@@ -111,6 +113,7 @@ class AbstractModel : public ExprVisitor<AbstractModel, void> {
   
   bool shouldPrintFuncInterp = false;
   std::ostream& Print(std::ostream& os) const;
+  pp::DocPtr Pp() const;
 
   unsigned num_evals() const;
   
@@ -135,7 +138,54 @@ class AbstractModel : public ExprVisitor<AbstractModel, void> {
 
 inline std::ostream& operator<<(std::ostream& os, const AbstractModel& AM) { return AM.Print(os); }
 
+//^----------------------------------------------------------------------------^
+
+template <>
+struct euforia::pp::PrettyPrinter<UninterpretedPartition> {
+  euforia::pp::DocPtr operator()(const UninterpretedPartition& c) { return c.Pp(); }
+};
+
+template <>
+struct euforia::pp::PrettyPrinter<AbstractModel> {
+  euforia::pp::DocPtr operator()(const AbstractModel& c) { return c.Pp(); }
+};
+
 
 }
+
+template <>
+struct fmt::formatter<euforia::UninterpretedPartition> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    auto it = ctx.begin(), end = ctx.end();
+    if (it != end && *it != '}') {
+      std::cerr << "invalid format\n";
+      exit(1);
+    }
+    return it;
+  }
+
+  template <typename FormatContext>
+  auto format(const euforia::UninterpretedPartition& e, FormatContext& ctx) -> decltype(ctx.out()) {
+    return format_to(ctx.out(), "{}", euforia::pp::Pprint(e));
+  }
+};
+
+template <>
+struct fmt::formatter<euforia::AbstractModel> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    auto it = ctx.begin(), end = ctx.end();
+    if (it != end && *it != '}') {
+      std::cerr << "invalid format\n";
+      exit(1);
+    }
+    return it;
+  }
+
+  template <typename FormatContext>
+  auto format(const euforia::AbstractModel& e, FormatContext& ctx) -> decltype(ctx.out()) {
+    return format_to(ctx.out(), "{}", euforia::pp::Pprint(e));
+  }
+};
+
 
 #endif /* abstract_model_hpp */

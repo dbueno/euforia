@@ -10,6 +10,7 @@
 #include <boost/range/algorithm/transform.hpp>
 
 #include "supp/expr_supp.h"
+#include "supp/fmt_supp.h"
 #include "supp/equality_literal.h"
 #include "refinement/fp_answer_scrubber.h"
 

@@ -5,15 +5,16 @@
 #ifndef cube_hpp
 #define cube_hpp
 
-#include "supp/std_supp.h"
-#include "supp/expr_supp.h"
-
 #include <boost/container_hash/hash_fwd.hpp>
 #include <cassert>
 #include <functional>
 #include <iterator>
 #include <memory>
 #include <vector>
+
+#include "supp/std_supp.h"
+#include "supp/expr_supp.h"
+#include "supp/pp/doc.h"
 
 namespace euforia {
 
@@ -69,8 +70,6 @@ class Cube {
 
     return true;
   }
-
-  friend std::ostream& operator<<(std::ostream& os, const Cube& c);
 
   inline z3::expr& operator[](const size_t i) { return lits[i]; }
   inline const z3::expr& operator[](const size_t i) const { return lits[i]; }
@@ -170,8 +169,8 @@ class Cube {
       c->lits[i] = cur;
       c->next.insert({cur, nxt});
     }
-    bool operator==(const self_type& rhs) { return i == rhs.i; }
-    bool operator!=(const self_type& rhs) { return i != rhs.i; }
+    bool operator==(const self_type& rhs) const { return i == rhs.i; }
+    bool operator!=(const self_type& rhs) const { return i != rhs.i; }
   };
 
   iterator begin();
@@ -192,9 +191,11 @@ class Cube {
     const_iterator(lit_storage::const_iterator start) : it(start) {}
     inline self_type operator++() { ++it; return *this; }
     inline self_type operator++(int) { self_type i = *this; ++it; return i; }
+    self_type operator --() { --it; return *this; }
+    self_type operator --(int) { self_type i = *this; --it; return i; }
     inline reference operator*() const { return *it; }
-    bool operator==(const self_type& rhs) { return it == rhs.it; }
-    bool operator!=(const self_type& rhs) { return it != rhs.it; }
+    bool operator==(const self_type& rhs) const { return it == rhs.it; }
+    bool operator!=(const self_type& rhs) const { return it != rhs.it; }
   };
 
   const_iterator begin() const;
@@ -250,8 +251,6 @@ class Cube {
   const_next_state_iterator nbegin() const;
   const_next_state_iterator nend() const;
 
-  void print(std::ostream& os) const;
-
 };
   
   
@@ -284,8 +283,6 @@ class TimedCube {
 
   std::size_t hash() const;
 
-  friend std::ostream& operator<<(std::ostream& os, const TimedCube& c);
-
   inline bool operator==(const TimedCube& rhs) const {
     return thecube == rhs.thecube && frame == rhs.frame;
   }
@@ -312,7 +309,64 @@ template<class T>
 using tcube_umap = std::unordered_map<TimedCube, T, TimedCubeHash,
       TimedCubeEqualTo>;
 
-}
+template <>
+struct euforia::pp::PrettyPrinter<Cube> {
+  euforia::pp::DocPtr operator()(const Cube& c) {
+    auto g = pp::groupsep(c.begin(), c.end(),
+                         pp::group(pp::append(
+                                 pp::break_(1, 0),
+                                 pp::append(pp::text(AcSep(Z3_OP_AND)), pp::text(" "))
+                                 )));
+    pp::DocStream s;
+    s << "cube<" << pp::nest(4, g) << ">";
+    return s;
+  }
+};
+
+template <>
+struct euforia::pp::PrettyPrinter<TimedCube> {
+  euforia::pp::DocPtr operator()(const TimedCube& c) {
+    auto g = pp::groupsep(c.thecube->begin(), c.thecube->end(),
+                         pp::group(pp::append(
+                                 pp::break_(1, 0),
+                                 pp::append(pp::text(AcSep(Z3_OP_AND)), pp::text(" "))
+                                 )));
+    pp::DocStream s;
+    s << "tcube@" << std::to_string(c.frame) << pp::text("<")
+        << pp::nest(4, g) << ">";
+    return s;
+  }
+};
+
+} // namespace euforia
+
+template <>
+struct fmt::formatter<euforia::Cube> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    auto it = ctx.begin(), ie = ctx.end();
+    ENSURE(it == ie || *it == '}');
+    return it;
+  }
+
+  template <typename FormatContext>
+  auto format(const euforia::Cube& c, FormatContext& ctx) -> decltype(ctx.out()) {
+    return format_to(ctx.out(), "{}", euforia::pp::Pprint(c));
+  }
+};
+
+template <>
+struct fmt::formatter<euforia::TimedCube> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    auto it = ctx.begin(), ie = ctx.end();
+    ENSURE(it == ie || *it == '}');
+    return it;
+  }
+
+  template <typename FormatContext>
+  auto format(const euforia::TimedCube& c, FormatContext& ctx) -> decltype(ctx.out()) {
+    return format_to(ctx.out(), "{}", euforia::pp::Pprint(c));
+  }
+};
 
 void mylog(const euforia::Cube& c);
 void mylog(const euforia::TimedCube& t);

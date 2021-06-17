@@ -7,8 +7,10 @@
 #include <boost/range/algorithm/transform.hpp>
 
 #include "fp_mus_refiner.h"
-#include "supp/reachability_graph.h"
 #include "supp/expr_substitution.h"
+#include "supp/expr_supp.h"
+#include "supp/fmt_supp.h"
+#include "supp/reachability_graph.h"
 
 using namespace std;
 

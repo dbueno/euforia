@@ -12,6 +12,7 @@
 #include "existential_elimination.h"
 #include "supp/euforia_config.h"
 #include "supp/marco.h"
+#include "supp/fmt_supp.h"
 #include "xsys/var_info_traversal.h"
 
 namespace euforia {

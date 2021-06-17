@@ -54,23 +54,6 @@ namespace euforia {
   }
 
   /*-----------------------------------------------------------------------------------*/
-
-  void Cube::print(std::ostream& os) const {
-    os << "cube<" << ID << ">[" << size() << "]{ ";
-    boost::copy(lits, make_ostream_joiner(os, " <&> "));
-    os << " }";
-
-#ifdef CUBE_HISTORY
-    os << "<";
-    copy(history.rbegin(), history.rend(), make_ostream_joiner(os, ", "));
-    os << ">";
-#endif
-  }
-  
-  std::ostream& operator<<(std::ostream& os, const Cube& c) {
-    c.print(os);
-    return os;
-  }
     
   void Cube::recomputeHash() const {
     hashval = boost::hash_range(begin(), end());
@@ -160,11 +143,4 @@ namespace euforia {
     return hash;
   }
 
-    
-  std::ostream& operator<<(std::ostream& os, const TimedCube& t) {
-    os << "tcube@frame" << t.frame << "[" << t.thecube->size() << "]{ ";
-    boost::copy(*t.thecube, make_ostream_joiner(os, " <&> "));
-    os << " }<" << t.hash() << ">";
-    return os;
-  }
 }

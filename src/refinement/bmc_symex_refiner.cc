@@ -29,6 +29,7 @@
 #include "supp/reachability_graph.h"
 #include "supp/std_supp.h"
 #include "supp/z3_solver.h"
+#include "supp/fmt_supp.h"
 #include "tslice.h"
 #include "xsys/abstract_vmt_transition_system.h"
 #include "xsys/primary_inputs.h"

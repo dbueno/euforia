@@ -100,7 +100,7 @@ class Checker {
   //! Adds a background assertion to the checker state
   void AddBackground(z3::expr);
   
-  void PrintState(int log_level) const;
+  void LogState(int log_level) const;
   void SummarizeFrames(int log_level) const;
 
   void PrintAssertions();

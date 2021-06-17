@@ -10,13 +10,13 @@
 #include "normalize_abstract_expr.h"
 #include "supp/equality_literal.h"
 #include "supp/euforia_config.h"
-#include "supp/expr_fmt.h"
 #include "supp/expr_iterators.h" // df/po iterators
 #include "supp/statistics.h"
 #include "tslice.h"
 #include "xsys/influence_traversal.h"
 #include "xsys/var_info_traversal.h"
 #include "supp/expr_flattener.h"
+#include "supp/fmt_supp.h"
 
 
 using namespace std;

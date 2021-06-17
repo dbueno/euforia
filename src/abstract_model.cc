@@ -4,6 +4,9 @@
 
 #include "abstract_model.h"
 
+#include <boost/iterator/filter_iterator.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+
 #include "cube.h"
 #include "supp/expr_iterators.h" // df/po iterators
 #include "supp/expr_supp.h"
@@ -28,7 +31,32 @@ UninterpretedPartition::~UninterpretedPartition() {}
 int UninterpretedPartition::size() const {
   return cells_.size();
 }
-
+  
+pp::DocPtr UninterpretedPartition::Pp() const {
+  using namespace euforia::pp;
+  pp::DocStream os;
+  os << "UninterpretedPartition(" << std::to_string(cells_.size()) << " cells_)" << newline();
+  pp::DocStream os_cells;
+  os_cells << "    ";
+  for (auto& subset : cells_) {
+    auto rep = subset.first;
+    const auto& elts = subset.second;
+    os_cells << Pprint(rep) << ": ";
+    struct IsRep {
+      IsRep(z3::ExprWrapper r) : rep(r) {}
+      bool operator()(z3::ExprWrapper x) { return x != rep; }
+      z3::ExprWrapper rep;
+    };
+    auto is_not_rep = IsRep(rep);
+    using NotRepIter = boost::filter_iterator<IsRep, decltype(elts.begin())>;
+    os_cells << commabox(
+        NotRepIter(is_not_rep, elts.begin(), elts.end()),
+        NotRepIter(is_not_rep, elts.end(), elts.end()),
+        text(","));
+    os_cells << newline();
+  }
+  return os << nest(4, os_cells);
+}
 
 std::ostream& UninterpretedPartition::Print(std::ostream& os) const {
   os << "UninterpretedPartition<" << cells_.size() << " cells_>:" << endl;
@@ -383,6 +411,37 @@ ostream& AbstractModel::Print(std::ostream &os) const {
   os << upart_;
   return os;
 }
+
+
+pp::DocPtr AbstractModel::Pp() const {
+  using namespace euforia::pp;
+  DocStream os;
+
+  auto ip = append(
+      text("  input predicates: "),
+      nest(4,  commabox(input_predicates_.begin(), input_predicates_.end(),
+                        text(","))));
+
+  auto is_bad_for_projection = matchForPresent(TS);
+  auto pp_pred = [&](z3::expr p) -> DocPtr {
+    return append(Pprint(p), is_bad_for_projection(p) ? text(" (*)") : empty());
+  };
+  auto upreds = append(
+      text("  upreds: "),
+      nest(4, commabox(boost::make_transform_iterator(upreds_.begin(), pp_pred),
+                       boost::make_transform_iterator(upreds_.end(), pp_pred),
+                       text(","))));
+  auto preds = append(
+      text("  preds: "),
+      nest(4, commabox(boost::make_transform_iterator(preds_.begin(), pp_pred),
+                       boost::make_transform_iterator(preds_.end(), pp_pred),
+                       text(","))));
+
+
+  os << "AbstractModel:" << newline() << ip << newline() << upreds << newline() << preds << newline() << "  " << upart_.Pp();
+  return os;
+}
+
 }
 
 void mylog(const euforia::UninterpretedPartition& up) { up.Print(std::cerr); }

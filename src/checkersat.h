@@ -229,9 +229,43 @@ class CheckerSat : public Solver {
   }
 };
 
-
-
 }
+
+template <>
+struct euforia::pp::PrettyPrinter<euforia::AbstractLemmaClause> {
+  euforia::pp::DocPtr operator()(const euforia::AbstractLemmaClause& l) {
+    pp::DocStream os;
+    os << "AbstractLemmaClause(";
+    switch (l.ty) {
+      case LemmaType::kForward:
+        os << "kForward";
+        break;
+      case LemmaType::kOneStep:
+        os << "kOneStep";
+        break;
+      default:
+        ENSURE(false);
+    }
+    os << "): " << Pprint(l.as_expr());
+    return os;
+  }
+};
+
+template <>
+struct fmt::formatter<euforia::AbstractLemmaClause> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    auto it = ctx.begin(), ie = ctx.end();
+    ENSURE(it == ie || *it == '}');
+    return it;
+  }
+
+  template <typename FormatContext>
+  auto format(const euforia::AbstractLemmaClause& c, FormatContext& ctx) -> decltype(ctx.out()) {
+    return format_to(ctx.out(), "{}", euforia::pp::Pprint(c));
+  }
+};
+
+
 
 void mylog(const euforia::AbstractLemmaClause& c);
 

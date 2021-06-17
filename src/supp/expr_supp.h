@@ -9,6 +9,7 @@
 #include <z3++.h>
 
 #include <boost/range/algorithm/copy.hpp>
+#include <fmt/format.h>
 #include <functional>
 #include <map>
 #include <set>
@@ -17,6 +18,69 @@
 #include <unordered_set>
 #include <vector>
 
+#include "supp/pp/doc.h"
+
+// specific overloads for expr, sort, and func_decl even though they are ast's.
+// this way pointers to such objects will be handled by these overloads in some
+// cases, instead of fmt complaining that there is no specialization for these
+// subclasses of ast.
+template <>
+struct fmt::formatter<z3::expr> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    auto it = ctx.begin(), end = ctx.end();
+    if (it != end && *it != '}') {
+      std::cerr << "invalid format\n";
+      exit(1);
+    }
+    return it;
+  }
+
+  template <typename FormatContext>
+  auto format(const z3::expr& e, FormatContext& ctx) -> decltype(ctx.out()) {
+    return format_to(ctx.out(), "{}", euforia::pp::Pprint(e));
+  }
+};
+
+template <>
+struct fmt::formatter<z3::func_decl> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    auto it = ctx.begin(), end = ctx.end();
+    if (it != end && *it != '}') {
+      std::cerr << "invalid format\n";
+      exit(1);
+    }
+    return it;
+  }
+
+  template <typename FormatContext>
+  auto format(const z3::func_decl& f, FormatContext& ctx) -> decltype(ctx.out()) {
+    return format_to(
+        ctx.out(),
+        "{}",
+        f.to_string());
+  }
+};
+
+template <>
+struct fmt::formatter<z3::sort> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    auto it = ctx.begin(), end = ctx.end();
+    if (it != end && *it != '}') {
+      std::cerr << "invalid format\n";
+      exit(1);
+    }
+    return it;
+  }
+
+  template <typename FormatContext>
+  auto format(const z3::sort& f, FormatContext& ctx) -> decltype(ctx.out()) {
+    return format_to(
+        ctx.out(),
+        "{}",
+        f.to_string());
+  }
+};
+
 
 namespace z3 {
 /// Wraps a z3 expr so it can be used inside various collections. Equality,
@@ -24,6 +88,7 @@ namespace z3 {
 class ExprWrapper {
  public:
   ExprWrapper(const z3::expr& e) : e_(e) {}
+  ExprWrapper(z3::expr&& e) : e_(e) {}
   // convert implicitly back to z3::expr
 
   inline operator z3::expr() const { return e_; }
@@ -79,7 +144,45 @@ inline std::size_t hash_value(const z3::expr& e) {
 
 }
 
+template <>
+struct fmt::formatter<z3::ExprWrapper> {
+  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+    auto it = ctx.begin(), end = ctx.end();
+    if (it != end && *it != '}') {
+      std::cerr << "invalid format\n";
+      exit(1);
+    }
+    return it;
+  }
+
+  template <typename FormatContext>
+  auto format(const z3::ExprWrapper& e, FormatContext& ctx) -> decltype(ctx.out()) {
+    return format_to(
+        ctx.out(),
+        "{}",
+        static_cast<z3::expr>(e).to_string());
+  }
+};
+
 namespace euforia {
+namespace pp {
+//! Pretty prints an expression.
+DocPtr PpExpr(z3::expr);
+
+//! Pretty prints an expression where some shared subterms are called out.
+DocPtr PpSharedExpr(z3::expr);
+
+template <>
+struct PrettyPrinter<z3::expr> {
+  DocPtr operator()(const z3::expr& e) { return PpExpr(e); }
+};
+
+template <>
+struct PrettyPrinter<z3::ExprWrapper> {
+  DocPtr operator()(const z3::ExprWrapper& e) { return PpExpr(e); }
+};
+} // namespace pp
+
 //! Set of expressions. I'm careful to use z3::ExprWrapper here because if you
 //! use == or != on sets, it will call x == y (for elements x and y from those
 //! sets), instead of using the EqualToExpr. Because of the EqualityComparable
@@ -113,12 +216,6 @@ template <typename T>
 using FuncDeclMap = 
     std::unordered_map<z3::func_decl, T, z3::HashExpr, z3::EqualToExpr>;
 
-}
-
-namespace z3 {
-// in z3 namespace because of argument-dependent lookup (ADL)
-std::ostream& operator<<(std::ostream& os, const std::vector<z3::expr>& c);
-std::ostream& operator<<(std::ostream& os, const euforia::ExprSet& c);
 }
 
 namespace euforia {
@@ -354,7 +451,41 @@ z3::expr expr_mk_or(z3::context& c, Range r) {
   return expr_mk_or(v);
 }
 
-}
+//^----------------------------------------------------------------------------^
+// Pretty printing
+
+//! Pretty prints an expression assuming it's a cube, i.e., ANDs of literals.
+pp::DocPtr PpExprCube(z3::expr c);
+
+//! Separator for associative commutative operators
+std::string AcSep(Z3_decl_kind);
+
+//! Prints expressions using their hashes and their decl names and uses a
+//! visited set so we don't print anything twice
+class ExprLegend {
+ public:
+  //! Formats a single node
+  std::string FormatNode(const z3::expr& e) {
+    std::stringstream ss;
+    PrintNode(ss, e);
+    return ss.str();
+  }
+
+  //! Prints a single node
+  std::ostream& PrintNode(std::ostream& os, const z3::expr& e);
+
+  //!  Prints an expression and all its descendents in post order
+  std::ostream& Print(std::ostream& os, const z3::expr& e);
+
+  inline void Reset() {
+    visited_.clear();
+  }
+
+ private:
+  ExprSet visited_;
+};
+
+} // namespace euforia
 
 
 #endif

@@ -33,6 +33,7 @@ extern "C" {
 #include "supp/mathsat_vmt_parser.h"
 #include "supp/statistics.h"
 #include "supp/z3_solver.h"
+#include "supp/pp/doc.h"
 #include "xsys/abstract_vmt_transition_system.h"
 #include "xsys/concrete_vmt_transition_system.h"
 
@@ -267,6 +268,9 @@ int main(int argc, char *const *argv) {
   // default-initialize everything except...
   euforia_config.use_one_shot_bmc_refinement = 1;
   euforia_config.refinement_solver = config::kZ3;
+
+  // pretty printing width
+  pp::best_width = 160;
 
   //  setenv("BTORAPITRACE", "/tmp/btorapitrace", 0);
 

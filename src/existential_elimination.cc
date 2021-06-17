@@ -10,6 +10,7 @@
 #include "supp/expr_substitution.h"
 #include "supp/model_justifier.h"
 #include "supp/z3_solver.h"
+#include "supp/fmt_supp.h"
 #include "xsys/var_info_traversal.h"
 
 #include <numeric>

@@ -17,6 +17,7 @@
 #include "supp/expr_iterators.h"
 #include "supp/expr_normalize.h"
 #include "supp/z3_solver.h"
+#include "supp/fmt_supp.h"
 #include "xsys/influence_traversal.h"
 
 using namespace std;
@@ -543,7 +544,7 @@ shared_ptr<Cube> CheckerSat::GetBadCube() {
   auto model = gbc_solver().get_model();
 
   for (auto lit : GetCoi(model, expr_not(xsys_.property()))) {
-    c->push(lit, checker_.xsys_.prime(lit));
+    c->push(lit, xsys_.prime(lit));
   }
   if (euforia_config.sort_cubes) {
     c->sort();
@@ -578,7 +579,7 @@ void CheckerSat::SanityCheckReachesNextFrame(Solver& S, ExprSet& assumps, int k)
     fmt::print(cerr, "assertions:\n{}", S.assertions());
     auto model = S.get_model();
     fmt::print(cerr, "model:\n{}", *model);
-    checker_.PrintState(0);
+    checker_.LogState(0);
     fmt::print(cerr, "R_{} & T reaches outside R_{}+, at depth {} (bad)\n", k, k+1, checker_.depth());
     fmt::print(cerr, "R_{}:\n", k);
     for (size_t i = k; i < checker_.F.size(); i++) {
@@ -615,7 +616,7 @@ void CheckerSat::SanityCheckFrames() {
     }
     auto r = Check(assumps);
     if (r == CheckResult::kUnsat) {
-      checker_.PrintState(0);
+      checker_.LogState(0);
       checker_.PrintAssertions();
       fmt::print(cerr, "R_{} is UNSAT\n", k);
       auto reasons = unsat_core_reasons();

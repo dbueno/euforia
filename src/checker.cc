@@ -13,6 +13,7 @@
 #include "supp/euforia_config.h"
 #include "supp/expr_supp.h"
 #include "supp/reachability_graph.h"
+#include "supp/fmt_supp.h"
 #include "supp/std_supp.h"
 #include "supp/z3_solver.h"
 
@@ -72,39 +73,23 @@ Checker::Checker(const TransitionSystem& ts)
 Checker::~Checker() = default;
 
 
-void Checker::PrintState(int log_level) const {
+void Checker::LogState(int log_level) const {
+  using namespace euforia::pp;
   if (!logger.ShouldLog(log_level)) {
     return;
   }
 
+  auto pp_frame = [](const DocPtr& i, auto&& frame) -> DocPtr {
+    DocStream ds;
+    ds << "F" << i << " size " << Pprint(frame.size()) << ": " <<
+        nest(4, commabox(frame.begin(), frame.end(), text(", ")));
+    return ds;
+  };
   for (int i = 0; i <= depth(); i++) {
     auto& frame = F[i];
-    stringstream fs;
-    bool first = true;
-    for (const auto& cube : frame) {
-      fs << (first ? "" : ", ");
-      fs << *cube;
-      if (first) first = false;
-    }
-    auto extra = "";
-//#ifdef DIRTYBIT
-//      extra = D[i] ? "*" : "";
-//#endif
-    logger.Log(log_level, "  > {}F{} [{}]: {}", extra, i, frame.size(), fs.str());
-
+    logger.Log(log_level, "{}", pp_frame(Pprint(i), frame));
   }
-  stringstream Finf;
-  bool first = true;
-  for (const auto& cube : F[frame_inf()]) {
-    Finf << (first ? "" : ", ");
-    Finf << *cube;
-    if (first) first = false;
-  }
-  auto extra = "";
-//#ifdef DIRTYBIT
-//    extra =  D[D.size()-1] ? "*" : "";
-//#endif
-  logger.Log(log_level, "  > {}Finf [{}]: {}", extra, F[frame_inf()].size(), Finf.str());
+  logger.Log(log_level, "{}", pp_frame(text("inf"), F[frame_inf()]));
 }
 
 void Checker::collect_statistics(Statistics *st) const {
@@ -251,7 +236,7 @@ bool Checker::Run() {
   const bool found_counterexample = true, found_invariant = false;
   while (true) {
     logger.Log(4, "frames:");
-    PrintState(4);
+    LogState(4);
     if (auto c = solver_->GetBadCube(); c) {
       if (BackwardReachability(TimedCube(c, depth()))) {
         ret = found_counterexample;
@@ -267,7 +252,7 @@ bool Checker::Run() {
   }
   SummarizeFrames(1);
   logger.Log(4, "final frames:");
-  PrintState(4);
+  LogState(4);
   return ret;
 }
 
@@ -400,8 +385,9 @@ bool Checker::BackwardReachability(TimedCube s0) {
       } else {
         (void)++sat;
         z.frame = s.frame-1;
-        logger.Log(5, "    expanded preimage: {} in F[{}]", z.thecube->asExpr(),
-                   z.frame);
+        logger.Log(5, "    expanded preimage in F[{}]: {}",
+                   z.frame,
+                   z.thecube->asExpr());
         if (!(z.frame == 0 || !solver_->IsInitial(*z.thecube))) {// && "cube preimage isInitial");
           // I =/=> !s, which is due to insufficiencies in preimage having to
           // do with inputs. Rare case, but must return unknown

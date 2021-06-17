@@ -5,19 +5,30 @@
 #include "supp/expr_supp.h"
 
 #include <algorithm>
+#include <boost/range/algorithm/copy.hpp>
+#include <boost/iterator/iterator_facade.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/algorithm/transform.hpp>
+#include <llvm/ADT/PostOrderIterator.h>
 #include <sstream>
+#include <type_traits>
 
-#include "checker_types.h"
-#include "supp/std_supp.h"
 #include "abstract_model.h"
-#include "supp/expr_rewriter.h"
+#include "checker_types.h"
+#include "supp/expr_graph_traits.h"
 #include "supp/expr_iterators.h"
+#include "supp/expr_rewriter.h"
+#include "supp/expr_visitor.h"
+#include "supp/std_supp.h"
 
 
 
 
 using namespace std;
+using namespace euforia::pp;
+using namespace euforia;
+using namespace euforia::pp;
+using namespace llvm;
 
 void mylog(const euforia::ExprSet& s) {
   std::cerr << "set<";
@@ -29,21 +40,6 @@ void mylog(const euforia::ExprSet& s) {
     first = false;
   }
   std::cerr << ">" << endl;
-}
-
-namespace z3 {
-std::ostream& operator<<(std::ostream& os, const vector<z3::expr>& c) {
-  os << "vector[" << c.size() << "]<";
-  boost::copy(c, make_ostream_joiner(os, " & "));
-  os << ">";
-  return os;
-}
-std::ostream& operator<<(std::ostream& os, const euforia::ExprSet& c) {
-  os << "unordered_set[" << c.size() << "]< ";
-  boost::copy(c, make_ostream_joiner(os, " & "));
-  os << ">";
-  return os;
-}
 }
 
 namespace euforia {
@@ -375,5 +371,806 @@ struct height_of_expr : ExprRewriter<height_of_expr, size_t> {
 
 
 
-
+DocPtr PpExprCube(z3::expr c) {
+  DocStream elts;
+  elts << pp::groupsep(ExprConjunctIterator::begin(c),
+                       ExprConjunctIterator::end(),
+                       pp::group(pp::append(
+                               pp::break_(1, 0),
+                               pp::text("& ")
+                               )));
+  return pp::nest(4, elts);
 }
+
+
+} // namespace euforia
+
+//^----------------------------------------------------------------------------^
+// Pretty printing
+
+
+namespace {
+std::string ac_sep(z3::expr e) {
+  return AcSep(e.decl().decl_kind());
+}
+}
+
+
+
+namespace euforia {
+class ExprPrinter;
+class SharedAddrTraversal;
+class SharedExprPrinter;
+}
+namespace llvm {
+template <>
+class po_iterator_storage<ExprPrinter, true> {
+ public:
+  inline po_iterator_storage(ExprPrinter& s) : ppexpr_(s) {}
+
+  // Defined below
+  void finishPostorder(z3::expr e);
+  bool insertEdge(Optional<z3::expr> from, z3::expr to);
+
+ private:
+  ExprPrinter& ppexpr_;
+};
+
+template <>
+class po_iterator_storage<SharedAddrTraversal, true> {
+ public:
+  inline po_iterator_storage(SharedAddrTraversal& s) : ppexpr_(s) {}
+
+  // Defined below
+  void finishPostorder(z3::expr e);
+  bool insertEdge(Optional<z3::expr> from, z3::expr to);
+
+ private:
+  SharedAddrTraversal& ppexpr_;
+};
+
+template <>
+class po_iterator_storage<SharedExprPrinter, true> {
+ public:
+  inline po_iterator_storage(SharedExprPrinter& s) : ppexpr_(s) {}
+
+  // Defined below
+  void finishPostorder(z3::expr e);
+  bool insertEdge(Optional<z3::expr> from, z3::expr to);
+
+ private:
+  SharedExprPrinter& ppexpr_;
+};
+} // namespace llvm
+
+
+//^----------------------------------------------------------------------------^
+
+namespace euforia {
+
+std::string AcSep(Z3_decl_kind k) {
+  switch (k) {
+    case Z3_OP_OR: return "||";
+    case Z3_OP_AND: return "&&";
+    case Z3_OP_BAND: return "&";
+    case Z3_OP_BOR: return "|";
+    case Z3_OP_BXOR: return "^";
+    case Z3_OP_BADD: return "+bv";
+    case Z3_OP_XOR: return "xor";
+    case Z3_OP_ADD: return "+";
+    case Z3_OP_MUL: return "*";
+    case Z3_OP_CONCAT: return "@";
+
+    default:
+                     ENSURE(false);
+  }
+}
+
+std::ostream& ExprLegend::PrintNode(std::ostream& os, const z3::expr& e) {
+  std::stringstream ss;
+  std::string s;
+  if (e.is_numeral(s)) {
+    fmt::print(ss, "{}", s);
+  } else if (e.is_var()) {
+    fmt::print(ss, "{}", e.to_string());
+  } else if (e.is_quantifier()) {
+    bool is_forall = Z3_is_quantifier_forall(e.ctx(), e);
+    bool is_lambda = Z3_is_lambda(e.ctx(), e);
+
+    ss << (is_lambda?"^":(is_forall?"!":"?")) << "[";
+
+    const unsigned num_bound = Z3_get_quantifier_num_bound(e.ctx(), e);
+    for (unsigned i = 0; i < num_bound; ++i) {
+      Z3_symbol n = Z3_get_quantifier_bound_name(e.ctx(), e, i);
+      auto sym = z3::symbol(e.ctx(), n);
+      // z3::sort srt(e.ctx(), Z3_get_quantifier_bound_sort(e.ctx(), e, i));
+      ss << sym.str() << ": ";
+      // if (i + 1 < nb) {
+      //   out << ", ";
+      // }
+    }
+    ss << "] : ";
+
+    fmt::print(ss, "{:08x} ", e.body().hash());
+  } else {
+    assert(e.is_app());
+    for (const auto& a : ExprArgs(e)) {
+      fmt::print(ss, "{:08x} ", a.hash());
+    }
+    fmt::print(os, "{:08x}: {} {}", e.hash(), e.decl().name().str(),
+               ss.str());
+  }
+  return os;
+}
+
+std::ostream& ExprLegend::Print(std::ostream& os, const z3::expr& e) {
+  for (auto it = po_expr_ext_iterator::begin(e, visited_),
+       ie = po_expr_ext_iterator::end(e, visited_); it != ie; ++it) {
+    PrintNode(os, *it);
+    os << "\n";
+  }
+  return os;
+}
+
+class PpCache {
+ public:
+
+  class ArgIterator : public boost::iterator_facade<
+        ArgIterator,
+        const DocPtr,
+        boost::forward_traversal_tag,
+        const DocPtr> {
+    public:
+     ArgIterator(const ExprMap<DocPtr>* m, unsigned i, z3::expr e) : i_(i), m_(m), e_(e) {
+       ENSURE(i <= e.num_args());
+     }
+
+    private:
+     friend class boost::iterator_core_access;
+
+     void increment() { i_++; }
+
+     bool equal(const ArgIterator& other) const {
+       return m_ == other.m_ && e_ == other.e_ && i_ == other.i_;
+     }
+
+     const DocPtr dereference() const { return m_->at(static_cast<z3::expr>(e_).arg(i_)); }
+
+     unsigned i_;
+     const z3::ExprWrapper e_;
+     const ExprMap<DocPtr>* m_;
+  };
+
+  ArgIterator args_begin(z3::expr e) const { return ArgIterator(&m_, 0, e); }
+  ArgIterator args_end(z3::expr e) const { return ArgIterator(&m_, e.num_args(), e); }
+
+  DocPtr arg(unsigned i, z3::expr e) const { return m_.at(e.arg(i)); }
+
+  void set_rewrite(z3::expr e, DocPtr d) { m_.insert({e, d}); }
+  DocPtr rewrites_to(z3::expr e) const {
+    ENSURE(has_rewrite(e));
+    return m_.at(e);
+  }
+  bool has_rewrite(z3::expr e) const {
+    return m_.find(e) != m_.end();
+  }
+
+ private:
+  ExprMap<DocPtr> m_;
+};
+
+//^----------------------------------------------------------------------------^
+
+class ExprPrinter : public ExprVisitor<ExprPrinter, DocPtr> {
+ private:
+  PpCache cache_;
+  vector<z3::expr> flatroots_;
+  ExprLegend leg_;
+
+ public:
+  DocPtr operator()(const z3::expr& e) {
+    if (logger.ShouldLog(7))
+      leg_.Print(cerr, e);
+    for (auto it = po_ext_begin(e, *this), ie = po_ext_end(e, *this);
+         it != ie; ++it) {
+      ; // work done in FinishPostorder and VisitPreorder
+    }
+    logger.Log(7, "flatroots");
+    for (auto& e : flatroots_) {
+      logger.Log(7, "{}", leg_.FormatNode(e));
+    }
+    ENSURE(flatroots_.empty());
+    ENSURE(cache_.rewrites_to(e));
+    return cache_.rewrites_to(e);
+  }
+
+  bool InsertEdge(Optional<z3::expr> from, z3::expr to) {
+    auto push = [&](z3::expr e) {
+      logger.Log(7, "push"); //, leg_.FormatNode(*from));
+      flatroots_.push_back(e);
+    };
+    logger.Log(7, "InsertEdge: {:08x} -> {:08x}",
+               from ? from->hash() : 0,
+               to.hash());
+    if (to.is_app()) {
+      switch (to.decl().decl_kind()) {
+        case Z3_OP_OR:
+        case Z3_OP_AND:
+        case Z3_OP_BAND:
+        case Z3_OP_BOR:
+        case Z3_OP_BADD:
+        case Z3_OP_BXOR:
+        case Z3_OP_XOR:
+        case Z3_OP_ADD:
+        case Z3_OP_CONCAT:
+          if (!from) {
+            push(to);
+          }
+          if (from && from->decl().decl_kind() != to.decl().decl_kind()) {
+            // to is a root because it isn't flattened into from
+            push(to);
+          }
+          break;
+
+        default:
+          break;
+      }
+    }
+    // Visits every edge.
+    return true;
+  }
+
+  void FinishPostorder(z3::expr e) {
+    // - if e is AND and has recorded children (i.e., it is the highest most AND
+    // in its sequence), make a doc for it and all its children.
+    // - otherwise, visit node
+    DocPtr d;
+    logger.Log(7, "FinishPostorder: {}", leg_.FormatNode(e));
+    if (e.is_app()) {
+      switch (e.decl().decl_kind()) {
+        case Z3_OP_OR:
+        case Z3_OP_AND:
+        case Z3_OP_BAND:
+        case Z3_OP_BOR:
+        case Z3_OP_BADD:
+        case Z3_OP_BXOR:
+        case Z3_OP_XOR:
+        case Z3_OP_ADD:
+        case Z3_OP_CONCAT:
+          ENSURE(!flatroots_.empty());
+          if (z3::eq(flatroots_.back(), e)) {
+            vector<DocPtr> kids;
+            for (auto& e1 : ExprFlatKinds(e, e.decl().decl_kind())) {
+              kids.push_back(cache_.rewrites_to(e1));
+            }
+            d = paren(
+                groupsep(kids.rbegin(),
+                         kids.rend(),
+                         group(append(break_(1, 4),
+                                      text(ac_sep(e)),
+                                      text(" ")
+                                     ))));
+            //break_(1, 0)))));
+            logger.Log(7, "pop");
+            flatroots_.pop_back();
+          }
+          break;
+
+        default:
+          d = visit(e);
+      }
+    } else {
+      d = visit(e);
+    }
+    cache_.set_rewrite(e, d);
+  }
+
+  //^--------------------------------------------------------------------------^
+  // visitors
+
+  DocPtr visitExpr(const z3::expr& e) {
+    string n;
+    if (e.is_numeral(n)) {
+      return text(n);
+    }
+    assert(e.is_app());
+    for (auto arg : ExprArgs(e)) {
+      ENSURE(cache_.has_rewrite(arg));
+    }
+    return text(e.to_string());
+  }
+
+  DocPtr visitQUANTIFIER(const z3::expr& e) {
+    // XXX does not get body or args
+    return text(e.is_forall() ? "!" : "?");
+  }
+
+  DocPtr visitVAR(const z3::expr& e) {
+    return text(e.to_string());
+  }
+
+  DocPtr visitEQ(const z3::expr& e) {
+    return paren(group(append(
+            cache_.arg(0, e),
+            text(" = "),
+            cache_.arg(1, e))));
+  }
+
+  DocPtr visitIFF(const z3::expr& e) {
+    return paren(group(append(
+            cache_.arg(0, e),
+            text(" iff "),
+            cache_.arg(1, e))));
+  }
+
+  DocPtr visitDISTINCT(const z3::expr& e) {
+    if (e.num_args() == 2) {
+      return paren(groupsep(cache_.args_begin(e),
+                            cache_.args_end(e),
+                            text(" <> ")));
+    } else {
+      return paren(groupsep(cache_.args_begin(e),
+                            cache_.args_end(e),
+                            group(append(break_(1, 4),
+                                         text("<> ")))));
+    }
+  }
+
+  DocPtr visitNOT(const z3::expr& e) {
+    return append(text("!"), cache_.arg(0, e));
+  }
+
+  DocPtr visitITE(const z3::expr& e) {
+    return paren(group(append(
+        text("if:"), cache_.arg(0, e),
+        break_(1, 4),
+        text("then:"), cache_.arg(1, e),
+        break_(1, 4),
+        text("else:"), cache_.arg(2, e))));
+  }
+
+  DocPtr visitIMPLIES(const z3::expr& e) {
+    return paren(group(append(
+        text("ante:"), cache_.arg(0, e),
+        break_(1, 4),
+        text("implies:"), cache_.arg(1, e))));
+  }
+
+  DocPtr visitSUB(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" - "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitUMINUS(const z3::expr& e) {
+    return append(text("-"), cache_.arg(0, e));
+  }
+
+  DocPtr visitDIV(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" / "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitIDIV(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" i/ "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitREM(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" rem "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitMOD(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" % "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitLE(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" <= "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitLT(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" < "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitGE(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" >= "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitGT(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" > "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitSTORE(const z3::expr& e) {
+    return append(
+        {text("("), cache_.arg(0, e), text(")"),
+        group(append(
+                {text("{"), cache_.arg(1, e),
+                break_(1, 0), text("<- "), cache_.arg(2, e), text("}")}))});
+  }
+
+  DocPtr visitSELECT(const z3::expr& e) {
+    return append(
+        {text("("), cache_.arg(0, e), text(")"),
+        append({text("["), cache_.arg(1, e)})});
+  }
+
+  DocPtr visitCONST_ARRAY(const z3::expr& e) {
+    return append(
+        {text("(_ -> "), cache_.arg(0, e), text(")")});
+  }
+
+  DocPtr visitBSUB(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" -bv "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitBSDIV(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" /bvs "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitBUDIV(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" /bvu "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitBSREM(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" bvsrem "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitBUREM(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" bvurem "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitBSMOD(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" %bvs "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitBSHL(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" <<bv "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitBASHR(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" >>bva "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitBLSHR(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" >>bvl "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitEXTRACT(const z3::expr& e) {
+    ENSURE(e.num_args()==1);
+    assert(Z3_get_decl_num_parameters(e.ctx(), e.decl()) == 2);
+    auto hi = Z3_get_decl_int_parameter(e.ctx(), e.decl(), 0);
+    auto lo = Z3_get_decl_int_parameter(e.ctx(), e.decl(), 1);
+    return append(
+        {text("("), cache_.arg(0, e), text(")"),
+        append({text("["), decimal(hi), text(","), decimal(lo), text("]")})});
+  }
+
+  DocPtr visitSIGN_EXT(const z3::expr& e) {
+    assert(e.num_args()==1);
+    assert(Z3_get_decl_num_parameters(e.ctx(), e.decl()) == 1);
+    auto added_bits = Z3_get_decl_int_parameter(e.ctx(), e.decl(), 0);
+    return group(append(
+        {text("sext:"), cache_.arg(0, e), break_(1, 2),
+        text("to:"), decimal(e.get_sort().bv_size() + added_bits)}));
+  }
+
+  DocPtr visitZERO_EXT(const z3::expr& e) {
+    assert(e.num_args()==1);
+    assert(Z3_get_decl_num_parameters(e.ctx(), e.decl()) == 1);
+    auto added_bits = Z3_get_decl_int_parameter(e.ctx(), e.decl(), 0);
+    return group(append(
+        {text("zext:"), cache_.arg(0, e), break_(1, 2),
+        text("to:"), decimal(e.get_sort().bv_size() + added_bits)}));
+  }
+
+  DocPtr visitSLT(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" <s "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitSLEQ(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" <=s "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitSGT(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" >s "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitSGEQ(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" >=s "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitULT(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" <u "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitULEQ(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" <=u "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitUGT(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" >u "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitUGEQ(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" >=u "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitBNEG(const z3::expr& e) {
+    return append(text("bv-"), cache_.arg(0, e));
+  }
+
+  DocPtr visitBNOT(const z3::expr& e) {
+    return append(text("~"), cache_.arg(0, e));
+  }
+
+  DocPtr visitBCOMP(const z3::expr& e) {
+    return append(text("2comp"), cache_.arg(0, e));
+  }
+
+  DocPtr visitROTATE_LEFT(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" lrot "), cache_.arg(1, e))));
+  }
+
+  DocPtr visitROTATE_RIGHT(const z3::expr& e) {
+    ENSURE(e.num_args() == 2);
+    return paren(group(append(
+        cache_.arg(0, e),
+        text(" rrot "), cache_.arg(1, e))));
+  }
+};
+
+//^----------------------------------------------------------------------------^
+
+
+struct SharedNode {
+  DocPtr addr;
+  DocPtr doc;
+  vector<DocPtr> args_addrs;
+  int depth;
+};
+
+class SharedAddrTraversal : public ExprVisitor<ExprPrinter, DocPtr> {
+ public:
+  ExprMap<SharedNode> cache_;
+  int counter_ = 0;
+
+  ExprMap<SharedNode> operator()(const z3::expr& e) {
+    for (auto it = po_ext_begin(e, *this), ie = po_ext_end(e, *this);
+         it != ie; ++it) {
+      ; // work done in FinishPostorder and VisitPreorder
+    }
+    return cache_;
+  }
+
+  void Build(z3::expr e) {
+    _unused(e);
+  }
+
+  bool InsertEdge(Optional<z3::expr> from, z3::expr to) {
+    _unused(from);
+    if (cache_.find(to) == cache_.end()) {
+      cache_[to];
+      return true;
+    }
+    return false;
+  }
+
+  void FinishPostorder(z3::expr e) {
+    SharedNode& n = cache_[e];
+    if (e.num_args() == 0) {
+      n.doc = n.addr = Pprint(e);
+    } else {
+      auto get_addr = [&](const z3::expr& e) { return cache_.at(e).addr; };
+      n.addr = append(text("#"), text(fmt::format("{}", counter_++)));
+      boost::copy(
+          boost::make_iterator_range(
+              boost::make_transform_iterator(ExprArgIterator::begin(e), get_addr),
+              boost::make_transform_iterator(ExprArgIterator::end(e), get_addr)),
+          back_inserter(n.args_addrs));
+    }
+  }
+
+  DocPtr visitExpr(const z3::expr& e) {
+    _unused(e);
+    ENSURE(false);
+  }
+};
+
+class SharedExprPrinter {
+ public:
+  // Maps to the "canonical" printed version.
+  ExprMap<DocPtr> printed_;
+  const ExprMap<SharedNode> share_;
+  vector<DocPtr> out_;
+  z3::expr e_;
+
+  SharedExprPrinter(z3::expr e) : e_(e), share_(SharedAddrTraversal()(e)) {}
+
+  DocPtr operator()() {
+    printed_.clear();
+    out_.clear();
+    for (auto it = po_ext_begin(e_, *this), ie = po_ext_end(e_, *this);
+         it != ie; ++it) {
+      ; // work done in FinishPostorder and VisitPreorder
+    }
+    ENSURE(out_.size() == 1);
+    // This is a knife.
+    return out_.back();
+  }
+
+  bool InsertEdge(Optional<z3::expr> from, z3::expr to) {
+    _unused(from);
+    _unused(to);
+    return true;
+  }
+
+  void FinishPostorder(z3::expr e) {
+    ENSURE(out_.size() >= e.num_args());
+
+    auto is_shared = [&](auto&& e) {
+      bool b = (e.num_args() > 0 && !is_not(e) && share_.at(e).addr.use_count() >= 3);
+      if (b)
+        logger.Log(7, "{} use_count {} addr is {}", e, share_.at(e).addr.use_count(), share_.at(e).addr);
+      return b;
+    };
+
+    // Pops arguments.
+    vector<DocPtr> args_docs;
+    for (unsigned i = 0; i < e.num_args(); i++) {
+      args_docs.push_back(out_.back());
+      logger.Log(7, "pop  <= {}", out_.back());
+      out_.pop_back();
+    }
+
+    if (auto search = printed_.find(e); search == printed_.end()) {
+      // Pretty-prints e for the first time. Creates the "canonical"
+      // representation of e, not using an address for e (but kids from the out
+      // stack).
+      DocPtr d;
+      if (e.num_args() == 0) {
+        // If there aren't any arguments, this special case produces a term
+        // that doesn't include empty parens on the end of the term (see else
+        // case).
+        d = append({text(e.decl().name().str())});
+      } else {
+        auto args_doc = nest(1, commabox(
+                args_docs.rbegin(), args_docs.rend(),
+                text(",")));
+        d = append(
+            {text(e.decl().name().str()), text("("), args_doc, text(")")});
+      }
+      // This formats the shared expression definition
+      if (is_shared(e)) {
+        d = append(text("#"), share_.at(e).addr, text(" is "), d);
+      }
+      out_.push_back(d);
+      logger.Log(7, "push => {}", d);
+      // Records that e's canonical version has been printed.
+      printed_.insert({e, d});
+    } else {
+      // e has been pretty-printed before. We may (1) use an address for e or
+      // (2) print it full again, depending on is_shared.
+      if (is_shared(e)) {
+        // If e is shared, formats it using its addr.
+        out_.push_back(share_.at(e).addr);
+        logger.Log(7, "push => {}", share_.at(e).addr);
+      } else {
+        out_.push_back(search->second);
+        logger.Log(7, "push => {}", search->second);
+      }
+    }
+  }
+};
+
+namespace pp {
+DocPtr PpExpr(z3::expr e) {
+  if (!bool(e)) {
+    return text("null");
+  }
+  ExprPrinter pp;
+  return pp(e);
+  // return append(text("ASS"), pp(e));
+}
+
+DocPtr PpSharedExpr(z3::expr e) {
+  if (!bool(e)) {
+    return text("null");
+  }
+  SharedExprPrinter pp(e);
+  return pp();
+}
+} // namespace pp
+
+} // namespace euforia
+
+// Implementation of po_iterator_storage methods.
+namespace llvm {
+bool po_iterator_storage<ExprPrinter, true>::insertEdge(
+        Optional<z3::expr> from, z3::expr to) { return ppexpr_.InsertEdge(from, to); }
+void po_iterator_storage<ExprPrinter, true>::finishPostorder(z3::expr e) { ppexpr_.FinishPostorder(e); }
+bool po_iterator_storage<SharedAddrTraversal, true>::insertEdge(
+        Optional<z3::expr> from, z3::expr to) { return ppexpr_.InsertEdge(from, to); }
+void po_iterator_storage<SharedAddrTraversal, true>::finishPostorder(z3::expr e) { ppexpr_.FinishPostorder(e); }
+bool po_iterator_storage<SharedExprPrinter, true>::insertEdge(
+        Optional<z3::expr> from, z3::expr to) { return ppexpr_.InsertEdge(from, to); }
+void po_iterator_storage<SharedExprPrinter, true>::finishPostorder(z3::expr e) { ppexpr_.FinishPostorder(e); }
+} // namespace llvm
+
+
