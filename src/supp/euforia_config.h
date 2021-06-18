@@ -18,22 +18,22 @@ SupportedSolver solver_from_string(const std::string& s);
 std::ostream& operator<<(std::ostream& out, const SupportedSolver& s);
 
 struct Config {
-  int no_check; // to test whether explicit initialization trumps
-  int verify_invariant;
-  int dump_abstract_queries;
-  int minimize_invariant ;
+  bool no_check; // to test whether explicit initialization trumps
+  bool verify_invariant;
+  bool dump_abstract_queries;
+  bool minimize_invariant ;
   bool running_stats;
   int use_tseitin;
-  int no_abstract_arrays;
-  int abstract_array_select_fresh;
-  int use_layered_refinement_queries;
-  int refinement_queries_without_t;
-  int sort_cubes;
-  int use_only_bmc_refinement;
-  int use_one_shot_bmc_refinement;
-  int use_osbmc_slicing;
-  int check_for_redundant_lemmas;
-  int creduce;
+  bool no_abstract_arrays;
+  bool abstract_array_select_fresh;
+  bool use_layered_refinement_queries;
+  bool refinement_queries_without_t;
+  bool sort_cubes;
+  bool use_only_bmc_refinement;
+  bool use_one_shot_bmc_refinement;
+  bool use_osbmc_slicing;
+  bool check_for_redundant_lemmas;
+  bool creduce;
   SupportedSolver refinement_solver;
   std::string dump_file; // file to dump to
 };

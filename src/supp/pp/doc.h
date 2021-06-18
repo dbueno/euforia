@@ -16,6 +16,15 @@
 namespace euforia {
 namespace pp {
 
+
+//^----------------------------------------------------------------------------^
+// Configuration
+
+//! Width used by [euforia::pp::Best].
+extern int best_width;
+
+//^----------------------------------------------------------------------------^
+
 struct Doc;
 using DocPtr = std::shared_ptr<Doc>;
 
@@ -155,8 +164,6 @@ class Pp {
 };
 
 
-extern int best_width;
-
 //! Formats the doc using the given stream and the global pretty-printing
 //! [best_width].
 void Best(Pp& s, const DocPtr& d);
@@ -266,8 +273,8 @@ struct PrettyPrinter<DocPtr> {
   DocPtr operator()(const DocPtr& d) { return d; }
 };
 
-}
-}
+} // namespace pp
+} // namespace euforia
 
 //^----------------------------------------------------------------------------^
 // Formatters.
@@ -307,8 +314,6 @@ struct fmt::formatter<euforia::pp::details::JustType> {
 //! Default Doc formatter formats the doc at width best_width.
 template <>
 struct fmt::formatter<euforia::pp::DocPtr> {
-  int width = euforia::pp::best_width;
-
   auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
     auto it = ctx.begin(), ie = ctx.end();
     ENSURE(it == ie || *it == '}');
@@ -318,7 +323,7 @@ struct fmt::formatter<euforia::pp::DocPtr> {
   template <typename FormatContext>
   auto format(const euforia::pp::DocPtr& doc, FormatContext& ctx) -> decltype(ctx.out()) {
     euforia::pp::PpFormatContext pp(ctx);
-    pp.best(width, doc);
+    Best(pp, doc);
     return pp.ctx().out();
   }
 };
@@ -326,8 +331,6 @@ struct fmt::formatter<euforia::pp::DocPtr> {
 //! Default DocStream formatter falls back on DocPtr.
 template <>
 struct fmt::formatter<euforia::pp::DocStream> {
-  int width = euforia::pp::best_width;
-
   auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
     auto it = ctx.begin(), ie = ctx.end();
     ENSURE(it == ie || *it == '}');

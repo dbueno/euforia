@@ -4,12 +4,34 @@
 
 #include "supp/pp/doc.h"
 
+#include <llvm/Support/CommandLine.h>
 #include <map>
 #include <memory>
 
 #include "supp/logger.h"
 
 using namespace std;
+
+//^----------------------------------------------------------------------------^
+// Configuration
+
+namespace euforia {
+namespace pp {
+
+int best_width;
+
+namespace {
+using namespace llvm;
+cl::opt<int, true> pp_best_width(
+    "pp-width",
+    cl::desc("Max width for pretty printing"),
+    cl::location(best_width),
+    cl::init(160));
+} // namespace
+} // namespace pp
+} // namespace euforia
+
+//^----------------------------------------------------------------------------^
 
 namespace {
 using namespace euforia::pp;
@@ -378,11 +400,10 @@ void Pp::best(const int w, const DocPtr& x) {
   }
 }
 
-int best_width = 160;
 void Best(Pp& s, const DocPtr& d) {
   s.best(best_width, d);
 }
 
 
-}
-}
+} // namespace pp
+} // namespace euforia

@@ -126,6 +126,9 @@ unique_ptr<Solver> AbstractChecker::Impl::make_solver() const {
       solver = MakeBoolectorSolver();
       break;
     }
+
+    default:
+      EUFORIA_FATAL("no solver configured");
   }
   return solver;
 }

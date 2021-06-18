@@ -2,15 +2,16 @@
 //
 // Author: Denis Bueno
 
+#include <cassert>
+#include <chrono>
+#include <csignal>
+#include <iostream>
+#include <llvm/Support/CommandLine.h>
 #include <llvm/Support/FileSystem.h>
+#include <mathsat.h>
+#include <regex>
 #include <string>
 #include <unordered_map>
-#include <iostream>
-#include <cassert>
-#include <regex>
-#include <csignal>
-#include <chrono>
-#include <mathsat.h>
 #ifdef HAVE_BOOST_IOSTREAMS
 #  include <boost/iostreams/filter/gzip.hpp>
 // #  include <boost/iostreams/filter/zlib.hpp>
@@ -75,7 +76,7 @@ static string ReadFile(const string& filename) {
     out.push(infile);
     bio::copy(out, decompressed);
     return decompressed.str();
-  } else 
+  } else
 #endif
   {
     ifstream infile(filename.c_str(), std::ios::in);
@@ -97,9 +98,7 @@ static string ReadFile(const string& filename) {
 static z3::context ctx;
 static TimerClock clk;
 static TimerClock::time_point start_time;
-static bool witness = false;
 static bool SVcompOutput = true;
-static int true_exit_status = EXIT_SUCCESS, false_exit_status = EXIT_SUCCESS;
 unique_ptr<AbstractChecker> chk;
 
 namespace euforia {
@@ -110,8 +109,8 @@ extern unsigned euforia_major_version;
 extern unsigned euforia_minor_version;
 
 static void PrintFeatures() {
-  unsigned z3Major, z3Minor, z3BuildNumber, z3RevisionNumber;
-  Z3_get_version (&z3Major, &z3Minor, &z3BuildNumber, &z3RevisionNumber);
+  unsigned z3_major, z3_minor, z3_build_num, z3_rev_num;
+  Z3_get_version (&z3_major, &z3_minor, &z3_build_num, &z3_rev_num);
 
   logger.Log(1, "EUForia version {}.{}", euforia_major_version,
              euforia_minor_version);
@@ -119,7 +118,7 @@ static void PrintFeatures() {
              git_version, git_branch, git_tag);
   logger.Log(1, "c++ {}", __cplusplus);
   logger.Log(1, "compiled with Z3 version {}.{} [build {}, revision {}]",
-             z3Major, z3Minor, z3BuildNumber, z3RevisionNumber);
+             z3_major, z3_minor, z3_build_num, z3_rev_num);
 #ifdef GENDATA_FIRST
   logger.Log(1, "GENDATA_FIRST: true");
 #else
@@ -190,72 +189,168 @@ static void sigterm_handler(int /*signal*/) {
     exit(1);
   }
 }
-  
-  
-static struct option longOptions[] = {
-  /* These options set a flag. */
-  {"verbose", required_argument, 0, 'v'},
-  {"out-dir", required_argument, 0, 0},
-  {"witness", no_argument, 0, 'w'},
-  {"no-check", no_argument, &euforia_config.no_check, 1},
-  {"true-exit-status", required_argument, 0, 0},
-  {"false-exit-status", required_argument, 0, 0},
-  {"no-abstract-arrays", no_argument, &euforia_config.no_abstract_arrays, 1},
-  {"abstract-selects-freshly", no_argument, &euforia_config.abstract_array_select_fresh, 1},
-  {"use-layered-refinement-queries", no_argument,
-    &euforia_config.use_layered_refinement_queries, 1},
-  {"use-refinement-queries-without-t", no_argument,
-    &euforia_config.refinement_queries_without_t, 1},
-  {"use-only-bmc-refinement", no_argument,
-    &euforia_config.use_only_bmc_refinement, 1},
-  {"use-one-shot-bmc-refinement", no_argument,
-    &euforia_config.use_one_shot_bmc_refinement, 1},
-  {"one-shot-bmc-slicing", no_argument,
-    &euforia_config.use_osbmc_slicing, 1},
-  {"dump-queries", no_argument,
-    &euforia_config.dump_abstract_queries, 1},
-  {"verify-invariant", no_argument,
-    &euforia_config.verify_invariant, 1},
-  {"minimize-invariant", no_argument, &euforia_config.minimize_invariant, 1},
-  {"running-stats", no_argument, 0, 'x'},
-  {"use-tseitin", no_argument, &euforia_config.use_tseitin, 1},
-  {"sort-cubes", no_argument, &euforia_config.sort_cubes, 1},
-  {"refinement-solver", required_argument, 0, 0},
-  {"check-for-redundant-lemmas", no_argument,
-    &euforia_config.check_for_redundant_lemmas, 1},
-  {"creduce", no_argument, &euforia_config.creduce, 1},
-  /* These options don’t set a flag.
-     We distinguish them by their indices. */
-  {"help",     no_argument,       0, 'h'},
-  {0, 0, 0, 0}
-};
 
-static const char *descr[] = {
-  "Set verbosity level (1-n)",
-  "Use the given path for output files",
-  "Print the invariant/counterexample",
-  "Just construct the system, no check",
-  "If given, EUForia will exit with given exit code if property holds",
-  "If given, EUForia will exit with given exit code if property doesn't hold",
-  "Leave array theory intact at abstract level",
-  "Abstract array selects as fresh 0-arity terms (not functions)",
-  "Try middle-abstraction layerings of refinement queries",
-  "Try step-refinement queries without T first",
-  "Use BMC exclusively for refinement",
-  "Use newer one-shot BMC query for BMC refinement",
-  "Slice T during one-shot BMC refinement",
-  "Dump one step queries in SMT2 format (solveRelativeXXX.smt2)",
-  "Check that the invariant is inductive at bit level",
-  "Minimize the inductive invariant",
-  "Print running stats",
-  "Use tseitin transformation to speed up eval()",
-  "Sort proof obligation cubes for maximum determinism",
-  "Choice of refinement solver: boolector or z3",
-  "Debug checks for redundant lemmas",
-  "Enables extra checks to improve creduce results",
-  "This help",
-  nullptr
-};
+
+//^----------------------------------------------------------------------------^
+// Command line options
+
+using namespace llvm;
+
+cl::opt<string> filename(
+    cl::Positional,
+    cl::desc("<input VMT file>"),
+    cl::init("-"));
+
+cl::opt<int> verbosity(
+    "v",
+    cl::desc("verbosity (0-n)"),
+    cl::init(0));
+
+static cl::opt<string, true /* external storage location */> out_dir(
+    "out-dir",
+    cl::desc("output directory"),
+    cl::location(LOG_DIR),
+    cl::init(""));
+
+static cl::opt<bool> witness(
+    "witness",
+    cl::desc("print witness after checking"),
+    cl::init(false));
+cl::alias witness_a("w", cl::desc("Alias for -witness"), cl::aliasopt(witness));
+
+static cl::opt<bool, true> no_check(
+    "no-check",
+    cl::desc("Just construct the system, no check"),
+    cl::location(euforia_config.no_check),
+    cl::init(false));
+
+static cl::opt<int> true_exit_status(
+    "true-exit-status",
+    cl::desc("number to exit with if property holds"),
+    cl::init(EXIT_SUCCESS));
+
+static cl::opt<int> false_exit_status(
+    "false-exit-status",
+    cl::desc("number to exit with if property doesn't hold"),
+    cl::init(EXIT_SUCCESS));
+
+static cl::opt<bool, true> no_abstract_arrays(
+    "no-abstract-arrays",
+    cl::desc("Do not abstract array theory terms"),
+    cl::location(euforia_config.no_abstract_arrays),
+    cl::init(false));
+
+static cl::opt<bool, true> abstract_selects_freshly(
+    "abstract-selects-freshly",
+    cl::desc("Abstract array selects as fresh 0-arity terms (not functions)"),
+    cl::location(euforia_config.abstract_array_select_fresh),
+    cl::init(false));
+
+static cl::opt<bool, true> use_layered_refinement_queries(
+    "use-layered-refinement-queries",
+    cl::desc("Try middle-abstraction layerings of refinement queries"),
+    cl::location(euforia_config.use_layered_refinement_queries),
+    cl::init(false));
+
+static cl::opt<bool, true> use_refinement_queries_without_t(
+    "use-refinement-queries-without-t",
+    cl::desc("Try step-refinement queries without T first"),
+    cl::location(euforia_config.refinement_queries_without_t),
+    cl::init(false));
+
+static cl::opt<bool, true> use_only_bmc_refinement(
+    "use-only-bmc-refinement",
+    cl::desc("Use BMC exclusively for refinement"),
+    cl::location(euforia_config.use_only_bmc_refinement),
+    cl::init(false));
+
+static cl::opt<bool, true> use_one_shot_bmc_refinement(
+    "use-one-shot-bmc-refinement",
+    cl::desc( "Use newer one-shot BMC query for BMC refinement"),
+    cl::location(euforia_config.use_one_shot_bmc_refinement),
+    cl::init(true));
+
+static cl::opt<bool, true> one_shot_bmc_slicing(
+    "one-shot-bmc-slicing",
+    cl::desc("Slice T during one-shot BMC refinement"),
+    cl::location(euforia_config.use_osbmc_slicing),
+    cl::init(false));
+
+static cl::opt<bool, true> dump_queries(
+    "dump-queries",
+    cl::desc( "Dump one step queries in SMT2 format (solveRelativeXXX.smt2)"),
+    cl::location(euforia_config.dump_abstract_queries),
+    cl::init(false));
+
+static cl::opt<bool, true> verify_invariant(
+    "verify-invariant",
+    cl::desc( "Check that the invariant is inductive at bit level"),
+    cl::location(euforia_config.verify_invariant),
+    cl::init(false));
+
+static cl::opt<bool, true> minimize_invariant(
+    "minimize-invariant",
+    cl::desc( "Minimize the inductive invariant"),
+    cl::location(euforia_config.minimize_invariant),
+    cl::init(false));
+
+static cl::opt<bool, true> running_stats(
+    "running-stats",
+    cl::desc( "Print running stats"),
+    cl::location(euforia_config.running_stats),
+    cl::init(false));
+cl::alias running_stats_a(
+    "x", cl::desc("Alias for -running-stats"), cl::aliasopt(running_stats));
+
+static cl::opt<bool, true> sort_cubes(
+    "sort-cubes",
+    cl::desc( "Sort proof obligation cubes for Maximum Determinism"),
+    cl::location(euforia_config.sort_cubes),
+    cl::init(false));
+
+static cl::opt<bool, true> check_for_redundant_lemmas(
+    "check-for-redundant-lemmas",
+    cl::desc( "Debug checks for redundant lemmas"),
+    cl::location(euforia_config.check_for_redundant_lemmas),
+    cl::init(false));
+
+static cl::opt<bool, true> enable_creduce(
+    "creduce",
+    cl::desc( "Enables extra checks to improve creduce results"),
+    cl::location(euforia_config.creduce),
+    cl::init(false));
+
+namespace {
+// Namespace so z3 and boolector don't collide.
+
+// These variable names are used as the option names on the command line, like
+// --refinement-solver=boolector instead of --refinement-solver=kBoolector.
+static auto z3 = config::kZ3;
+static auto boolector = config::kBoolector;
+static cl::opt<config::SupportedSolver, true> refinement_solver(
+    "refinement-solver",
+    cl::desc("which refinement solver to use:"),
+    cl::values(
+        clEnumVal(z3, "Z3"),
+        clEnumVal(boolector, "Boolector")),
+    cl::location(euforia_config.refinement_solver),
+    cl::init(z3));
+} // namespace
+
+static void PrintVersion(raw_ostream& ) {
+  unsigned z3_major, z3_minor, z3_build_num, z3_rev_num;
+  Z3_get_version (&z3_major, &z3_minor, &z3_build_num, &z3_rev_num);
+  fmt::print("euforia {}.{}\n", euforia_major_version,
+             euforia_minor_version);
+  fmt::print("commit {}, branch {}, tag {}\n",
+             git_version, git_branch, git_tag);
+  fmt::print("c++ {}\n", __cplusplus);
+  fmt::print("compiled with Z3 version {}.{} [build {}, revision {}]\n",
+             z3_major, z3_minor, z3_build_num, z3_rev_num);
+}
+
+//^----------------------------------------------------------------------------^
+// Entry point
 
 int main(int argc, char *const *argv) {
   TimerDuration before_check_duration(0);
@@ -264,121 +359,19 @@ int main(int argc, char *const *argv) {
   std::signal(SIGTERM, sigterm_handler);
   std::signal(SIGINT, sigterm_handler);
 
-  // Initializes EUForia's default configuration
-  // default-initialize everything except...
-  euforia_config.use_one_shot_bmc_refinement = 1;
-  euforia_config.refinement_solver = config::kZ3;
-
-  // pretty printing width
-  pp::best_width = 160;
-
   //  setenv("BTORAPITRACE", "/tmp/btorapitrace", 0);
 
-  while (true) {
-    /* getopt_long stores the option index here. */
-    int optionIndex = 0;
-    int c = getopt_long(argc, argv, "v:wIhx", longOptions, &optionIndex);
-    
-    /* Detect the end of the options. */
-    if (c == -1)
-      break;
-    
-    auto currOption = string(longOptions[optionIndex].name);
-
-    switch (c) {
-      case 0: {
-        /* If this option set a flag, do nothing else now. */
-        if (longOptions[optionIndex].flag != 0)
-          break;
-
-        else if (currOption == "out-dir") {
-          LOG_DIR = string(optarg);
-        }
-        
-        else if (currOption == "true-exit-status") {
-          true_exit_status = std::stoi(optarg);
-        }
-
-        else if (currOption == "false-exit-status") {
-          false_exit_status = std::stoi(optarg);
-        }
-
-        else if (currOption == "refinement-solver") {
-          euforia_config.refinement_solver =
-              config::solver_from_string(string(optarg));
-        }
-
-        break;
-      }
-
-      case 'v': {
-        int n = 1;
-        n = stoi(optarg);
-        logger.set_level(n);
-      }
-        break;
-        
-      case 'w':
-        witness = true;
-        break;
-
-      case 'x':
-        euforia_config.running_stats = true;
-        break;
-        
-      case 'h': {
-        logger.Log(0, "EUForia version {}.{}", euforia_major_version,
-                   euforia_minor_version);
-        logger.Log(0, "commit {}, branch {}, tag {}",
-                   git_version, git_branch, git_tag);
-        printf("%s [options] filename.bc\n", argv[0]);
-        printf("available options\n");
-        for (int i = 0; longOptions[i].name; i++) {
-          struct option *opt = &longOptions[i];
-          printf("  ");
-          if (opt->val) {
-            printf("-%c, ", opt->val);
-          }
-          printf("--%s", opt->name);
-          switch (opt->has_arg) {
-            case no_argument:
-              break;
-            case required_argument:
-              printf("=ARG");
-              break;
-            case optional_argument:
-              printf("[=ARG]");
-              break;
-            default:
-              abort();
-          }
-          printf(": %s\n", descr[i]);
-        }
-        exit(EXIT_SUCCESS);
-        break;
-      }
-        
-      case '?':
-        /* getopt_long already printed an error message. */
-        exit(EXIT_FAILURE);
-        break;
-        
-      default:
-        abort();
-    }
-  }
+  cl::SetVersionPrinter(PrintVersion);
+  cl::ParseCommandLineOptions(argc, argv);
+  // use -print-all-options on command line
+  cl::PrintOptionValues();
+  logger.set_level(verbosity);
 
   PrintFeatures();
   logger.Log(1, "witness: {}", witness);
   logger.Log(1, "{}", euforia_config);
-  
+
   start_time = clk.now();
-  std::string error_msg;
-  std::string filename;
-  if (optind >= argc) {
-    cerr << "Please give a vmt file to analyze" << endl;
-    exit(EXIT_FAILURE);
-  }
 
   if (euforia_config.dump_abstract_queries) {
     if (LOG_DIR.empty()) {
@@ -386,8 +379,8 @@ int main(int argc, char *const *argv) {
       exit(EXIT_FAILURE);
     }
   }
-      
-  
+
+
   // create LOG_DIR if it doesn't exist
   if (!LOG_DIR.empty()) {
     if (auto dirError = fs::create_directories(LOG_DIR)) {
@@ -410,14 +403,16 @@ int main(int argc, char *const *argv) {
 #endif
 
   logger.Log(1, "prepare for descent");
-  
+
   int exit_status;
   wordexp_t wp;
-  int failure = wordexp(argv[optind], &wp, 0);
+  int failure = wordexp(filename.c_str(), &wp, 0);
   if (failure) {
-    cerr << "Unable to expand filename" << endl;
+    cerr << "Unable to expand target filename" << endl;
     exit(EXIT_FAILURE);
   }
+  filename = string(wp.we_wordv[0]);
+  logger.Log(1, "target: {}", filename);
 
   // Z3_enable_trace("dl");
   // Z3_enable_trace("dl_rule");
@@ -435,9 +430,6 @@ int main(int argc, char *const *argv) {
   msat_env menv = msat_create_env(mcfg);
   MathsatEnvDeleter del_menv(menv);
   msat_destroy_config(mcfg);
-
-  filename = wp.we_wordv[0];
-  logger.Log(1, "target: {}", filename);
 
   struct stat buffer;
   if (stat(filename.c_str(), &buffer) != 0) {
@@ -546,7 +538,6 @@ int main(int argc, char *const *argv) {
   ats.collect_statistics(&st);
   if (logger.ShouldLog(1))
     st.Print(logger.out());
-  
 
   // } catch (const z3::exception& e) {
   //   fmt::print(std::cerr, "FOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
