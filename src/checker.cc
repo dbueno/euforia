@@ -6,8 +6,9 @@
 
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/heap/priority_queue.hpp>
-#include <queue>
 #include <fstream>
+#include <llvm/Support/CommandLine.h>
+#include <queue>
 
 #include "counterexample.h"
 #include "supp/euforia_config.h"
@@ -19,6 +20,27 @@
 
 
 using namespace std;
+
+//^----------------------------------------------------------------------------^
+// Configuration for blocked cube generalization
+
+enum BlockedCubeGeneralizeAlgorithm {
+  kGreedyMus,
+  kMic
+};
+
+namespace opt {
+using namespace llvm;
+auto greedy = kGreedyMus;
+auto mic = kMic;
+cl::opt<BlockedCubeGeneralizeAlgorithm> generalize_algorithm(
+    "blocked-cube-generalizer",
+    cl::desc("Algorithm for generalizing blocked cubes:"),
+    cl::values(
+        clEnumVal(greedy, "Greedy (one pass to drop literals)"),
+        clEnumVal(mic, "MIC (FSIS paper)")),
+    cl::init(greedy));
+} // namespace
 
 
 /*-----------------------------------------------------------------------------------*/
@@ -412,12 +434,18 @@ bool Checker::BackwardReachability(TimedCube s0) {
   return false; // no cx
 }
 
-
-
-
 vector<TimedCube> Checker::Generalize(TimedCube z, TimedCube /*orig*/) {
+  switch (opt::generalize_algorithm) {
+    case kMic:
+      return vector<TimedCube>({solver_->GeneralizeMic(z, z)});
+    case kGreedyMus:
+      return GeneralizeGreedyMus(z, z);
+  }
+}
+
+vector<TimedCube> Checker::GeneralizeGreedyMus(TimedCube z, TimedCube /*orig*/) {
   ScopedTimeKeeper timekeep(&stats_.generalize_time);
-  logger.LogOpenFold(5, "[generalizing]");
+  logger.LogOpenFold(5, "[generalizing with greedy]");
   vector<TimedCube> ret;
   ret.reserve(2);
   
@@ -661,7 +689,7 @@ void Checker::CheckInvariant() {
   // P & Rk & T & (!Rk+ || !P+) is UNSAT
   ExprSet assumps;
   assumps.insert(!solver_->notp_act_);
-  solver_->AddLemmaAssumps(assumps);
+  solver_->AddLemmaAssumps(std::inserter(assumps, assumps.begin()));
   solver_->Add(xsys_.property());
   vector<z3::expr> notRkPlus;
   for (size_t i = 0; i < F.size(); i++) {

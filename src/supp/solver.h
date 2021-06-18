@@ -211,6 +211,42 @@ class Solver {
   int64_t num_solve_unsat_calls_ = 0;
   int64_t num_unsat_core_calls_ = 0;
 };
+
+class AssumptionContext {
+ public:
+  AssumptionContext() = default;
+
+  // For back_inserter
+  using value_type = z3::expr;
+  void push_back(z3::expr e) { Add(e); }
+
+  //! Add assumption
+  void Add(z3::expr e) { assumps_.push_back(e); }
+
+  void Push() { stack_.push_back(assumps_.size()); }
+
+  void Pop() {
+    ENSURE(assumps_.size() >= stack_.size());
+    const size_t target = PopStack();
+    while (assumps_.size() > target) {
+      assumps_.pop_back();
+    }
+  }
+
+  operator const std::vector<z3::expr>&() const { return assumps_; }
+
+ private:
+  std::vector<z3::expr> assumps_;
+  std::vector<size_t> stack_;
+
+  size_t PopStack() {
+    if (stack_.empty())
+      return 0;
+    size_t ret = stack_.back();
+    stack_.pop_back();
+    return ret;
+  }
+};
 }
 
 #endif

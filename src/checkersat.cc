@@ -130,7 +130,7 @@ TimedCube CheckerSat::SolveRelative(const TimedCube& s,
   assumps_.insert(!notp_act_);
 
   // Enable lemmas
-  AddLemmaAssumps(assumps_);
+  AddLemmaAssumps(std::inserter(assumps_, assumps_.begin()));
   
   // R[k-1] cubes are in solver, just assume them
   for (size_t i = 0; i < F_act_.size(); i++) {
@@ -193,10 +193,7 @@ TimedCube CheckerSat::SolveRelative(const TimedCube& s,
         nlogger.Log("generalize", "unsat core reduction: {} -> {} literals",
                    assumps_.size(), core_set.size());
 
-
-#ifndef NO_GEN_WITH_UNSAT_CORE
         auto new_cube = GeneralizeWithUnsatCore(core_set, *s.thecube);
-#endif
         
         logger.Log(6, "    new s: {}", *new_cube);
         for (int i = k-1; i <= checker_.depth(); i++) {
@@ -240,58 +237,80 @@ TimedCube CheckerSat::SolveRelative(const TimedCube& s,
 }
 
 
+// Only makes IsInitial queries, no SolveRelative queries.
 shared_ptr<Cube> CheckerSat::GeneralizeWithUnsatCore(const ExprSet& core_set,
                                                      const Cube& c) {
   auto new_cube = make_shared<Cube>(c);
   logger.Log(6, "    core: {}", unsat_core_reasons());
-  if (new_cube->size() > 1) {
-    ScopedTimeKeeper t(&generalize_with_core_time_);
-    auto& cuberef = *new_cube;
-    Cube core_cube(c.ctx());
-    // This loop makes a cube just out of the core literals. If we get
-    // lucky, then that cube is both quite small and doesn't intersect
-    // with I -- avoiding an expensive minimization step.
-    for (int64_t i = 0; i < static_cast<int64_t>(cuberef.size()); i++) {
-      const auto& elt = cuberef[i];
-      auto b = GetWithDefault(tracking_bools_, cuberef.getNext(elt),
-                              cuberef.getNext(elt)); // Bools hit default
-      if (core_set.find(b) != core_set.end()) {
-        core_cube.push(elt, cuberef.getNext(elt));
-      }
-    }
-    ++num_gen_core_tests_;
-    if (!IsInitial(core_cube)) {
-      logger.Log(5, "able to use core cube immediately");
-      new_cube = make_shared<Cube>(move(core_cube));
-      ++num_gen_core_fast_;
-    } else {
-      // This tries to start with the current cube and whittle it down
-      // with the core. It is especially slow when the cubhe is large
-      // relative to the core size.
-      for (int64_t i = 0; i < static_cast<int64_t>(cuberef.size()); ) {
-        auto elt = cuberef[i];
-        auto b = GetWithDefault(tracking_bools_, cuberef.getNext(elt),
-                                cuberef.getNext(elt)); // Bools hit default
-        if (core_set.find(b) == core_set.end()) {
-          auto elt_next = cuberef.getNext(elt);
-          swap(cuberef[i], cuberef[cuberef.size()-1]);
-          cuberef.erase(cuberef.size()-1);
-          ++num_gen_core_tests_;
-          if (!IsInitial(cuberef)) {
-            // Don't increment i here because we deleted an element from
-            // cuberef and put a new one at place i.
-            continue;
-          }
-          cuberef.push(elt, elt_next);
-        }
-        i++;
-      }
-      EUFORIA_EXPENSIVE_ASSERT(!IsInitial(cuberef), "cube is in I");
+  if (new_cube->size() <= 1)
+    return new_cube;
+    
+  ScopedTimeKeeper t(&generalize_with_core_time_);
+  auto& new_cube_ref = *new_cube;
+  Cube core_cube(c.ctx());
+  // This loop makes a cube just out of the core literals. If we get
+  // lucky, then that cube is both quite small and doesn't intersect
+  // with I -- avoiding an expensive minimization step.
+  for (int64_t i = 0; i < static_cast<int64_t>(new_cube_ref.size()); i++) {
+    const auto& elt = new_cube_ref[i];
+    auto b = GetWithDefault(tracking_bools_, new_cube_ref.getNext(elt),
+                            new_cube_ref.getNext(elt)); // Bools hit default
+    if (core_set.find(b) != core_set.end()) {
+      core_cube.push(elt, new_cube_ref.getNext(elt));
     }
   }
+  ++num_gen_core_tests_;
+  if (!IsInitial(core_cube)) {
+    logger.Log(5, "able to use core cube immediately");
+    ++num_gen_core_fast_;
+    return make_shared<Cube>(move(core_cube));
+  }
+  
+  // This loop finds a superset of the core constraints that is hopefully
+  // also a small subset of the original constraints, that doesn't intersect
+  // with I.
+  for (int64_t i = 0; i < static_cast<int64_t>(new_cube_ref.size()); ) {
+    auto elt = new_cube_ref[i];
+    auto b = GetWithDefault(tracking_bools_, new_cube_ref.getNext(elt),
+                            new_cube_ref.getNext(elt)); // Bools hit default
+    if (core_set.find(b) == core_set.end()) {
+      auto elt_next = new_cube_ref.getNext(elt);
+      swap(new_cube_ref[i], new_cube_ref[new_cube_ref.size()-1]);
+      new_cube_ref.erase(new_cube_ref.size()-1);
+      ++num_gen_core_tests_;
+      if (!IsInitial(new_cube_ref)) {
+        // Don't increment i here because we deleted an element from
+        // new_cube_ref and put a new one at place i.
+        continue;
+      }
+      new_cube_ref.push(elt, elt_next);
+    }
+    i++;
+  }
+  EUFORIA_EXPENSIVE_ASSERT(!IsInitial(new_cube_ref), "cube is in I");
   return new_cube;
 }
 
+TimedCube CheckerSat::GeneralizeMic(TimedCube s, TimedCube /*orig*/) {
+  _unused(s);
+  ENSURE(false);
+}
+
+Cube CheckerSat::LIC(TimedCube c) {
+  _unused(c);
+  abort();
+  // 1. Checks that \psi & c & T => c'. This is the same 
+}
+
+TimedCube CheckerSat::GeneralizeInterpolant(TimedCube s, TimedCube /*orig*/) {
+  _unused(s);
+  ENSURE(false);
+  z3::fixedpoint fp(ctx());
+  _unused(fp);
+
+  // If the core is !Initial, then construct fp problem using the core.
+  // Otherwise, use the original cube.
+}
 
 
 
@@ -587,7 +606,7 @@ void CheckerSat::SanityCheckFrames() {
   // ensure R_1 is satisfiable
   for (size_t k = 1; k < checker_.F.size()-2; k++) {
     ExprSet assumps;
-    AddLemmaAssumps(assumps);
+    AddLemmaAssumps(std::inserter(assumps, assumps.begin()));
     for (size_t i = 0; i < checker_.F.size(); i++) {
       // part of Rk
       assumps.insert(k-1 <= i ? F_act_[i] : !F_act_[i]);

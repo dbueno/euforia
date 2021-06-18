@@ -72,6 +72,7 @@ class Checker {
   // Returns true if there's a Counterexample. Otherwise it doesn't.
   bool BackwardReachability(TimedCube tc);
   std::vector<TimedCube> Generalize(TimedCube blocked, TimedCube origBlocked);
+  std::vector<TimedCube> GeneralizeGreedyMus(TimedCube z, TimedCube /*orig*/);
   // true if invariant found, false otherwise
   bool PropagateBlockedCubes();
   

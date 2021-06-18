@@ -312,11 +312,11 @@ using tcube_umap = std::unordered_map<TimedCube, T, TimedCubeHash,
 template <>
 struct euforia::pp::PrettyPrinter<Cube> {
   euforia::pp::DocPtr operator()(const Cube& c) {
-    auto g = pp::groupsep(c.begin(), c.end(),
-                         pp::group(pp::append(
-                                 pp::break_(1, 0),
-                                 pp::append(pp::text(AcSep(Z3_OP_AND)), pp::text(" "))
-                                 )));
+    auto g = pp::groupsep(
+        c.begin(), c.end(),
+        pp::group(pp::append(
+                pp::break_(1, 0),
+                pp::append(pp::text(AcSep(Z3_OP_AND)), pp::text(" ")))));
     pp::DocStream s;
     s << "cube<" << pp::nest(4, g) << ">";
     return s;
@@ -326,11 +326,11 @@ struct euforia::pp::PrettyPrinter<Cube> {
 template <>
 struct euforia::pp::PrettyPrinter<TimedCube> {
   euforia::pp::DocPtr operator()(const TimedCube& c) {
-    auto g = pp::groupsep(c.thecube->begin(), c.thecube->end(),
-                         pp::group(pp::append(
-                                 pp::break_(1, 0),
-                                 pp::append(pp::text(AcSep(Z3_OP_AND)), pp::text(" "))
-                                 )));
+    auto g = pp::groupsep(
+        c.thecube->begin(), c.thecube->end(),
+        pp::group(pp::append(
+                pp::break_(1, 0),
+                pp::append(pp::text(AcSep(Z3_OP_AND)), pp::text(" ")))));
     pp::DocStream s;
     s << "tcube@" << std::to_string(c.frame) << pp::text("<")
         << pp::nest(4, g) << ">";

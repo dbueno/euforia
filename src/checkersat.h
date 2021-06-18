@@ -128,6 +128,8 @@ class CheckerSat : public Solver {
   //! If set, does not generalize unreachable cube
   static constexpr SolveRelativeParams NoGen{1 << 2};
 
+  //! Checks R_{c.frame-1} & T & c+.
+  //!
   //! if SAT, returns a TimedCube with kFrameNull. If ExtractModel is set,
   //! returns a preimage cube
   //! 
@@ -141,6 +143,11 @@ class CheckerSat : public Solver {
   //! cube. Returns a fresh cube guaranteed not to intersect with I
   std::shared_ptr<Cube> GeneralizeWithUnsatCore(
       const ExprSet& core, const Cube& c);
+
+  TimedCube GeneralizeMic(TimedCube z, TimedCube /*orig*/);
+  TimedCube GeneralizeInterpolant(TimedCube z, TimedCube /*orig*/);
+
+  Cube LIC(TimedCube c);
 
   //! add newly blocked cube to solver
   void BlockCubeInSolver(TimedCube s);
@@ -236,21 +243,13 @@ class CheckerSat : public Solver {
   ExprSet dedup_lemmas_;
   std::vector<std::shared_ptr<AbstractLemmaClause>> one_step_lemmas_;
   std::vector<std::shared_ptr<AbstractLemmaClause>> forward_lemmas_;
-  void AddLemmaAssumps(z3::expr_vector& s) {
+  template <typename Output>
+  void AddLemmaAssumps(Output out) {
     for (auto& lemma : forward_lemmas_) {
-      s.push_back(lemma->activation);
+      *out++ = lemma->activation;
     }
     for (auto& lemma : one_step_lemmas_) {
-      s.push_back(lemma->activation);
-    }
-  }
-  
-  void AddLemmaAssumps(ExprSet& s) {
-    for (auto& lemma : forward_lemmas_) {
-      s.insert(lemma->activation);
-    }
-    for (auto& lemma : one_step_lemmas_) {
-      s.insert(lemma->activation);
+      *out++ = lemma->activation;
     }
   }
 };

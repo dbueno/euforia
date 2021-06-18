@@ -27,13 +27,11 @@ int main() {
 
   Z3Solver s(ctx);
   MarcoEnumerator enumerate(s, constraints);
-  logger.set_level(1);
+  logger.set_level(5);
 
   size_t i = 0;
   for (const auto& ms : enumerate) {
-    fmt::print("{} [", ms.kind());
-    boost::copy(ms, make_ostream_joiner(std::cout, ", "));
-    fmt::print("]\n");
+    fmt::print("{}\n", ms);
     if (++i == 10) {
       EUFORIA_FATAL("error in marco: too many subsets");
     }

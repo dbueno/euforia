@@ -3,36 +3,36 @@
 //!
 //! Enumeration of Minimal Unsatisfiable Cores and Maximal Satisfying Subsets
 //! This tutorial illustrates how to use Z3 for extracting all minimal
-//! unsatisfiable cores together with all maximal satisfying subsets. 
-//! 
+//! unsatisfiable cores together with all maximal satisfying subsets.
+//!
 //! Origin
 //! The algorithm that we describe next represents the essence of the core
 //! extraction procedure by Liffiton and Malik and independently by Previti and
 //! Marques-Silva: Enumerating Infeasibility: Finding Multiple MUSes Quickly
 //! Mark H. Liffiton and Ammar Malik in Proc. 10th International Conference on
 //! Integration of Artificial Intelligence (AI) and Operations Research (OR)
-//! techniques in Constraint Programming (CPAIOR-2013), 160-175, May 2013. 
-//! 
+//! techniques in Constraint Programming (CPAIOR-2013), 160-175, May 2013.
+//!
 //! Partial MUS Enumeration
-//!  Alessandro Previti, Joao Marques-Silva in Proc. AAAI-2013 July 2013 
-//! 
+//!  Alessandro Previti, Joao Marques-Silva in Proc. AAAI-2013 July 2013
+//!
 //! Z3py Features
-//! 
+//!
 //! This implementation contains no tuning. It was contributed by Mark Liffiton
 //! and it is a simplification of one of the versions available from his Marco
 //! Polo Web site.  It illustrates the following features of Z3's Python-based
 //! API:
-//!    1. Using assumptions to track unsatisfiable cores. 
-//!    2. Using multiple solvers and passing constraints between them. 
+//!    1. Using assumptions to track unsatisfiable cores.
+//!    2. Using multiple solvers and passing constraints between them.
 //!    3. Calling the C-based API from Python. Not all API functions are
 //!       supported over the Python wrappers. This example shows how to get a
 //!       unique integer identifier of an AST, which can be used as a key in a
-//!       hash-table. 
-//! 
+//!       hash-table.
+//!
 //! Idea of the Algorithm
 //! The main idea of the algorithm is to maintain two logical contexts and
 //! exchange information between them:
-//! 
+//!
 //!     1. The MapSolver is used to enumerate sets of clauses that are not
 //!        already supersets of an existing unsatisfiable core and not already
 //!        a subset of a maximal satisfying assignment. The MapSolver uses one
@@ -43,7 +43,7 @@
 //!        each maximal satisfiable subset, say, represented by predicats p2,
 //!        p3, p5, the MapSolver contains a clause corresponding to the
 //!        disjunction of all literals not in the maximal satisfiable subset,
-//!        p1 | p4 | p6. 
+//!        p1 | p4 | p6.
 //!     2. The SubsetSolver contains a set of soft clauses (clauses with the
 //!        unique indicator atom occurring negated).  The MapSolver feeds it a
 //!        set of clauses (the indicator atoms). Recall that these are not
@@ -53,7 +53,7 @@
 //!        unsatisfiable subset
 //!        corresponding to these atoms. If asserting the atoms is consistent
 //!        with the SubsetSolver, then it extends this set of atoms maximally
-//!        to a satisfying set. 
+//!        to a satisfying set.
 //!
 
 
@@ -61,6 +61,7 @@
 #define SUPP_MARCO_H_
 
 #include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/iterator/iterator_facade.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/optional.hpp>
 #include <boost/program_options.hpp>
@@ -69,6 +70,7 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/transform.hpp>
 #include <boost/range/combine.hpp>
+#include <fmt/format.h>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -79,8 +81,9 @@
 #include "checker_types.h" // tmeporary
 #include "supp/expr_iterators.h"
 #include "supp/expr_supp.h"
-#include "supp/std_supp.h"
+#include "supp/pp/doc.h"
 #include "supp/solver.h"
+#include "supp/std_supp.h"
 #include "supp/z3_solver.h"
 
 namespace euforia {
@@ -97,7 +100,7 @@ class SeedSet {
   using iterator = std::unordered_set<int>::iterator;
   using const_iterator = std::unordered_set<int>::const_iterator;
 
-  SeedSet() {}
+  SeedSet() = default;
 
   template <typename Range>
   SeedSet(const Range& r) {
@@ -105,10 +108,10 @@ class SeedSet {
   }
 
   size_t size() const { return s_.size(); }
-  auto find(int i) { return s_.find(i); }
+  auto find(int i) const { return s_.find(i); }
   auto erase(int i) { return s_.erase(i); }
   template <typename Range>
-  void erase(const Range& r) {
+  void erase(Range&& r) {
     for (auto&& i : r) {
       s_.erase(i);
     }
@@ -129,7 +132,8 @@ class SeedSet {
 //^----------------------------------------------------------------------------^
 
 //! Solves subsets of a given set of constraints, allowing growing and
-//! shrinking.
+//! shrinking. For a given set of constraints, it asserts a formula (c_i =>
+//! <constraint i>), where c_i is a Boolean indicator variable.
 class SubsetSolver {
  public:
   SubsetSolver(Solver& s) : solver_(s) {}
@@ -141,13 +145,17 @@ class SubsetSolver {
       solver_.Add(z3::implies(CVar(i), constraints_[i]));
     }
   }
-  
+
   template <typename Range>
   bool CheckSubset(const Range& seeds) {
     z3::expr_vector assumptions(ctx());
     boost::transform(seeds, ExprVectorInserter(assumptions),
                      [&](auto&& seed) { return CVar(seed); });
-    return solver_.Check(assumptions) == CheckResult::kSat;
+    auto result = solver_.Check(assumptions) == CheckResult::kSat;
+
+    logger.Log(6, "SubsetSolver::CheckSubset => {}",
+               result == true ? "sat" : "unsat");
+    return result;
   }
 
   size_t num_constraints() const { return constraints_.size(); }
@@ -197,7 +205,7 @@ class MapSolver {
 
   //! Blocks down from a given set
   void BlockDown(const SeedSet& frompoint);
-  
+
   //! Blocks up from a given set
   void BlockUp(const SeedSet& frompoint);
 
@@ -220,7 +228,7 @@ class MarcoEnumerator {
 
   class Iterator;
 
-  //! Stores a set of constraints that are either a MUS or a MSS
+  //! A set of constraints that are either a MUS or a MSS
   class SupremalSet {
    public:
     using iterator = std::vector<z3::expr>::iterator;
@@ -228,7 +236,7 @@ class MarcoEnumerator {
 
     SupremalSet(Supremals kind, std::vector<z3::expr>&& s)
         : kind_(kind), subset_(s) {}
-    
+
     Supremals kind() const { return kind_; }
     const std::vector<z3::expr>& subset() const { return subset_; }
     auto begin() const { return subset_.begin(); }
@@ -237,7 +245,7 @@ class MarcoEnumerator {
    private:
     Supremals kind_;
     std::vector<z3::expr> subset_;
-    
+
     friend class Iterator;
     // kind is uninitialized so don't do anything with this
     SupremalSet() {}
@@ -245,48 +253,30 @@ class MarcoEnumerator {
 
 
   //! This iterator is expensive to copy.
-  class Iterator {
+  class Iterator : public boost::iterator_facade<
+      Iterator, const SupremalSet, boost::forward_traversal_tag> {
    public:
-    using reference = const SupremalSet&;
-    using pointer = const SupremalSet*;
-    using value_type = SupremalSet;
-    using iterator_category = std::input_iterator_tag;
-
     // end iterator has no seed or solver
-    Iterator(z3::context&);
+    Iterator() = default;
     // initializes seed_ with solver
-    Iterator(SubsetSolver&& s);
-
-    bool operator!=(const Iterator& other) {
-      return !(*this == other);
-    }
-
-    bool operator==(const Iterator& other) {
-      return seed_ == other.seed_;
-    }
-
-    reference operator*() { return subset_; }
-    pointer operator->() { return &subset_; }
-
-    Iterator& operator++() {
-      Advance();
-      return *this;
-    }
-
-    value_type operator++(int) {
-      value_type x = *(*this);
-      ++(*this);
-      return x;
-    }
+    Iterator(
+        Solver& s, const std::vector<z3::expr>& constraints);
 
    private:
-    // end() iterator has no ssolver_
+    // end() iterator has none everywhere
     boost::optional<SubsetSolver> ssolver_;
-    MapSolver msolver_;
+    boost::optional<MapSolver> msolver_;
     boost::optional<SeedVector> seed_; // empty = end
-    SupremalSet subset_;
+    // last subset returned by FindNextSupremalSet
+    SupremalSet last_subset_;
 
-    void Advance();
+    friend class boost::iterator_core_access;
+
+    void increment() { FindNextSupremalSet(); }
+    bool equal(const Iterator& other) const { return seed_ == other.seed_; }
+    const SupremalSet& dereference() const { return last_subset_; }
+
+    void FindNextSupremalSet();
   };
 
   using iterator = Iterator;
@@ -298,23 +288,56 @@ class MarcoEnumerator {
     boost::copy(constraints, back_inserter(constraints_));
   }
 
-  iterator begin() {
-    return Iterator(SubsetSolver(solver_, constraints_));
-  }
+  iterator begin() { return Iterator(solver_, constraints_); }
 
-  iterator end() {
-    return Iterator(solver_.ctx());
-  }
+  iterator end() { return Iterator(); }
 
  private:
   Solver& solver_;
   std::vector<z3::expr> constraints_;
 };
 
-std::ostream& operator<<(std::ostream& os, MarcoEnumerator::Supremals k);
-std::ostream& operator<<(std::ostream& os, const SeedSet& s);
-
 } // end namespace marco
+
+template <>
+struct euforia::pp::PrettyPrinter<marco::SeedSet> {
+  euforia::pp::DocPtr operator()(const marco::SeedSet& s) {
+    auto g = pp::commabox(s.begin(), s.end(), pp::text(","));
+    pp::DocStream d;
+    d << "SeedSet<" << pp::nest(4, g) << ">";
+    return d;
+  }
+};
+
+template <>
+struct euforia::pp::PrettyPrinter<marco::MarcoEnumerator::Supremals> {
+  euforia::pp::DocPtr operator()(const marco::MarcoEnumerator::Supremals& s) {
+    switch (s) {
+      case marco::MarcoEnumerator::Supremals::kMss:
+        return pp::text("MSS");
+      case marco::MarcoEnumerator::Supremals::kMus:
+        return pp::text("MUS");
+      default:
+        break;
+    }
+    EUFORIA_FATAL("unhandled switch case");
+  }
+};
+
+template <>
+struct euforia::pp::PrettyPrinter<marco::MarcoEnumerator::SupremalSet> {
+  euforia::pp::DocPtr operator()(const marco::MarcoEnumerator::SupremalSet& s) {
+    auto g = pp::commabox(s.begin(), s.end(), pp::text(","));
+    pp::DocStream d;
+    d << pp::Pprint(s.kind()) << "<" << pp::nest(4, g) << ">";
+    return d;
+  }
+};
+
 } // end namespace euforia
+
+EUFORIA_FWD_FORMATTER_TO_PP(euforia::marco::SeedSet);
+EUFORIA_FWD_FORMATTER_TO_PP(euforia::marco::MarcoEnumerator::Supremals);
+EUFORIA_FWD_FORMATTER_TO_PP(euforia::marco::MarcoEnumerator::SupremalSet);
 
 #endif

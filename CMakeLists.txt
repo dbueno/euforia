@@ -421,11 +421,11 @@ install(TARGETS euforia
 #  libeuforia
 #  ${BOOLECTOR_LINK_LIBRARIES}
 #  ${llvm_libs} z3 mathsat ${GMPXX_LIB} ${GMP_LIB} fmt::fmt)
-# add_executable(testmarco tests/testmarco/main.cc)
-# target_link_libraries(testmarco
-#  libeuforia
-#  ${BOOLECTOR_LINK_LIBRARIES}
-#  ${llvm_libs} z3 mathsat ${GMPXX_LIB} ${GMP_LIB} fmt::fmt)
+add_executable(testmarco tests/testmarco/main.cc)
+target_link_libraries(testmarco
+ libeuforia
+ Boolector::boolector
+ ${llvm_libs} z3::libz3 mathsat ${GMPXX_LIB} ${GMP_LIB} fmt::fmt)
 # if (COMPILE_WITH_COVERAGE)
 #   target_link_options(test_graph_traits BEFORE
 #     PUBLIC -fprofile-instr-generate -fcoverage-mapping)

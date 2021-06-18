@@ -4,6 +4,8 @@
 #include <boost/algorithm/cxx11/iota.hpp>
 #include <numeric>
 
+#include "supp/pp/pp_std_instances.h"
+
 using namespace std;
 
 namespace {
@@ -15,7 +17,7 @@ z3::expr id2bool(z3::context& c, int i) {
   return c.bool_const(to_string(i).c_str());
 }
 }
-  
+
 namespace euforia {
 namespace marco {
 
@@ -54,7 +56,7 @@ SeedSet SubsetSolver::Shrink(const SeedVector& seed) {
       continue;
     }
     current.erase(i);
-    // logger.Log(5, "Shrink::CheckSubset({})", current);
+    logger.Log(6, "Shrink::CheckSubset({})", current);
     if (!CheckSubset(current)) {
       current = SeedSet(seed_from_core());
     } else {
@@ -135,57 +137,33 @@ void MapSolver::BlockUp(const SeedSet& frompoint) {
 //^----------------------------------------------------------------------------^
 //
 
-std::ostream& operator<<(std::ostream& os, MarcoEnumerator::Supremals k) {
-  switch (k) {
-    case MarcoEnumerator::Supremals::kMss:
-      os << "MSS";
-      break;
-    case MarcoEnumerator::Supremals::kMus:
-      os << "MUS";
-      break;
-    default:
-      EUFORIA_FATAL("unhandled switch case");
-  }
-  return os;
-}
-
-//^----------------------------------------------------------------------------^
-//
-
-// end iterator constructor, never calls advance
-MarcoEnumerator::Iterator::Iterator(z3::context& c) : msolver_(c, 0) {}
-
 // begin iterator constructor
-MarcoEnumerator::Iterator::Iterator(SubsetSolver&& s)
-    : ssolver_(s), msolver_(s.ctx(), s.num_constraints()) {
-  Advance();
+MarcoEnumerator::Iterator::Iterator(
+    Solver& s, const std::vector<z3::expr>& c)
+    : ssolver_(SubsetSolver(s, c)), msolver_(MapSolver(s.ctx(), c.size())) {
+  FindNextSupremalSet();
 }
 
-void MarcoEnumerator::Iterator::Advance() {
+void MarcoEnumerator::Iterator::FindNextSupremalSet() {
+  pp::DocStream s;
+  s << "MarcoEnumerator::FindNextSupremalSet";
   assert(ssolver_);
-  seed_ = msolver_.NextSeed();
+  seed_ = msolver_->NextSeed();
   if (!seed_) {
     return;
   }
+  auto pp_seed = pp::Pprint(*seed_);
+  logger.Log(6, "{}", pp::group(s << ":" << pp::break_(1, 4) << pp_seed));
 
-  stringstream seed_str;
-  boost::copy(*seed_, make_ostream_joiner(seed_str, " "));
   if (ssolver_->CheckSubset(*seed_)) {
     auto mss = ssolver_->Grow(*seed_);
-    subset_ = SupremalSet(Supremals::kMss, ssolver_->to_c_lits(mss));
-    msolver_.BlockDown(mss);
+    last_subset_ = SupremalSet(Supremals::kMss, ssolver_->to_c_lits(mss));
+    msolver_->BlockDown(mss);
   } else {
     auto mus = ssolver_->Shrink(*seed_);
-    subset_ = SupremalSet(Supremals::kMus, ssolver_->to_c_lits(mus));
-    msolver_.BlockUp(mus);
+    last_subset_ = SupremalSet(Supremals::kMus, ssolver_->to_c_lits(mus));
+    msolver_->BlockUp(mus);
   }
-}
-
-std::ostream& operator<<(std::ostream& os, const SeedSet& s) {
-  fmt::print(os, "SeedSet< ");
-  boost::copy(s, make_ostream_joiner(os, ", "));
-  fmt::print(os, " >");
-  return os;
 }
 } // end namespace marco
 } // end namespace euforia
