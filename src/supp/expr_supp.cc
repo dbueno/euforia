@@ -49,7 +49,7 @@ bool IsUFunction(const z3::func_decl& decl) {
       decl.arity() > 0 &&
       starts_with(decl.range().name().str(), uninterpreted_bv_sort_name))
     return true;
-  
+
   return false;
 }
 
@@ -67,7 +67,7 @@ bool IsUPredicate(const z3::func_decl& decl) {
         return true;
     }
   }
-  
+
   return false;
 }
 
@@ -247,7 +247,7 @@ z3::expr expr_eq(const z3::expr& a_in, const z3::expr& b_in) {
     if (is_literal_false(a)) return expr_not(b); // false == a  ==> !b
     if (is_literal_false(b)) return expr_not(a);
   }
-  
+
   return a == b;
 }
 
@@ -290,7 +290,7 @@ z3::expr expr_distinct(const z3::expr_vector& v_in) {
        return x;
      }
   }
-  
+
   return z3::distinct(v);
 }
 
@@ -327,7 +327,7 @@ bool IsValue(const z3::expr& e) {
       case Z3_OP_TRUE:
       case Z3_OP_FALSE:
         return true;
-        
+
       default:
         return false;
     }
@@ -554,9 +554,27 @@ class PpCache {
   bool has_rewrite(z3::expr e) const {
     return m_.find(e) != m_.end();
   }
+  DocPtr at(z3::expr e) const {
+    return m_.at(e);
+  }
 
  private:
   ExprMap<DocPtr> m_;
+};
+
+class SortPrinter {
+ public:
+  DocPtr operator()(const z3::sort& s) {
+    return visitSort(s);
+  }
+
+  DocPtr visitSort(const z3::sort& s) {
+    _unused(s);
+    return text("ANY-SORT");
+  }
+
+ private:
+  SortMap<DocPtr> cache_;
 };
 
 //^----------------------------------------------------------------------------^
@@ -566,6 +584,8 @@ class ExprPrinter : public ExprVisitor<ExprPrinter, DocPtr> {
   PpCache cache_;
   vector<z3::expr> flatroots_;
   ExprLegend leg_;
+  SortPrinter ppsort_;
+  vector<string> names_;
 
  public:
   DocPtr operator()(const z3::expr& e) {
@@ -589,9 +609,17 @@ class ExprPrinter : public ExprVisitor<ExprPrinter, DocPtr> {
       logger.Log(7, "push"); //, leg_.FormatNode(*from));
       flatroots_.push_back(e);
     };
-    logger.Log(7, "InsertEdge: {:08x} -> {:08x}",
-               from ? from->hash() : 0,
+    logger.Log(7, "InsertEdge: {:08x} -> {:08x}", from ? from->hash() : 0,
                to.hash());
+    // This logic (along with what's in FinishPostorder) will print flattened
+    // associative/commutative ops. This means (a && (b && (c && d))) will be
+    // printed as (a && b && c && d). That way it prints with fewer parens and
+    // less hierarchy, which is easier on the eyes.
+    //
+    // As the expr is explored top-down, on the first encounter of OP, we push
+    // it into the flatroots_ list. In FinishPostorder (below), when we
+    // encounter this member of flatroots, we rewrite it to its flattened
+    // representation.
     if (to.is_app()) {
       switch (to.decl().decl_kind()) {
         case Z3_OP_OR:
@@ -643,14 +671,12 @@ class ExprPrinter : public ExprVisitor<ExprPrinter, DocPtr> {
             for (auto& e1 : ExprFlatKinds(e, e.decl().decl_kind())) {
               kids.push_back(cache_.rewrites_to(e1));
             }
-            d = paren(
-                groupsep(kids.rbegin(),
-                         kids.rend(),
-                         group(append(break_(1, 4),
-                                      text(ac_sep(e)),
-                                      text(" ")
-                                     ))));
-            //break_(1, 0)))));
+
+            // This version breaks on *all* occurrences of the flattened
+            // operator (if any need to break at all) which isn't maximally
+            // space efficient but is actually possible to read.
+            auto sep = append(line(), text(ac_sep(e)), text(" "));
+            d = paren(nest_used(group(separate(kids.rbegin(), kids.rend(), sep))));
             logger.Log(7, "pop");
             flatroots_.pop_back();
           }
@@ -680,67 +706,99 @@ class ExprPrinter : public ExprVisitor<ExprPrinter, DocPtr> {
     return text(e.to_string());
   }
 
+  DocPtr visitUNINTERPRETED(const z3::expr& e) {
+    if (e.num_args() == 0) {
+      return visitExpr(e);
+    }
+
+    return append(
+        {text(e.decl().name().str()),
+        paren(nest_used(group(separate(cache_.args_begin(e), cache_.args_end(e),
+                                       append(text(","), break_(1, 0))))))});
+  }
+
   DocPtr visitQUANTIFIER(const z3::expr& e) {
-    // XXX does not get body or args
-    return text(e.is_forall() ? "!" : "?");
+    auto q = text(e.is_forall() ? "!" : "?");
+    auto& ctx = e.ctx();
+    // bool is_lambda = Z3_is_lambda(ctx, e);
+    unsigned nb = Z3_get_quantifier_num_bound(ctx, e);
+
+    vector<DocPtr> vars;
+    for (unsigned i = 0; i < nb; ++i) {
+      Z3_symbol n = Z3_get_quantifier_bound_name(ctx, e, i);
+      z3::sort srt(ctx, Z3_get_quantifier_bound_sort(ctx, e, i));
+      vars.push_back(append(
+              {text(z3::symbol(ctx, n).str()),
+              text(":"), ppsort_(srt)}));
+    }
+    return paren(append(
+            {q,
+            sepbox(vars.begin(), vars.end(), text("")), cache_.at(e.body())}));
+
   }
 
   DocPtr visitVAR(const z3::expr& e) {
-    return text(e.to_string());
+    auto idx = Z3_get_index_value(e.ctx(), e);
+    return text("var" + to_string(idx));
   }
 
+#define BINOP_DOC(e, op)                \
+  ENSURE((e).num_args() == 2);          \
+  return paren(nest_used(group(append(  \
+                  cache_.arg(0, (e)),   \
+                  line(),               \
+                  (op),                 \
+                  line(),               \
+                  cache_.arg(1, e)))));
+
   DocPtr visitEQ(const z3::expr& e) {
-    return paren(group(append(
-            cache_.arg(0, e),
-            text(" = "),
-            cache_.arg(1, e))));
+    return paren(nest_used(group(append(
+                    cache_.arg(0, e),
+                    line(),
+                    text("="),
+                    line(),
+                    cache_.arg(1, e)))));
   }
 
   DocPtr visitIFF(const z3::expr& e) {
-    return paren(group(append(
-            cache_.arg(0, e),
-            text(" iff "),
-            cache_.arg(1, e))));
+    return paren(nest_used(group(append(
+                    cache_.arg(0, e),
+                    line(),
+                    text("iff"),
+                    line(),
+                    cache_.arg(1, e)))));
   }
 
   DocPtr visitDISTINCT(const z3::expr& e) {
-    if (e.num_args() == 2) {
-      return paren(groupsep(cache_.args_begin(e),
-                            cache_.args_end(e),
-                            text(" <> ")));
-    } else {
-      return paren(groupsep(cache_.args_begin(e),
-                            cache_.args_end(e),
-                            group(append(break_(1, 4),
-                                         text("<> ")))));
-    }
+    auto sep = append(line(), text("<>"), line());
+    return paren(nest_used(group(separate(
+                    cache_.args_begin(e),
+                    cache_.args_end(e),
+                    sep))));
   }
 
   DocPtr visitNOT(const z3::expr& e) {
-    return append(text("!"), cache_.arg(0, e));
+    return append(text("~"), cache_.arg(0, e));
   }
 
   DocPtr visitITE(const z3::expr& e) {
-    return paren(group(append(
-        text("if:"), cache_.arg(0, e),
-        break_(1, 4),
-        text("then:"), cache_.arg(1, e),
-        break_(1, 4),
-        text("else:"), cache_.arg(2, e))));
+    return paren(nest_used(group(append(
+                    text("if: "), cache_.arg(0, e),
+                    line(),
+                    text("then: "), cache_.arg(1, e),
+                    line(),
+                    text("else: "), cache_.arg(2, e)))));
   }
 
   DocPtr visitIMPLIES(const z3::expr& e) {
-    return paren(group(append(
-        text("ante:"), cache_.arg(0, e),
-        break_(1, 4),
-        text("implies:"), cache_.arg(1, e))));
+    return paren(nest_used(group(append(
+                    text("ante:"), cache_.arg(0, e),
+                    line(),
+                    text("implies:"), cache_.arg(1, e)))));
   }
 
   DocPtr visitSUB(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" - "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("-"));
   }
 
   DocPtr visitUMINUS(const z3::expr& e) {
@@ -804,17 +862,15 @@ class ExprPrinter : public ExprVisitor<ExprPrinter, DocPtr> {
   }
 
   DocPtr visitSTORE(const z3::expr& e) {
-    return append(
-        {text("("), cache_.arg(0, e), text(")"),
-        group(append(
-                {text("{"), cache_.arg(1, e),
-                break_(1, 0), text("<- "), cache_.arg(2, e), text("}")}))});
+    return paren(append(
+            {cache_.arg(0, e),
+            nest_used(group(brace(append(
+                        {cache_.arg(1, e), break_(1, 0), text("<- "),
+                        cache_.arg(2, e)}))))}));
   }
 
   DocPtr visitSELECT(const z3::expr& e) {
-    return append(
-        {text("("), cache_.arg(0, e), text(")"),
-        append({text("["), cache_.arg(1, e)})});
+    return paren(append({cache_.arg(0, e), sqbracket(cache_.arg(1, e))}));
   }
 
   DocPtr visitCONST_ARRAY(const z3::expr& e) {
@@ -823,150 +879,124 @@ class ExprPrinter : public ExprVisitor<ExprPrinter, DocPtr> {
   }
 
   DocPtr visitBSUB(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" -bv "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("-bv"));
   }
 
   DocPtr visitBSDIV(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" /bvs "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("/bvs"));
   }
 
   DocPtr visitBUDIV(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" /bvu "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("/bvu"));
   }
 
   DocPtr visitBSREM(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" bvsrem "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("bvsrem"));
   }
 
   DocPtr visitBUREM(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" bvurem "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("bvurem"));
   }
 
   DocPtr visitBSMOD(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" %bvs "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("\%bvs"));
   }
 
   DocPtr visitBSHL(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" <<bv "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("<<bv"));
   }
 
   DocPtr visitBASHR(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" >>bva "), cache_.arg(1, e))));
+    BINOP_DOC(e, text(">>bva"));
   }
 
   DocPtr visitBLSHR(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" >>bvl "), cache_.arg(1, e))));
+    BINOP_DOC(e, text(">>bvl"));
   }
 
   DocPtr visitEXTRACT(const z3::expr& e) {
+    // XXX special case extract with equal params
     ENSURE(e.num_args()==1);
     assert(Z3_get_decl_num_parameters(e.ctx(), e.decl()) == 2);
     auto hi = Z3_get_decl_int_parameter(e.ctx(), e.decl(), 0);
     auto lo = Z3_get_decl_int_parameter(e.ctx(), e.decl(), 1);
-    return append(
-        {text("("), cache_.arg(0, e), text(")"),
-        append({text("["), decimal(hi), text(","), decimal(lo), text("]")})});
+    if (hi == lo) {
+      return append(
+          {cache_.arg(0, e),
+          sqbracket(nest_used(group(append(
+                          {text("bit:"),
+                          line(),
+                          Pprint(hi)}))))});
+    } else {
+      return append(
+          {cache_.arg(0, e),
+          sqbracket(nest_used(group(append(
+                          {text("frombit:"),
+                          line(),
+                          Pprint(hi),
+                          line(),
+                          text("downto:"),
+                          line(),
+                          Pprint(lo)}))))});
+    }
   }
 
   DocPtr visitSIGN_EXT(const z3::expr& e) {
     assert(e.num_args()==1);
     assert(Z3_get_decl_num_parameters(e.ctx(), e.decl()) == 1);
     auto added_bits = Z3_get_decl_int_parameter(e.ctx(), e.decl(), 0);
-    return group(append(
-        {text("sext:"), cache_.arg(0, e), break_(1, 2),
-        text("to:"), decimal(e.get_sort().bv_size() + added_bits)}));
+    return paren(nest_used(group(append(
+        {text("sext-to:"),
+        Pprint(e.get_sort().bv_size() + added_bits),
+        line(),
+        text("of:"),
+        line(),
+        cache_.arg(0, e)}))));
   }
 
   DocPtr visitZERO_EXT(const z3::expr& e) {
     assert(e.num_args()==1);
     assert(Z3_get_decl_num_parameters(e.ctx(), e.decl()) == 1);
     auto added_bits = Z3_get_decl_int_parameter(e.ctx(), e.decl(), 0);
-    return group(append(
-        {text("zext:"), cache_.arg(0, e), break_(1, 2),
-        text("to:"), decimal(e.get_sort().bv_size() + added_bits)}));
+    return paren(nest_used(group(append(
+        {text("zext-to:"),
+        Pprint(e.get_sort().bv_size() + added_bits),
+        line(),
+        text("of:"),
+        line(),
+        cache_.arg(0, e)}))));
   }
 
   DocPtr visitSLT(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" <s "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("<s"));
   }
 
   DocPtr visitSLEQ(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" <=s "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("<=s"));
   }
 
   DocPtr visitSGT(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" >s "), cache_.arg(1, e))));
+    BINOP_DOC(e, text(">s"));
   }
 
   DocPtr visitSGEQ(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" >=s "), cache_.arg(1, e))));
+    BINOP_DOC(e, text(">=s"));
   }
 
   DocPtr visitULT(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" <u "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("<u"));
   }
 
   DocPtr visitULEQ(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" <=u "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("<=u"));
   }
 
   DocPtr visitUGT(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" >u "), cache_.arg(1, e))));
+    BINOP_DOC(e, text(">u"));
   }
 
   DocPtr visitUGEQ(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" >=u "), cache_.arg(1, e))));
+    BINOP_DOC(e, text(">=u"));
   }
 
   DocPtr visitBNEG(const z3::expr& e) {
@@ -974,7 +1004,7 @@ class ExprPrinter : public ExprVisitor<ExprPrinter, DocPtr> {
   }
 
   DocPtr visitBNOT(const z3::expr& e) {
-    return append(text("~"), cache_.arg(0, e));
+    return append(text("bv~"), cache_.arg(0, e));
   }
 
   DocPtr visitBCOMP(const z3::expr& e) {
@@ -982,17 +1012,11 @@ class ExprPrinter : public ExprVisitor<ExprPrinter, DocPtr> {
   }
 
   DocPtr visitROTATE_LEFT(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" lrot "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("lrot"));
   }
 
   DocPtr visitROTATE_RIGHT(const z3::expr& e) {
-    ENSURE(e.num_args() == 2);
-    return paren(group(append(
-        cache_.arg(0, e),
-        text(" rrot "), cache_.arg(1, e))));
+    BINOP_DOC(e, text("rrot"));
   }
 };
 

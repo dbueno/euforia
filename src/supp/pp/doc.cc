@@ -84,7 +84,7 @@ DocPtr append(DocPtr lhs, DocPtr rhs) {
   }
   return std::make_shared<Append>(lhs, rhs);
 }
-  
+
 DocPtr append(std::initializer_list<DocPtr> elts) {
   auto it = elts.begin(), ie = elts.end();
   if (it == ie)
@@ -101,12 +101,13 @@ DocPtr nest(int indent, DocPtr d) {
   return std::make_shared<Nest>(indent, d);
 }
 
-DocPtr text(std::string&& s) {
-  return std::make_shared<Text>(std::forward<std::string>(s));
+DocPtr nest_used(DocPtr d) {
+  ENSURE(d);
+  return std::make_shared<NestUsed>(d);
 }
 
-DocPtr decimal(int i) {
-  return text(to_string(i));
+DocPtr text(std::string&& s) {
+  return std::make_shared<Text>(std::forward<std::string>(s));
 }
 
 DocPtr text(const std::string& s) {
@@ -117,14 +118,6 @@ DocPtr break_(int sp, int off) {
   return std::make_shared<Break>(sp, off);
 }
 
-DocPtr sp(int off) {
-  return break_(1, off);
-}
-
-DocPtr line() {
-  return break_(1, 0);
-}
-
 DocPtr newline() {
   return std::make_shared<Newline>();
 }
@@ -132,11 +125,6 @@ DocPtr newline() {
 DocPtr group(DocPtr g) {
   ENSURE(g);
   return std::make_shared<Group>(g);
-}
-
-DocPtr paren(DocPtr d) {
-  ENSURE(d);
-  return append(text("("), d, text(")"));
 }
 
 DocPtr PpAst(DocPtr p) {
@@ -170,7 +158,7 @@ DocPtr PpAst(DocPtr p) {
         rw.insert({x, text("nl")});
         break;
       }
-        
+
       case DocKind::kBreak: {
         q.pop_back();
         auto b = dynamic_pointer_cast<Break>(x);
@@ -189,6 +177,24 @@ DocPtr PpAst(DocPtr p) {
           rw.insert({n, group(append(
                           text("nest"),
                           text(to_string(n->indent)),
+                          text("("),
+                          break_(0, 2),
+                          nest(2, d),
+                          text(")")))});
+
+        }
+        break;
+      }
+
+      case DocKind::kNestUsed: {
+        auto n = dynamic_pointer_cast<NestUsed>(x);
+        if (!all_rw1(n->doc)) {
+          q.push_back(n->doc);
+        } else {
+          q.pop_back();
+          auto d = rw.at(n->doc);
+          rw.insert({n, group(append(
+                          text("box"),
                           text("("),
                           break_(0, 2),
                           nest(2, d),
@@ -271,6 +277,12 @@ bool fitting(vector<Elt>&& elts, int left0) {
           break;
         }
 
+        case DocKind::kNestUsed: {
+          auto n = dynamic_pointer_cast<NestUsed>(doc);
+          q.push_back({left, mode, n->doc});
+          break;
+        }
+
         case DocKind::kText: {
           auto t = dynamic_pointer_cast<Text>(doc);
           left -= t->str.size();
@@ -341,6 +353,12 @@ void Pp::best(const int w, const DocPtr& x) {
       case DocKind::kNest: {
         auto n = dynamic_pointer_cast<Nest>(doc);
         q.push_back({i + n->indent, mode, n->doc});
+        break;
+      }
+
+      case DocKind::kNestUsed: {
+        auto n = dynamic_pointer_cast<NestUsed>(doc);
+        q.push_back({k, mode, n->doc});
         break;
       }
 

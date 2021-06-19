@@ -24,42 +24,32 @@ namespace pp {
 extern int best_width;
 
 //^----------------------------------------------------------------------------^
+// PrettyPrinter intended for clients to partially specialize
 
 struct Doc;
 using DocPtr = std::shared_ptr<Doc>;
 
-//! Users may provide PrettyPrinter instances for theis custom datatypes.
+//! Users may provide PrettyPrinter instances for their custom datatypes.
 template <typename T, typename Enable = void>
 struct PrettyPrinter {
   DocPtr operator()(const T&) = delete; // error if used
 };
 
+//! Users should normally call Pprint to create a Doc from a source datatype,
+//! representing the pretty-printing of that data. It calls the appropriate
+//! template specialization of PrettyPrinter.
 template <typename T>
 DocPtr Pprint(const T& x) { return PrettyPrinter<std::decay_t<T>>()(x); }
 
-enum class DocKind {
-  kEmpty,
-  kAppend,
-  kNest,
-  kText,
-  kBreak,
-  kNewline,
-  kGroup
-};
-
-struct Doc {
-  const DocKind kind;
-  DocKind getKind() const { return kind; }
-
-  Doc(DocKind k) : kind(k) {}
-  virtual ~Doc() = default;
-};
+//^----------------------------------------------------------------------------^
+// Pretty printer interface
+//
+// These are the functions to use when implementing a pretty-printer.
 
 DocPtr empty();
 DocPtr text(std::string&& s);
 DocPtr text(const std::string& s);
-DocPtr decimal(int i);
-// Associative.
+// Append is associative.
 DocPtr append(DocPtr lhs, DocPtr rhs);
 DocPtr append(std::initializer_list<DocPtr> elts);
 inline DocPtr append(DocPtr a, DocPtr b, DocPtr c) { return append(append(a, b), c); }
@@ -68,18 +58,75 @@ inline DocPtr append(DocPtr a, DocPtr b, DocPtr c, DocPtr d, DocPtr e) { return 
 inline DocPtr append(DocPtr a, DocPtr b, DocPtr c, DocPtr d, DocPtr e, DocPtr f) { return append(append(a, b, c, d, e), f); }
 inline DocPtr append(DocPtr a, DocPtr b, DocPtr c, DocPtr d, DocPtr e, DocPtr f, DocPtr g) { return append(append(a, b, c, d, e, f), g); }
 inline DocPtr append(DocPtr a, DocPtr b, DocPtr c, DocPtr d, DocPtr e, DocPtr f, DocPtr g, DocPtr h) { return append(append(a, b, c, d, e, f, g), h); }
-//! Indent document d.
+
+template <typename Iter>
+DocPtr appendi(Iter it, Iter ie) {
+  DocPtr ret = empty();
+  for (; it != ie; ++it) {
+    ret = append(ret, Pprint(*it));
+  }
+  return ret;
+}
+
+template <typename Range>
+DocPtr appendr(const Range& r) {
+  DocPtr ret = empty();
+  for (const auto& e : r) {
+    ret = append(ret, Pprint(e));
+  }
+  return ret;
+}
+
+//! Indent document [d] by additional [indent]. Only affects formatting is d is
+//! emitted on more than one line.
 DocPtr nest(int indent, DocPtr d);
+//! Indent document [d] by text used on the line.
+DocPtr nest_used(DocPtr d);
+inline DocPtr nest_used(int indent, DocPtr d) {
+  return nest_used(nest(indent, d));
+}
 //! Inserts n spaces or a linebreak; if break, then indent by offset on the
 //! next line.
 DocPtr break_(int sp, int off);
 //! Same as break_(1, off).
-DocPtr sp(int off);
+inline DocPtr sp(int off) {
+  return break_(1, off);
+}
 //! Same as break_(1, 0).
-DocPtr line();
+inline DocPtr line() {
+  return break_(1, 0);
+}
 DocPtr newline();
+//! If g fits on the current line, emit it with spaces for every break_;
+//! otherwise, emit it with newlines for every break_.
 DocPtr group(DocPtr g);
-DocPtr paren(DocPtr);
+//! Wrap the document in parentheses.
+inline DocPtr paren(DocPtr d) {
+  ENSURE(d);
+  return append(text("("), d, text(")"));
+}
+inline DocPtr brace(DocPtr d) {
+  ENSURE(d);
+  return append(text("{"), d, text("}"));
+}
+inline DocPtr sqbracket(DocPtr d) {
+  ENSURE(d);
+  return append(text("["), d, text("]"));
+}
+
+//! Returns a doc with sep in between every (pretty-printed) element of the
+//! iterator.
+template <typename Iter>
+DocPtr separate(Iter it, Iter ie, DocPtr sep) {
+  DocPtr ret = empty();
+  if (it != ie) {
+    ret = Pprint(*it++);
+  }
+  for (; it != ie; ++it) {
+    ret = append(ret, sep, Pprint(*it));
+  }
+  return ret;
+};
 
 template <typename Iter>
 DocPtr groupsep(Iter i, Iter end, DocPtr sep) {
@@ -114,6 +161,9 @@ DocPtr commabox(Iter it, Iter ie, DocPtr comma) {
   return groupsep(it, ie, group(append(comma, break_(1, 0))));
 }
 
+//^----------------------------------------------------------------------------^
+// DocStream interface
+
 //! This class makes it easy to append, basically.
 class DocStream {
  public:
@@ -137,7 +187,7 @@ class DocStream {
   std::vector<DocPtr> docs_;
 };
 
-//! A prettyprinter outputs formatted text from a Doc.
+//! Subclasses of Pp output formatted text from a Doc.
 class Pp {
  public:
   virtual ~Pp() = default;
@@ -162,7 +212,6 @@ class Pp {
   //! Outputs the document using [w] as max width.
   void best(const int w, const DocPtr& d);
 };
-
 
 //! Formats the doc using the given stream and the global pretty-printing
 //! [best_width].
@@ -196,6 +245,27 @@ class PpFormatContext : public Pp {
   FormatContext& ctx_;
 };
 
+//^----------------------------------------------------------------------------^
+// Doc datatype definition
+
+enum class DocKind {
+  kEmpty,
+  kAppend,
+  kNest,
+  kNestUsed,
+  kText,
+  kBreak,
+  kNewline,
+  kGroup
+};
+
+struct Doc {
+  const DocKind kind;
+  DocKind getKind() const { return kind; }
+
+  Doc(DocKind k) : kind(k) {}
+  virtual ~Doc() = default;
+};
 
 namespace details {
 
@@ -215,6 +285,12 @@ struct Nest : public Doc {
   Nest(int i, DocPtr d) : indent(i), doc(d), Doc(DocKind::kNest) {}
   static bool classof(const Doc* d) { return d->getKind() == DocKind::kNest; }
   int indent;
+  DocPtr doc;
+};
+
+struct NestUsed : public Doc {
+  NestUsed(DocPtr d) : doc(d), Doc(DocKind::kNestUsed) {}
+  static bool classof(const Doc* d) { return d->getKind() == DocKind::kNestUsed; }
   DocPtr doc;
 };
 
@@ -243,19 +319,19 @@ struct Group : public Doc {
   DocPtr g;
 };
 
-
+//! Used to defined
 struct JustType {
   JustType(DocPtr d) : d(d) {}
   DocPtr d;
 };
 }
 
-
+//! Pretty print the DocPtr.
 DocPtr PpAst(DocPtr p);
 
 
 //^----------------------------------------------------------------------------^
-// Default instances.
+// Default instances. Call Pprint(_) on the relevant types.
 
 template <>
 struct PrettyPrinter<std::string> {
@@ -298,6 +374,8 @@ struct fmt::formatter<euforia::pp::details::JustType> {
       return format_to(ctx.out(), "Append");
     } else if ( std::dynamic_pointer_cast<Nest>(doc)) {
       return format_to(ctx.out(), "Nest");
+    } else if ( std::dynamic_pointer_cast<NestUsed>(doc)) {
+      return format_to(ctx.out(), "NestUsed");
     } else if ( std::dynamic_pointer_cast<Text>(doc)) {
       return format_to(ctx.out(), "Text");
     } else if ( std::dynamic_pointer_cast<Break>(doc)) {
