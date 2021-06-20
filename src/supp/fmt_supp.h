@@ -121,7 +121,7 @@ struct fmt::formatter<std::shared_ptr<T>> {
 
 template <typename T>
 struct euforia::pp::PrettyPrinter<std::shared_ptr<T>> {
-  DocPtr operator()(const std::shared_ptr<T>& p) {
+  DocPtr operator()(const std::shared_ptr<T>& p) const {
     euforia::pp::DocStream s;
     s << "sptr<" << (p ? Pprint(*p) : euforia::pp::text("null")) << ">";
     return s;

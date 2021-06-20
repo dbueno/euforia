@@ -177,7 +177,7 @@ DocPtr PpSharedExpr(z3::expr);
 
 template <>
 struct PrettyPrinter<z3::expr> {
-  DocPtr operator()(const z3::expr& e) { return PpExpr(e); }
+  DocPtr operator()(const z3::expr& e) const { return PpExpr(e); }
 };
 template <>
 struct PrettyPrinter<z3::func_decl> {
@@ -194,7 +194,7 @@ struct PrettyPrinter<z3::func_interp> {
 
 template <>
 struct PrettyPrinter<z3::ExprWrapper> {
-  DocPtr operator()(const z3::ExprWrapper& e) { return PpExpr(e); }
+  DocPtr operator()(const z3::ExprWrapper& e) const { return PpExpr(e); }
 };
 } // namespace pp
 

@@ -311,7 +311,7 @@ using tcube_umap = std::unordered_map<TimedCube, T, TimedCubeHash,
 
 template <>
 struct euforia::pp::PrettyPrinter<Cube> {
-  euforia::pp::DocPtr operator()(const Cube& c) {
+  euforia::pp::DocPtr operator()(const Cube& c) const {
     auto g = pp::groupsep(
         c.begin(), c.end(),
         pp::group(pp::append(
@@ -325,7 +325,7 @@ struct euforia::pp::PrettyPrinter<Cube> {
 
 template <>
 struct euforia::pp::PrettyPrinter<TimedCube> {
-  euforia::pp::DocPtr operator()(const TimedCube& c) {
+  euforia::pp::DocPtr operator()(const TimedCube& c) const {
     auto g = pp::groupsep(
         c.thecube->begin(), c.thecube->end(),
         pp::group(pp::append(

@@ -142,12 +142,12 @@ inline std::ostream& operator<<(std::ostream& os, const AbstractModel& AM) { ret
 
 template <>
 struct euforia::pp::PrettyPrinter<UninterpretedPartition> {
-  euforia::pp::DocPtr operator()(const UninterpretedPartition& c) { return c.Pp(); }
+  euforia::pp::DocPtr operator()(const UninterpretedPartition& c) const { return c.Pp(); }
 };
 
 template <>
 struct euforia::pp::PrettyPrinter<AbstractModel> {
-  euforia::pp::DocPtr operator()(const AbstractModel& c) { return c.Pp(); }
+  euforia::pp::DocPtr operator()(const AbstractModel& c) const { return c.Pp(); }
 };
 
 

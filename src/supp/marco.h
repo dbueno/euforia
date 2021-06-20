@@ -301,7 +301,7 @@ class MarcoEnumerator {
 
 template <>
 struct euforia::pp::PrettyPrinter<marco::SeedSet> {
-  euforia::pp::DocPtr operator()(const marco::SeedSet& s) {
+  euforia::pp::DocPtr operator()(const marco::SeedSet& s) const {
     auto g = pp::commabox(s.begin(), s.end(), pp::text(","));
     pp::DocStream d;
     d << "SeedSet<" << pp::nest(4, g) << ">";
@@ -311,7 +311,7 @@ struct euforia::pp::PrettyPrinter<marco::SeedSet> {
 
 template <>
 struct euforia::pp::PrettyPrinter<marco::MarcoEnumerator::Supremals> {
-  euforia::pp::DocPtr operator()(const marco::MarcoEnumerator::Supremals& s) {
+  euforia::pp::DocPtr operator()(const marco::MarcoEnumerator::Supremals& s) const {
     switch (s) {
       case marco::MarcoEnumerator::Supremals::kMss:
         return pp::text("MSS");
@@ -326,7 +326,7 @@ struct euforia::pp::PrettyPrinter<marco::MarcoEnumerator::Supremals> {
 
 template <>
 struct euforia::pp::PrettyPrinter<marco::MarcoEnumerator::SupremalSet> {
-  euforia::pp::DocPtr operator()(const marco::MarcoEnumerator::SupremalSet& s) {
+  euforia::pp::DocPtr operator()(const marco::MarcoEnumerator::SupremalSet& s) const {
     auto g = pp::commabox(s.begin(), s.end(), pp::text(","));
     pp::DocStream d;
     d << pp::Pprint(s.kind()) << "<" << pp::nest(4, g) << ">";

@@ -335,18 +335,18 @@ DocPtr PpAst(DocPtr p);
 
 template <>
 struct PrettyPrinter<std::string> {
-  DocPtr operator()(const std::string& s) { return text(s); }
+  DocPtr operator()(const std::string& s) const { return text(s); }
 };
 
 template <typename Arith>
 struct PrettyPrinter<Arith,
     std::enable_if_t<std::is_arithmetic<Arith>::value>> {
-  DocPtr operator()(const Arith k) { return text(std::to_string(k)); }
+  DocPtr operator()(const Arith k) const { return text(std::to_string(k)); }
 };
 
 template <>
 struct PrettyPrinter<DocPtr> {
-  DocPtr operator()(const DocPtr& d) { return d; }
+  DocPtr operator()(const DocPtr& d) const { return d; }
 };
 
 } // namespace pp
