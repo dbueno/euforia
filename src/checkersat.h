@@ -9,6 +9,7 @@
 #include <bitset>
 
 #include "checker_types.h"
+#include "supp/pp/doc.h"
 #include "supp/solver.h"
 #include "supp/std_supp.h"
 #include "supp/z3_solver.h"
@@ -60,7 +61,32 @@ struct AbstractLemmaClause {
   OrderedExprSet lits_; // logical OR of these literals
 };
 
-std::ostream& operator<<(std::ostream&, const AbstractLemmaClause&);
+template <>
+struct pp::PrettyPrinter<AbstractLemmaClause> {
+  pp::DocPtr operator()(const AbstractLemmaClause& l) const {
+    using namespace pp;
+    DocPtr ty;
+    switch (l.ty) {
+      case LemmaType::kForward:
+        ty = text("kForward");
+        break;
+      case LemmaType::kOneStep:
+        ty = text("kOneStep");
+        break;
+      default:
+        ENSURE(false);
+    }
+    DocPtr sep = append(line(), text("&& "));
+    DocPtr lemma = nest_used(separate(l.lits_begin(), l.lits_end(), sep));
+    return append(
+        {text("AbstractLemmaClause"),
+        paren(ty),
+        nest(4, group(append(
+                    {line(),
+                    text("num:"), Pprint(l.number), line(),
+                    text("lits:"), lemma})))});
+  }
+};
 
 /*----------------------------------------------------------------------------*/
 constexpr int kFrameNull = -1;
@@ -228,44 +254,9 @@ class CheckerSat : public Solver {
     }
   }
 };
+} // namespace euforia
 
-}
-
-template <>
-struct euforia::pp::PrettyPrinter<euforia::AbstractLemmaClause> {
-  euforia::pp::DocPtr operator()(const euforia::AbstractLemmaClause& l) {
-    pp::DocStream os;
-    os << "AbstractLemmaClause(";
-    switch (l.ty) {
-      case LemmaType::kForward:
-        os << "kForward";
-        break;
-      case LemmaType::kOneStep:
-        os << "kOneStep";
-        break;
-      default:
-        ENSURE(false);
-    }
-    os << "): " << Pprint(l.as_expr());
-    return os;
-  }
-};
-
-template <>
-struct fmt::formatter<euforia::AbstractLemmaClause> {
-  auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-    auto it = ctx.begin(), ie = ctx.end();
-    ENSURE(it == ie || *it == '}');
-    return it;
-  }
-
-  template <typename FormatContext>
-  auto format(const euforia::AbstractLemmaClause& c, FormatContext& ctx) -> decltype(ctx.out()) {
-    return format_to(ctx.out(), "{}", euforia::pp::Pprint(c));
-  }
-};
-
-
+EUFORIA_FWD_FORMATTER_TO_PP(euforia::AbstractLemmaClause);
 
 void mylog(const euforia::AbstractLemmaClause& c);
 

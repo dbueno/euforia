@@ -38,28 +38,6 @@ void AbstractLemmaClause::AddLit(z3::expr l) {
   }
   lits_.emplace(l);
 }
-  
-std::ostream& operator<<(std::ostream& os, const AbstractLemmaClause& l) {
-  os << "AbstractLemmaClause(";
-  switch (l.ty) {
-    case LemmaType::kForward:
-     os << "kForward";
-     break;
-    case LemmaType::kOneStep:
-     os << "kOneStep";
-     break;
-    default:
-     assert(false);
-  }
-  os << "): " << l.as_expr();
-  //bool first = true;
-  //for (auto& lit : l.lits) {
-  //  if (!first) os << " || ";
-  //  os << lit << endl;
-  //  first = false;
-  //}
-  return os;
-}
 
 // Have to define storage for these outside...
 constexpr CheckerSat::SolveRelativeParams CheckerSat::ExtractModel;
@@ -703,7 +681,7 @@ void CheckerSat::collect_statistics(Statistics *st) const {
 }
 
 void mylog(const euforia::AbstractLemmaClause& c) {
-  cerr << c << endl;
+  fmt::print(std::cerr, "{}", c);
 }
 
 }

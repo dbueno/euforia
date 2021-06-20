@@ -342,7 +342,7 @@ AbstractChecker::Impl::LearnLemmas(const z3::expr& mus_abstract,
 
   logger.Log(1, "learning lemma {} with {} literals", lemma->number,
              lemma->size());
-  logger.Log(2, "[{}] {}", where, *lemma);
+  logger.LogFold(2, "[{}]\n{}", where, *lemma);
   if (has_inputs) { // transition lemma
     LearnLemmaInSolver(lemma, where);
   } else {
