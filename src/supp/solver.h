@@ -57,9 +57,17 @@ class Model {
   virtual std::unique_ptr<Assignment> assignment(z3::expr var);
 
   virtual std::ostream& Print(std::ostream&) const = 0;
+  virtual pp::DocPtr Pp() const = 0;
 
   virtual void collect_statistics(Statistics *st) const = 0;
 };
+
+namespace pp {
+template <>
+struct PrettyPrinter<Model> {
+  DocPtr operator()(const Model& m) const { return m.Pp(); }
+};
+}
 
 inline std::ostream& operator<<(std::ostream& os, const Model& m) {
   return m.Print(os);
@@ -248,5 +256,7 @@ class AssumptionContext {
   }
 };
 }
+
+EUFORIA_FWD_FORMATTER_TO_PP(euforia::Model);
 
 #endif

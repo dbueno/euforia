@@ -168,6 +168,9 @@ namespace euforia {
 namespace pp {
 //! Pretty prints an expression.
 DocPtr PpExpr(z3::expr);
+DocPtr PpFuncDecl(z3::func_decl);
+DocPtr PpFuncEntry(z3::func_entry);
+DocPtr PpFuncInterp(z3::func_interp);
 
 //! Pretty prints an expression where some shared subterms are called out.
 DocPtr PpSharedExpr(z3::expr);
@@ -175,6 +178,18 @@ DocPtr PpSharedExpr(z3::expr);
 template <>
 struct PrettyPrinter<z3::expr> {
   DocPtr operator()(const z3::expr& e) { return PpExpr(e); }
+};
+template <>
+struct PrettyPrinter<z3::func_decl> {
+  DocPtr operator()(const z3::func_decl& e) const { return PpFuncDecl(e); }
+};
+template <>
+struct PrettyPrinter<z3::func_entry> {
+  DocPtr operator()(const z3::func_entry& e) const { return PpFuncEntry(e); }
+};
+template <>
+struct PrettyPrinter<z3::func_interp> {
+  DocPtr operator()(const z3::func_interp& e) const { return PpFuncInterp(e); }
 };
 
 template <>

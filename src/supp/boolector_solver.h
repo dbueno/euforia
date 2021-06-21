@@ -87,6 +87,12 @@ class BoolectorModel : public Model {
 
   virtual z3::expr Eval(const z3::expr& e, bool completion = false) override;
   virtual std::ostream& Print(std::ostream&) const override;
+  virtual pp::DocPtr Pp() const override {
+    // XXX fix this
+    std::stringstream ss;
+    Print(ss);
+    return pp::text(ss.str());
+  }
   virtual void collect_statistics(Statistics *st) const override;
 
  private:

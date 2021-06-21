@@ -168,6 +168,106 @@ static inline auto ExprDisjuncts(const z3::expr& e) {
   return boost::iterator_range<ExprFlatKindIterator>(
       ExprDisjunctIterator::begin(e), ExprDisjunctIterator::end());
 }
+
+class FuncEntryArgIterator : public boost::iterator_facade<FuncEntryArgIterator, z3::expr, boost::forward_traversal_tag, z3::expr> {
+ public:
+  FuncEntryArgIterator() = default;
+  FuncEntryArgIterator(z3::func_entry e, unsigned i) : i_(i), entry_(e) {}
+
+ private:
+  unsigned i_;
+  z3::func_entry entry_;
+
+  // iterator facade
+  friend class boost::iterator_core_access;
+  void increment() { i_++; }
+  bool equal(const FuncEntryArgIterator& other) const { return i_ == other.i_; }
+  auto dereference() const { return entry_.arg(i_); }
+};
+
+class FuncInterpEntryIterator : public boost::iterator_facade<FuncInterpEntryIterator, z3::func_entry, boost::forward_traversal_tag, z3::func_entry> {
+ public:
+  FuncInterpEntryIterator() = default;
+  FuncInterpEntryIterator(z3::func_interp p, unsigned i) : i_(i), interp_(p) {}
+
+ private:
+  unsigned i_;
+  z3::func_interp interp_;
+
+  // iterator facade
+  friend class boost::iterator_core_access;
+  void increment() { i_++; }
+  bool equal(const FuncInterpEntryIterator& other) const { return i_ == other.i_; }
+  auto dereference() const { return interp_.entry(i_); }
+};
+
+class ModelConstDeclIterator : public boost::iterator_facade<ModelConstDeclIterator, z3::func_decl, boost::forward_traversal_tag, z3::func_decl> {
+ public:
+  ModelConstDeclIterator() = default;
+  ModelConstDeclIterator(z3::model m) : model_(m), i_(0) {}
+  ModelConstDeclIterator(z3::model m, unsigned i) : i_(i), model_(m) {}
+
+ private:
+  unsigned i_;
+  boost::optional<z3::model> model_;
+
+  // iterator facade
+  friend class boost::iterator_core_access;
+  void increment() { i_++; }
+  bool equal(const ModelConstDeclIterator& other) const { return i_ == other.i_; }
+  auto dereference() const { return model_->get_const_decl(i_); }
+};
+
+class ModelFuncDeclIterator : public boost::iterator_facade<ModelFuncDeclIterator, z3::func_decl, boost::forward_traversal_tag, z3::func_decl> {
+ public:
+  ModelFuncDeclIterator() = default;
+  ModelFuncDeclIterator(z3::model m) : model_(m), i_(0) {}
+  ModelFuncDeclIterator(z3::model m, unsigned i) : i_(i), model_(m) {}
+
+ private:
+  unsigned i_;
+  boost::optional<z3::model> model_;
+
+  // iterator facade
+  friend class boost::iterator_core_access;
+  void increment() { i_++; }
+  bool equal(const ModelFuncDeclIterator& other) const { return i_ == other.i_; }
+  auto dereference() const { return model_->get_func_decl(i_); }
+};
+
+class ModelConstInterpIterator : public boost::iterator_facade<ModelConstInterpIterator, z3::expr, boost::forward_traversal_tag, z3::expr> {
+ public:
+  ModelConstInterpIterator() = default;
+  ModelConstInterpIterator(z3::model m) : model_(m), i_(0) {}
+  ModelConstInterpIterator(z3::model m, unsigned i) : i_(i), model_(m) {}
+
+ private:
+  unsigned i_;
+  boost::optional<z3::model> model_;
+
+  // iterator facade
+  friend class boost::iterator_core_access;
+  void increment() { i_++; }
+  bool equal(const ModelConstInterpIterator& other) const { return i_ == other.i_; }
+  auto dereference() const { return model_->get_const_interp(model_->get_const_decl(i_)); }
+};
+
+class ModelFuncInterpIterator : public boost::iterator_facade<ModelFuncInterpIterator, z3::func_interp, boost::forward_traversal_tag, z3::func_interp> {
+ public:
+  ModelFuncInterpIterator() = default;
+  ModelFuncInterpIterator(z3::model m) : model_(m), i_(0) {}
+  ModelFuncInterpIterator(z3::model m, unsigned i) : i_(i), model_(m) {}
+
+ private:
+  unsigned i_;
+  boost::optional<z3::model> model_;
+
+  // iterator facade
+  friend class boost::iterator_core_access;
+  void increment() { i_++; }
+  bool equal(const ModelFuncInterpIterator& other) const { return i_ == other.i_; }
+  auto dereference() const { return model_->get_func_interp(model_->get_func_decl(i_)); }
+};
 } // end namespace euforia
 
 //^----------------------------------------------------------------------------^

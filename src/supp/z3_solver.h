@@ -11,6 +11,7 @@
 #include "checker_types.h"
 #include "supp/expr_supp.h"
 #include "supp/solver.h"
+#include "supp/pp/doc.h"
 
 namespace euforia {
 
@@ -41,6 +42,8 @@ class Z3Model : public Model {
     return os;
   }
 
+  virtual pp::DocPtr Pp() const override;
+
   void collect_statistics(Statistics *st) const override;
 
  private:
@@ -49,6 +52,7 @@ class Z3Model : public Model {
   mutable int64_t num_uninterpreted_evals_ = 0;
   mutable int64_t num_unknown_evals_ = 0;
 };
+
 
 //^----------------------------------------------------------------------------^
 //

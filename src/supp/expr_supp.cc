@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <boost/range/algorithm/copy.hpp>
-#include <boost/iterator/iterator_facade.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/algorithm/transform.hpp>
 #include <llvm/ADT/PostOrderIterator.h>
@@ -1164,13 +1163,13 @@ class SharedExprPrinter {
 };
 
 namespace pp {
+
 DocPtr PpExpr(z3::expr e) {
   if (!bool(e)) {
     return text("null");
   }
   ExprPrinter pp;
   return pp(e);
-  // return append(text("ASS"), pp(e));
 }
 
 DocPtr PpSharedExpr(z3::expr e) {
@@ -1180,6 +1179,35 @@ DocPtr PpSharedExpr(z3::expr e) {
   SharedExprPrinter pp(e);
   return pp();
 }
+
+DocPtr PpFuncDecl(z3::func_decl d) {
+  return text(d.to_string());
+}
+
+DocPtr PpFuncEntry(z3::func_entry entry) {
+  auto sep = line();
+  auto args = nest_used(group(separate(FuncEntryArgIterator(entry, 0), FuncEntryArgIterator(entry, entry.num_args()), sep)));
+  return group(append(
+          {text("if"),
+          line(),
+          args,
+          line(),
+          text("then"),
+          line(),
+          Pprint(entry.value())}));
+}
+
+DocPtr PpFuncInterp(z3::func_interp interp) {
+  auto sep = line();
+    auto entries = nest_used(group(
+            separate(FuncInterpEntryIterator(interp, 0),
+                     FuncInterpEntryIterator(interp, interp.num_entries()),
+                     sep)));
+  auto else_case = append(text("else -> "), Pprint(interp.else_value()));
+  return group(append(
+          {entries, line(), else_case}));
+}
+
 } // namespace pp
 
 } // namespace euforia

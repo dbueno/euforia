@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <boost/optional.hpp>
 
 template<class C, class T, class A>
 static bool starts_with(std::basic_string<C,T,A> const& haystack,
@@ -67,7 +68,7 @@ class ostream_joiner {
   using reference = void;
   using iterator_category = std::output_iterator_tag;
 
-  ostream_joiner(std::ostream& os, const DelimT& delimeter) 
+  ostream_joiner(std::ostream& os, const DelimT& delimeter)
       : os_(os), delimeter_(delimeter), first_(true) {}
 
   template <class T>
@@ -104,23 +105,71 @@ template <class T>
 void *addressof_void(T& arg) {
   return static_cast<void*>(std::addressof(arg));
 }
-  
+
+#define RETURNS(...) -> decltype(__VA_ARGS__) { return (__VA_ARGS__); }
+
+// https://stackoverflow.com/questions/12672372/boost-transform-iterator-and-c11-lambda
+// Makes a default-constructible function object from a lambda.
+template<class Fun>
+struct function_object
+{
+  boost::optional<Fun> f;
+
+  function_object() {}
+  function_object(Fun f): f(f) {}
+
+  function_object(const function_object & rhs) : f(rhs.f) {}
+
+  // Assignment operator is just a copy construction, which does not provide
+  // the strong exception guarantee.
+  function_object& operator=(const function_object& rhs) {
+    if (this != &rhs)
+    {
+      this->~function_object();
+      new (this) function_object(rhs);
+    }
+    return *this;
+  }
+
+  template<class F>
+  struct result
+  {};
+
+  template<class F, class T>
+  struct result<F(T)>
+  {
+    typedef decltype(std::declval<Fun>()(std::declval<T>())) type;
+  };
+
+  template<class T>
+      auto operator()(T && x) const RETURNS((*f)(std::forward<T>(x)))
+
+      template<class T>
+      auto operator()(T && x) RETURNS((*f)(std::forward<T>(x)))
+};
+
+template<class F>
+function_object<F> make_function_object(F f)
+{
+  return function_object<F>(f);
+}
+
 
 //^----------------------------------------------------------------------------^
 //
 
 namespace euforia {
-  
+
 // Exponential moving average over last N items
 template <typename Rep = double>
 class ExpAvgT {
- 
+
  private:
   Rep avg_ = 0.0;
-  
+
  public:
   const Rep alpha_; // 2/(N+1) where I assume N is the number of queries I'm wanting to be most "important" in the avg
-  
+
   ExpAvgT(unsigned N) : alpha_(2.f/(static_cast<Rep>(N)+static_cast<Rep>(1.0))) {}
 
   inline Rep get() const { return avg_; }
@@ -139,7 +188,7 @@ class ExpAvgT {
     avg_ = (static_cast<Rep>(c)-avg_) * alpha_ + avg_;
     return *this;
   }
-  
+
   template <typename Num>
   inline ExpAvgT operator+(Num c) const {
     ExpAvgT a(*this);
@@ -154,7 +203,7 @@ template <typename Rep = double, typename NRep = int64_t>
 class RunningAvgT {
   Rep avg_;
   NRep n_;
- 
+
  public:
   RunningAvgT() : avg_(static_cast<Rep>(0)), n_(static_cast<NRep>(0)) {}
 
@@ -166,7 +215,7 @@ class RunningAvgT {
     ++n_;
     return *this;
   }
-  
+
   template <typename Num>
   inline RunningAvgT operator+(Num c) const {
     ExpAvgT<Rep> a(*this);
