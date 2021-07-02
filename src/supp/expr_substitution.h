@@ -21,6 +21,7 @@ class ExprSubstitution {
   ExprSubstitution(const z3::expr_vector& src,
                    const z3::expr_vector& dst) : src_(src), dst_(dst) {}
   ExprSubstitution(const ExprSubstitution& other);
+  ExprSubstitution& operator=(const ExprSubstitution& other);
 
   z3::context& ctx();
 

@@ -17,6 +17,16 @@ ExprSubstitution::ExprSubstitution(const ExprSubstitution& other)
   AddSubstitution(other.src_, other.dst_);
 }
 
+ExprSubstitution& ExprSubstitution::operator=(const ExprSubstitution& other) {
+  src_ = z3::expr_vector(other.src_.ctx());
+  dst_ = z3::expr_vector(other.dst_.ctx());
+  // z3::expr_vector's copy constructor SHARES POINTERS WITH THE SOURCE
+  // INSTANCE.  so we need to manually copy the entries from other into our
+  // src_ and dst_
+  AddSubstitution(other.src_, other.dst_);
+  return *this;
+}
+
 z3::context& ExprSubstitution::ctx() {
   return src_.ctx();
 }
