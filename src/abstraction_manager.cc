@@ -102,6 +102,7 @@ void AbstractionManager::AddGroundAbstraction(const z3::expr& concrete_var,
   EUFORIA_ASSERT(inserted, "must be inserted, something very wrong");
   inserted = reverse_subst_.insert({abstract_var, concrete_var}).second;
   EUFORIA_ASSERT(inserted, "must be inserted, something very wrong");
+  _unused(inserted);
 }
 
 z3::expr AbstractionManager::Abstract(const z3::expr& e) {
@@ -342,6 +343,7 @@ z3::expr AbstractionManager::visitEXTRACT(const z3::expr& e) {
   auto conc_decl = [](const z3::expr_vector& args) -> z3::expr {
     unsigned hi, lo;
     auto b = Z3_get_numeral_uint(args.ctx(), args[0], &hi);
+    _unused(b);
     assert(b);
     b = Z3_get_numeral_uint(args.ctx(), args[1], &lo);
     assert(b);

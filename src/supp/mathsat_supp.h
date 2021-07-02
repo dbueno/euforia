@@ -31,6 +31,8 @@ class TermWrapper {
   }
   
   TermWrapper(msat_env env, msat_term t) : t_(t), env_(env) {}
+
+  TermWrapper(const TermWrapper& t) : t_(t.t_), env_(t.env_) {}
   
   TermWrapper& operator=(const TermWrapper& t) {
     t_ = t.t_;
@@ -154,6 +156,8 @@ class TermChildIterator : public llvm::iterator_facade_base<TermChildIterator,
 
   TermChildIterator(const TermWrapper& t) : t_(t), i_(0) {}
   TermChildIterator(const TermWrapper& t, size_t i) : t_(t), i_(i) {}
+  TermChildIterator(const TermChildIterator& other)
+      : t_(other.t_), i_(other.i_) {}
   TermChildIterator& operator=(const TermChildIterator& other) {
     t_ = other.t_;
     i_ = other.i_;

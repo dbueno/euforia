@@ -210,6 +210,7 @@ class AbstractVmtTransitionSystem::Impl {
           break;
         }
       }
+      _unused(found_sat_lit); // for when asserts disabled
       assert(found_sat_lit);
     }
     logger.LogCloseFold(5, "");

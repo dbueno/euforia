@@ -14,7 +14,7 @@
 #include "supp/expr_substitution.h"
 
 #include <boost/range/algorithm/for_each.hpp>
-#include <boost/function_output_iterator.hpp>
+#include <boost/iterator/function_output_iterator.hpp>
 #include <llvm/ADT/FoldingSet.h>
 
 #include <type_traits>

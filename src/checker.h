@@ -8,6 +8,7 @@
 #include "checker_types.h"
 #include "checkersat.h"
 #include "cube.h"
+#include "supp/reachability_graph.h"
 #include "supp/statistics.h"
 #include "xsys/transition_system.h"
 
@@ -17,7 +18,6 @@ namespace euforia {
 class Checker;
 class Counterexample;
 class TransitionSystem;
-class ReachabilityGraph;
   
 
 /*-----------------------------------------------------------------------------------*/
