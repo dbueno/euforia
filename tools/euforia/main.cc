@@ -264,11 +264,9 @@ int main(int argc, char *const *argv) {
   std::signal(SIGINT, sigterm_handler);
 
   // Initializes EUForia's default configuration
-  euforia_config = {
-    // default-initialize everything except...
-    .refinement_solver = config::kZ3,
-    .use_one_shot_bmc_refinement = 1
-  };
+  // default-initialize everything except...
+  euforia_config.use_one_shot_bmc_refinement = 1;
+  euforia_config.refinement_solver = config::kZ3;
 
   //  setenv("BTORAPITRACE", "/tmp/btorapitrace", 0);
 

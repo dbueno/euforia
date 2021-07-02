@@ -43,6 +43,8 @@ class ExprWithMacros {
       }
     }
 
+    Node(const Node& n) : defs_(n.defs_), e_(n.e_) {}
+
     Node& operator=(const Node& n) {
       defs_ = n.defs_;
       e_ = n.e_;
