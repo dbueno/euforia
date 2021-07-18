@@ -85,6 +85,8 @@ DocPtr nest_used(DocPtr d);
 inline DocPtr nest_used(int indent, DocPtr d) {
   return nest_used(nest(indent, d));
 }
+//! Immediately indents and nests the doc by [off]
+DocPtr nest_indent(int indent, DocPtr d);
 //! Inserts n spaces or a linebreak; if break, then indent by offset on the
 //! next line.
 DocPtr break_(int sp, int off);
@@ -168,24 +170,36 @@ DocPtr commabox(Iter it, Iter ie, DocPtr comma) {
 class DocStream {
  public:
   DocStream() {
-    docs_.push_back(empty());
+    reset();
   }
 
-  void print(std::string&& s) {
-    append(pp::text(std::forward<std::string>(s)));
+  void reset() {
+    docs_.clear();
+    docs_.push_back(empty());
   }
 
   void append(DocPtr d) { docs_.back() = pp::append(docs_.back(), d); }
 
-  DocPtr doc() const { return docs_.back(); }
   operator DocPtr() const { return docs_.back(); }
 
-  DocStream& operator<<(DocPtr d) { append(d); return *this; }
-  DocStream& operator<<(std::string&& s) { print(std::forward<std::string>(s)); return *this; }
+  DocPtr take() {
+    auto ret = docs_.back();
+    docs_.back() = empty();
+    return ret;
+  }
+
+  //! Appends o to the Doc.
+  template <typename T>
+  DocStream& operator<<(const T& o) {
+    append(Pprint(o));
+    return *this;
+  }
 
  private:
   std::vector<DocPtr> docs_;
 };
+
+//^----------------------------------------------------------------------------^
 
 //! Subclasses of Pp output formatted text from a Doc.
 class Pp {
@@ -332,6 +346,21 @@ DocPtr PpAst(DocPtr p);
 
 //^----------------------------------------------------------------------------^
 // Default instances. Call Pprint(_) on the relevant types.
+
+// String literals decay to char *, so this template specialization will be
+// chose. But the operator() call can happen on char * or the sized variant, so
+// both overloads are provided.
+template <>
+struct euforia::pp::PrettyPrinter<char *> {
+  euforia::pp::DocPtr operator()(const char *s) const {
+    return pp::text(std::string(s));
+  }
+
+  template <std::size_t N>
+  euforia::pp::DocPtr operator()(const char (&s)[N] ) const {
+    return pp::text(std::string(s));
+  }
+};
 
 template <>
 struct PrettyPrinter<std::string> {

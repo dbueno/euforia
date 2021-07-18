@@ -11,6 +11,9 @@
 #include <unordered_set>
 
 namespace euforia {
+namespace pp {
+class DocStream;
+}
 
 //! Logging, but by name, not level. I use it for zeroing in on some patterns.
 //! The other logger is more of an overall narrative of euforia as it runs.
@@ -35,7 +38,7 @@ class NameLogger {
                                        const Args&... args) {
     if (should_log(name)) {
       auto fmt_msg = [&](std::ostream& os) {
-        fmt::print(os, "{}: ", name);
+        // fmt::print(os, "[{}]: ", name);
         fmt::print(os, fmt, std::forward<const Args>(args)...);
         fmt::print(os, "\n");
       };
@@ -49,6 +52,7 @@ class NameLogger {
 };
 
 extern NameLogger nlogger;
+pp::DocStream dbgd();
 
 
 // 1 - high level messages

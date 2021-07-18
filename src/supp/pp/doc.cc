@@ -63,6 +63,11 @@ struct fmt::formatter<Mode> {
 
 
 namespace euforia {
+using namespace pp;
+DocStream dbgd() {
+  return DocStream();
+}
+
 namespace pp {
 
 using namespace details;
@@ -104,6 +109,10 @@ DocPtr nest(int indent, DocPtr d) {
 DocPtr nest_used(DocPtr d) {
   ENSURE(d);
   return std::make_shared<NestUsed>(d);
+}
+
+DocPtr nest_indent(int indent, DocPtr d) {
+  return append(break_(indent, 0), nest(indent, d));
 }
 
 DocPtr text(std::string&& s) {
