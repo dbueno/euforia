@@ -253,7 +253,9 @@ BoolectorSolver::failed_literals() {
       }
     }
   }
-  DEBUG_CODE(for (auto& elt : ret) { assert(!elt.empty()); });
+#ifndef NDEBUG
+  for (auto& elt : ret) { assert(!elt.empty()); }
+#endif
   return ret;
 }
 
