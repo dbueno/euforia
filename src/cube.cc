@@ -85,6 +85,17 @@ namespace euforia {
       }
     }
   }
+
+  void Cube::swap(Cube& other) {
+    assert(&ctx() == &other.ctx());
+    lits.swap(other.lits);
+    next.swap(other.next);
+    dirty = 1;
+#ifdef CUBE_HISTORY
+    history.swap(other.history);
+#endif
+    std::swap(ID, other.ID);
+  }
   
     
   z3::expr Cube::asExpr() const {

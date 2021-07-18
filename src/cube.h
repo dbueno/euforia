@@ -131,6 +131,8 @@ class Cube {
 
   void push(const z3::expr& lcurr, const z3::expr& lnext);    
 
+  void swap(Cube& other);
+
   class iterator {
    private:
     Cube *c; // ptr so I get copy-assign
