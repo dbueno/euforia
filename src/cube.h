@@ -278,6 +278,18 @@ class TimedCube {
     return bool(thecube);
   }
 
+   Cube& operator*() const {
+    return *thecube;
+   }
+
+   std::shared_ptr<Cube> operator->() const {
+     return thecube;
+   }
+
+   operator std::shared_ptr<Cube>&() {
+     return thecube;
+   }
+
   /**
    * Returns a TimedCube with the same cube and frame+1.
    */
