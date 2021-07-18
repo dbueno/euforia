@@ -1,12 +1,4 @@
-/APICA.xcodeproj/project.xcworkspace/xcshareddata
-/APICA.xcodeproj/project.xcworkspace/xcuserdata
-/APICA.xcodeproj/xcuserdata
-/bin
 /build*
 /results
 /creduce_runs
-*.o
-/.vimbuild
-CMakeCache.txt
-/CMakeFiles
 /tags
