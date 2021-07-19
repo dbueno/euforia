@@ -103,24 +103,8 @@ include(FindThreads)
 
 # ----------------------------------------
 # Z3
-# assumes Z3_DIR/build is where z3 dylib is
-#set(Z3_DIR ${CMAKE_SOURCE_DIR}/../z3)
-if(NOT DEFINED Z3_DIR)
-  set(Z3_DIR /opt/z3-4.6.0/)
-endif()
-if(EXISTS "${Z3_DIR}" AND IS_DIRECTORY "${Z3_DIR}")
-  message(STATUS "Using z3 at: ${Z3_DIR}")
-else()
-  message(FATAL_ERROR "Z3_DIR not found: ${Z3_DIR}")
-  return()
-endif()
-include_directories(SYSTEM ${Z3_DIR}/include)
-if(EXISTS ${Z3_DIR}/lib)
-  link_directories(${Z3_DIR}/lib)
-endif()
-if(EXISTS ${Z3_DIR}/lib64)
-  link_directories(${Z3_DIR}/lib64)
-endif()
+find_package(Z3 4.8.7 REQUIRED)
+# include_directories(SYSTEM ${Z3_INCLUDE_DIR})
 
 # ----------------------------------------
 # Boolector
@@ -355,14 +339,14 @@ add_custom_target(make-bin-directory ALL COMMAND ${CMAKE_COMMAND}
 
 add_library(libeuforia STATIC ${LIBEUFORIA_SOURCES})
 set_target_properties(libeuforia PROPERTIES OUTPUT_NAME "euforia")
-target_link_libraries(libeuforia PUBLIC fmt::fmt
+target_link_libraries(libeuforia PUBLIC z3::libz3 fmt::fmt
   propagate_const::propagate_const)
 
 # Main euforia executable
 add_executable(euforia tools/euforia/main.cc)
 llvm_map_components_to_libnames(llvm_libs support)
 target_link_libraries(euforia
-  libeuforia ${llvm_libs} z3 mathsat ${GMPXX_LIB} ${GMP_LIB}
+  libeuforia ${llvm_libs} mathsat ${GMPXX_LIB} ${GMP_LIB} z3::libz3
   Boolector::boolector fmt::fmt propagate_const::propagate_const)
 
 if (COMPILE_WITH_COVERAGE)
@@ -377,17 +361,17 @@ endif()
 if(${Boost_PROGRAM_OPTIONS_FOUND})
   add_executable(horn2vmt tools/horn2vmt/main.cc)
   target_link_libraries(horn2vmt libeuforia
-    Boost::program_options ${llvm_libs} z3 mathsat ${GMPXX_LIB} ${GMP_LIB}
+    Boost::program_options ${llvm_libs} z3::libz3 mathsat ${GMPXX_LIB} ${GMP_LIB}
     Boolector::boolector fmt::fmt)
 
   add_executable(eufbvabs tools/eufbvabs/main.cc)
   target_link_libraries(eufbvabs libeuforia
-    Boost::program_options ${llvm_libs} z3 mathsat ${GMPXX_LIB} ${GMP_LIB}
+    Boost::program_options ${llvm_libs} z3::libz3 mathsat ${GMPXX_LIB} ${GMP_LIB}
     fmt::fmt propagate_const::propagate_const)
 
   add_executable(z3simp tools/z3simp/main.cc)
   target_link_libraries(z3simp
-    Boost::program_options z3 ${GMPXX_LIB} ${GMP_LIB} fmt::fmt)
+    Boost::program_options z3::libz3 ${GMPXX_LIB} ${GMP_LIB} fmt::fmt)
 else()
     message(WARNING "Not building horn2vmt, eufbvams, z3simp because Boost::program_options not found")
 endif()
@@ -454,8 +438,7 @@ add_dependencies(euforia make-bin-directory)
 
 add_custom_target(tags
   COMMAND ctags --c++-kinds=+pf --c-kinds=+p --fields=+imaSft --extras=+q -Rnu
-  ./src ./tools ${Z3_DIR}/include ${BOOLECTOR_DIR}/src/boolector.h
-  ${MATHSAT_DIR}/include ${LLVM_INCLUDE_DIRS}
+  ./src ./tools
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 function(add_clang_static_analysis target)

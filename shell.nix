@@ -1,15 +1,9 @@
-with (import <nixpkgs> {});
-# Use shell hook:
-# - Tell me I'm in the euforia shell.
-# - Make build dir.
-
-let
-  euforia = callPackage ./default.nix {};
-  mkShell = pkgs.mkShell.override { stdenv = euforia.stdenv; };
-in mkShell {
-  inputsFrom = with pkgs; [ euforia ];
-  buildInputs = [ creduce ctags ];
-  srcDir = ./.;
-  cmakeFlags = euforia.cmakeFlags;
-  hardeningDisable = [ "all" ];
-}
+(import (
+  let
+    lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+  in fetchTarball {
+    url = "https://github.com/edolstra/flake-compat/archive/${lock.nodes.flake-compat.locked.rev}.tar.gz";
+    sha256 = lock.nodes.flake-compat.locked.narHash; }
+) {
+  src =  ./.;
+}).shellNix

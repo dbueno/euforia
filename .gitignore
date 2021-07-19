@@ -9,3 +9,4 @@
 /.vimbuild
 CMakeCache.txt
 /CMakeFiles
+/tags
