@@ -7,24 +7,31 @@
     };
   };
   outputs = { self, nixpkgs, flake-utils, flake-compat }:
+  let
+    overlay = (final: prev: {
+      euforiaPackages = final.lib.makeScope final.newScope (self: with self; {
+        immer = callPackage ./immer.nix {};
+        fmt = callPackage ./fmtlib.nix {};
+        z3 = callPackage ./z3.nix {};
+        mathsat = callPackage ./mathsat.nix {};
+        outputCheck = callPackage ./outputcheck.nix {};
+        propagateConst = callPackage ./propagate-const.nix {};
+        euforia = callPackage ./euforia.nix { inherit self; };
+      });
+    });
+  in
+  {
+    inherit overlay;
+  } //
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
-        euforiaPackages = pkgs.lib.makeScope pkgs.newScope (self: with self; {
-          immer = callPackage ./immer.nix {};
-          fmt = callPackage ./fmtlib.nix {};
-          z3 = callPackage ./z3.nix {};
-          mathsat = callPackage ./mathsat.nix {};
-          outputCheck = callPackage ./outputcheck.nix {};
-          propagateConst = callPackage ./propagate-const.nix {};
-          euforia = callPackage ./euforia.nix { inherit self; };
-        });
+        pkgs = import nixpkgs { overlays = [ overlay ]; inherit system; };
       in {
-        packages = euforiaPackages;
-        defaultPackage = euforiaPackages.euforia;
+        packages = pkgs.euforiaPackages;
+        defaultPackage = pkgs.euforiaPackages.euforia;
         devShell =
           let
-            euforiaDev = euforiaPackages.euforia.override { debugVersion = true; };
+            euforiaDev = pkgs.euforiaPackages.euforia.override { debugVersion = true; };
           in
           pkgs.mkShell {
             inputsFrom = [ euforiaDev ];
