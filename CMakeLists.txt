@@ -363,6 +363,7 @@ if(${Boost_PROGRAM_OPTIONS_FOUND})
   target_link_libraries(horn2vmt libeuforia
     Boost::program_options ${llvm_libs} z3::libz3 mathsat ${GMPXX_LIB} ${GMP_LIB}
     Boolector::boolector fmt::fmt)
+install(TARGETS horn2vmt RUNTIME DESTINATION bin)
 
   add_executable(eufbvabs tools/eufbvabs/main.cc)
   target_link_libraries(eufbvabs libeuforia
