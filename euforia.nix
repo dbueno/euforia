@@ -17,7 +17,7 @@
 , boolector
 , universal-ctags
 , debugVersion ? false
-, sanitizer ? true
+, sanitizer ? false
 }:
 let
   denisbueno = "Denis Bueno <dbueno@gmail.com>";
