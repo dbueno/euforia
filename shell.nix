@@ -4,11 +4,12 @@ with (import <nixpkgs> {});
 # - Make build dir.
 
 let
-  euforia = import ./default.nix;
+  euforia = callPackage ./default.nix {};
   mkShell = pkgs.mkShell.override { stdenv = euforia.stdenv; };
 in mkShell {
   inputsFrom = with pkgs; [ euforia ];
   buildInputs = [ creduce ctags ];
   srcDir = ./.;
+  cmakeFlags = euforia.cmakeFlags;
   hardeningDisable = [ "all" ];
 }
