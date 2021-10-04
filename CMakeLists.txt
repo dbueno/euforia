@@ -45,7 +45,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Default compile flags to yell under a variety of useful conditions.
-add_compile_options(-Wall -Wextra -Werror -Wno-unused-function -Wunused-variable
+add_compile_options(-Wall -Wextra -Wno-unused-function -Wunused-variable
   -Wno-reorder -fno-omit-frame-pointer)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
   add_compile_options( -Weffc++ -Wheader-hygiene -Wold-style-cast -Wshadow)

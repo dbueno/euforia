@@ -39,6 +39,7 @@
             inherit (euforiaDev) cmakeFlags;
             hardeningDisable = [ "all" ];
             TAGS = "${euforiaDev.tags}/tags";
+            CXXFLAGS = "-Werror";
           };
         });
 }
