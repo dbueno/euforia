@@ -8,10 +8,10 @@ Just run
 
 ::
 
-    nixFlakes run . -- -h
+    nixFlakes run . -- <vmt-file>
 
-Nix Build Without Flakes
-------------------------
+Nix Build (Without Flakes)
+--------------------------
 
 The file ``default.nix`` contains a complete build description that
 works with the `Nix package
@@ -21,9 +21,9 @@ After cloning the repo, you can do:
 
 ::
 
-   nix-build -E "with import <nixpkgs> {}; callPackage ./default.nix {}"
+    nix-build .
 
-and after the build completes, you can run euforia.
+and after the build completes, you can run euforia like so:
 
 ::
 
@@ -34,5 +34,6 @@ You can find some example VMT files in ``./examples``.
 General advice
 --------------
 
-If you like, setup.sh can give you a general idea of how to build
-euforia, but it might be out of sync with the nix build.
+If you like, ``setup.sh`` can give you a general idea of how to build euforia,
+but it might be out of sync with the nix build. The nix build is in
+``euforia.nix``.
