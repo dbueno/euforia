@@ -494,7 +494,7 @@ int main(int argc, char *const *argv) {
       cx->print(cout);
     }
     exit_status = false_exit_status;
-    logger.Log(0, "false(unreach-call)");
+    fmt::print("false(unreach-call)\n");
   } else {
     if (witness) {
       auto q = chk->concrete_invariant_query();
@@ -534,7 +534,7 @@ int main(int argc, char *const *argv) {
 
     }
     exit_status = true_exit_status;
-    logger.Log(0, "true(unreach-call)");
+    fmt::print("true(unreach-call)\n");
   }
   logger.Log(1, "total_time: {:.6f}", check_time.count());
   Statistics st;

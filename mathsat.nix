@@ -1,12 +1,11 @@
-with import <nixpkgs> {};
-#{ stdenv, fetchurl }:
+{ stdenv, fetchurl, lib, gmp }:
 
 let
   version = "5.6.5";
   name = "mathsat";
 in stdenv.mkDerivation rec {
   inherit name version;
-  
+
   src = fetchurl {
     url = "https://mathsat.fbk.eu/download.php?file=${name}-${version}-"
       + lib.optionalString stdenv.hostPlatform.isDarwin "darwin-libcxx-x86_64"
@@ -20,7 +19,7 @@ in stdenv.mkDerivation rec {
   nativeBuildInputs = [ gmp ];
 
   inherit gmp;
-  
+
   installPhase = ''
     mkdir $out
     cp -r . $out/
