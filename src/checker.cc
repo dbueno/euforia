@@ -203,7 +203,7 @@ void Checker::PrintAssertions() {
     //}
   }
   if (logger.ShouldLog(4))
-    solver_->Print(std::cout);
+    solver_->Print(logger.out());
 }
 
 

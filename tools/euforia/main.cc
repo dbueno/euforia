@@ -175,7 +175,7 @@ static void sigterm_handler(int /*signal*/) {
   if (chk) {
     Statistics st;
     chk->collect_statistics(&st);
-    st.Print(std::cout);
+    st.Print(logger.out());
   }
   logger.Log(1, "total_time: {:.6f}", dur.count());
 
@@ -474,7 +474,7 @@ int main(int argc, char *const *argv) {
   ts.TransitionSystem::collect_static_statistics(&sst);
   ats.collect_static_statistics(&sst);
   if (logger.ShouldLog(1))
-    sst.Print(std::cout);
+    sst.Print(logger.out());
   logger.Log(4, "abstract transition system:\n{}", ats);
   chk = std::make_unique<AbstractChecker>(ats);
   // chk->set_abstraction_refinement(false);
@@ -491,7 +491,7 @@ int main(int argc, char *const *argv) {
   if (has_cx) {
     if (witness) {
       cx = chk->TakeCounterexample();
-      cx->print(cout);
+      cx->print(std::cout);
     }
     exit_status = false_exit_status;
     fmt::print("false(unreach-call)\n");
@@ -541,7 +541,7 @@ int main(int argc, char *const *argv) {
   chk->collect_statistics(&st);
   ats.collect_statistics(&st);
   if (logger.ShouldLog(1))
-    st.Print(std::cout);
+    st.Print(logger.out());
   
 
   // } catch (const z3::exception& e) {

@@ -40,7 +40,7 @@ class NameLogger {
         fmt::print(os, "\n");
       };
       //fmt::print(std::cerr, "[{:06d}] ", count_);
-      fmt_msg(std::cout);
+      fmt_msg(std::cerr);
     }
   }
 
@@ -72,6 +72,8 @@ class Logger {
     mirror_file_ = std::ofstream(filename);
   }
 
+  std::ostream& out() const { return std::cerr; }
+
   template <typename... Args> void Log(int level, const char *fmt,
                                        const Args&... args) {
     if (ShouldLog(level)) {
@@ -80,7 +82,7 @@ class Logger {
         fmt::print(os, "\n");
       };
       //fmt::print(std::cerr, "[{:06d}] ", count_);
-      fmt_msg(std::cout);
+      fmt_msg(out());
       if (mirror_file_.is_open())
         fmt_msg(mirror_file_);
       ++count_;
@@ -96,7 +98,7 @@ class Logger {
         fmt::print(os, "{{{{{{");
         fmt::print(os, "\n");
       };
-      fmt_msg(std::cout);
+      fmt_msg(out());
       if (mirror_file_.is_open())
         fmt_msg(mirror_file_);
       ++count_;
@@ -112,7 +114,7 @@ class Logger {
         fmt::print(os, "}}}}}}");
         fmt::print(os, "\n");
       };
-      fmt_msg(std::cout);
+      fmt_msg(out());
       if (mirror_file_.is_open())
         fmt_msg(mirror_file_);
       ++count_;
@@ -135,7 +137,7 @@ class Logger {
         fmt::print(os, msg);
         fmt::print(os, "\n");
       };
-      fmt_msg(std::cout);
+      fmt_msg(out());
       if (mirror_file_.is_open())
         fmt_msg(mirror_file_);
       ++count_;
