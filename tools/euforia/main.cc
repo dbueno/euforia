@@ -78,9 +78,18 @@ static string ReadFile(const string& filename) {
     return decompressed.str();
   } else
 #endif
-  {
+  if (filename == "-") {
+    ifstream infile("/dev/stdin", std::ios::in);
+    if (!infile.good()) {
+      fmt::print(cerr, "Error reading filename: {}\n", filename);
+      exit(1);
+    }
+    ostringstream ss;
+    ss << infile.rdbuf();
+    return ss.str();
+  } else {
     ifstream infile(filename.c_str(), std::ios::in);
-    if (!infile) {
+    if (!infile.good()) {
       fmt::print(cerr, "Error reading filename: {}\n", filename);
       exit(1);
     }
@@ -380,7 +389,6 @@ int main(int argc, char *const *argv) {
     }
   }
 
-
   // create LOG_DIR if it doesn't exist
   if (!LOG_DIR.empty()) {
     if (auto dirError = fs::create_directories(LOG_DIR)) {
@@ -430,13 +438,6 @@ int main(int argc, char *const *argv) {
   msat_env menv = msat_create_env(mcfg);
   MathsatEnvDeleter del_menv(menv);
   msat_destroy_config(mcfg);
-
-  struct stat buffer;
-  if (stat(filename.c_str(), &buffer) != 0) {
-    auto error = strerror(errno);
-    fmt::print(cerr, "Error loading target: {}\n", error);
-    exit(EXIT_FAILURE);
-  }
 
   // try {
   string filebuf = ReadFile(filename);
